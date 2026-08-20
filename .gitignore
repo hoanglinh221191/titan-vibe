@@ -1,0 +1,48 @@
+# Build products
+/build/
+/bin/
+/titan
+/titan.exe
+*.o
+*.d
+*.a
+*.so
+*.dll
+*.exe
+
+# Local molecular-simulation data
+*.xtc
+*.trr
+*.edr
+*.tpr
+*.cpt
+*.pdb
+*.gro
+*.pqr
+*.xvg
+*.ndx
+
+# Runtime outputs
+*.log
+pbctopo_frame_report.csv
+pbctopo_assignment_set.csv
+pbctopo_debug.log
+network_edges.csv
+network_nodes.csv
+network_communities.csv
+network_community_summary.csv
+network_supergraph.csv
+pca_fel.csv
+tica_projections.csv
+
+# Local test scratch
+/test/tmp/
+/tmp/
+/.codex_tmp/
+__pycache__/
+*.pyc
+
+# Editor and operating-system files
+.DS_Store
+Thumbs.db
+*.swp

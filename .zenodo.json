@@ -1,0 +1,20 @@
+{
+  "title": "TITAN-VIBE: Virtual Intact Block Extraction for periodic reconstruction",
+  "description": "Reference implementation of VIBE, a framewise periodic-boundary reconstruction method with certified triclinic nearest-copy calculations and explicit uncertainty reporting.",
+  "license": "MIT",
+  "upload_type": "software",
+  "creators": [
+    {"name": "O, My Na"},
+    {"name": "Dao, Duy Quang"},
+    {"name": "Nguyen, Thi Le Anh"},
+    {"name": "Li, Mai Suan"},
+    {"name": "Nguyen, Hoang Linh"}
+  ],
+  "keywords": [
+    "periodic boundary conditions",
+    "molecular dynamics",
+    "triclinic lattice",
+    "molecular reconstruction",
+    "uncertainty"
+  ]
+}
