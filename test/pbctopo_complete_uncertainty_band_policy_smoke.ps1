@@ -1,5 +1,6 @@
 param(
-    [string]$WorkRoot = (Join-Path $PSScriptRoot 'tmp\pbctopo_complete_uncertainty_band_policy_smoke')
+    [string]$WorkRoot = (Join-Path $PSScriptRoot 'tmp\pbctopo_complete_uncertainty_band_policy_smoke'),
+    [string]$Compiler = 'g++'
 )
 
 $ErrorActionPreference = 'Stop'
@@ -29,7 +30,7 @@ int main() {
 }
 '@ | Set-Content -LiteralPath $source -Encoding ASCII
 
-$compiler = 'C:\msys64\ucrt64\bin\clang++.exe'
+$compiler = (Get-Command $Compiler -ErrorAction Stop).Source
 & $compiler -std=c++23 -Wall -Wextra -Werror -Isrc $source -o $exe
 if ($LASTEXITCODE -ne 0) {
     throw "Failed to compile uncertainty-band policy smoke: exit $LASTEXITCODE"
