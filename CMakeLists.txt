@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 
-project(titan_vibe VERSION 1.0.0 LANGUAGES CXX)
+project(titan_vibe VERSION 1.0.1 LANGUAGES CXX)
 
 file(GLOB TITAN_VIBE_CORE_SOURCES CONFIGURE_DEPENDS
      "${CMAKE_CURRENT_SOURCE_DIR}/src/pbctopo/*.cpp")

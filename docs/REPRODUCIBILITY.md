@@ -2,11 +2,18 @@
 
 ## Source provenance
 
-This repository is a focused extraction of the VIBE implementation used for
-the associated methods study. The extraction was prepared on 20 August 2026
-from the TITAN development tree and contains the frame solver, all VIBE
-submodules, the topology graph builder, and only the host declarations required
-to compile them.
+Version 1.0.1 refreshes the focused VIBE extraction on 9 September 2026 from
+clean TITAN commit `6a8385cf1c63c42046b8a38053f003311e85e633`.
+All VIBE submodules, the frame adapter and topology implementation are copied
+from that commit. Five minimal host declaration headers are retained from
+the public extraction and adjusted only when required for compilation;
+they are not byte-identical copies of the complete TITAN host headers.
+The file-level source mapping is recorded in `SOURCE_PROVENANCE.json`.
+
+The separately rebuilt complete TITAN executable retains embedded identity
+`0.2.0-dev.242+g6a8385cf1c63` (clean development source). The public source
+package version `1.0.1` does not change that executable identity and this
+repository still does not build a standalone TITAN executable.
 
 The release deliberately omits unrelated TITAN implementations. In particular,
 it contains no HoloLift, Poisson-Boltzmann, boundary-element, TABI, PBCN/FixBox,

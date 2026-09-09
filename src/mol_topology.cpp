@@ -253,7 +253,13 @@ parse_and_expand_gromacs_topology(std::string_view topology_path) {
         continue;
       }
 
-      if (section == "bonds") {
+      // GROMACS [ constraints ] entries are covalent/topological links whose
+      // distances are enforced rather than integrated as bond potentials.  For
+      // periodic reconstruction they carry the same hard-connectivity meaning
+      // as [ bonds ].  This is essential for Martini, where constrained side-
+      // chain and nucleic-acid beads may otherwise appear as false singleton
+      // components even though they belong to one molecule.
+      if (section == "bonds" || section == "constraints") {
         if (current_molecule == nullptr)
           continue;
         std::istringstream iss(line);

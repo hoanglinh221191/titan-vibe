@@ -12,6 +12,9 @@ Included:
 - minimal host data declarations required to compile the adapter;
 - independent algorithm-level tests.
 
+The source-identical frame adapter includes optional H9 diagnostic exports
+(disabled by default). These exports do not include the HoloLift solver.
+
 Excluded:
 
 - HoloLift and all trajectory-wide lifting code;

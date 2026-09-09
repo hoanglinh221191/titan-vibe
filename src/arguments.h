@@ -32,6 +32,10 @@ struct PbcArgs {
   bool pbctopo_exact_component_limit_set{false};
   int pbctopo_beam_width{0};
   bool pbctopo_beam_width_set{false};
+  // Host fields present at the bound TITAN source commit; defaults unchanged.
+  int pbctopo_component_shell_radius{0};
+  bool pbctopo_component_shell_radius_set{false};
+  bool pbctopo_h9_orbit{false};
 };
 
 struct arguments {

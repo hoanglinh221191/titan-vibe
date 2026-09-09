@@ -96,10 +96,27 @@ void apply_pbctopo_search_identifiability(
 
 void apply_pbctopo_final_selected_evidence(
     PbctopoIdentifiability &identifiability, bool evidence_audit_evaluated,
-    bool evidence_graph_connected) {
+    bool evidence_graph_connected, std::size_t evidence_component_count,
+    std::size_t evidence_edge_count,
+    std::size_t explicit_contact_evidence_edges,
+    std::size_t scored_contact_evidence_edges,
+    std::size_t evidence_connected_component_count) {
   if (!evidence_audit_evaluated)
     return;
 
+  identifiability.evidence_component_count = evidence_component_count;
+  identifiability.evidence_edge_count = evidence_edge_count;
+  identifiability.explicit_contact_evidence_edges =
+      explicit_contact_evidence_edges;
+  identifiability.scored_contact_evidence_edges = scored_contact_evidence_edges;
+  identifiability.evidence_connected_component_count =
+      evidence_connected_component_count;
+  identifiability.unconstrained_relative_components =
+      evidence_connected_component_count > 0
+          ? evidence_connected_component_count - 1
+          : 0;
+  identifiability.relative_lattice_degrees_of_freedom =
+      3 * identifiability.unconstrained_relative_components;
   identifiability.evidence_graph_connected = evidence_graph_connected;
   identifiability.identified = evidence_graph_connected;
   identifiability.objective_unique_within_search_domain =

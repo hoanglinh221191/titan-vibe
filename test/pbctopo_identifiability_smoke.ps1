@@ -147,7 +147,8 @@ int main() {
          "fully enumerated singleton evidence was not reported as unique");
 
   auto final_disconnected = fully_unique;
-  apply_pbctopo_final_selected_evidence(final_disconnected, true, false);
+  apply_pbctopo_final_selected_evidence(final_disconnected, true, false,
+                                       3, 1, 0, 1, 2);
   expect(!final_disconnected.identified &&
              !final_disconnected.evidence_graph_connected &&
              !final_disconnected.objective_unique_within_search_domain &&
@@ -162,7 +163,8 @@ int main() {
          "final disconnected evidence did not restore uniqueness invariants");
 
   auto final_connected = final_disconnected;
-  apply_pbctopo_final_selected_evidence(final_connected, true, true);
+  apply_pbctopo_final_selected_evidence(final_connected, true, true,
+                                       3, 2, 0, 2, 1);
   expect(final_connected.identified &&
              final_connected.evidence_graph_connected &&
              final_connected.objective_unique_within_search_domain &&
@@ -171,7 +173,8 @@ int main() {
          "final connected singleton evidence was not reported as unique");
 
   auto connected_non_singleton = ambiguous;
-  apply_pbctopo_final_selected_evidence(connected_non_singleton, true, true);
+  apply_pbctopo_final_selected_evidence(connected_non_singleton, true, true,
+                                       3, 2, 0, 2, 1);
   expect(connected_non_singleton.identified &&
              !connected_non_singleton.objective_unique_within_search_domain &&
              !connected_non_singleton.evidence_unique_within_search_domain &&
@@ -183,7 +186,8 @@ int main() {
 
   auto unevaluated = fully_unique;
   const auto before_unevaluated = unevaluated;
-  apply_pbctopo_final_selected_evidence(unevaluated, false, false);
+  apply_pbctopo_final_selected_evidence(unevaluated, false, false,
+                                       3, 0, 0, 0, 3);
   expect(same_identifiability(unevaluated, before_unevaluated),
          "unevaluated final evidence mutated identifiability");
 

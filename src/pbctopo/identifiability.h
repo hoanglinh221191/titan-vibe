@@ -30,7 +30,11 @@ void apply_pbctopo_search_identifiability(
 
 void apply_pbctopo_final_selected_evidence(
     PbctopoIdentifiability &identifiability, bool evidence_audit_evaluated,
-    bool evidence_graph_connected);
+    bool evidence_graph_connected, std::size_t evidence_component_count,
+    std::size_t evidence_edge_count,
+    std::size_t explicit_contact_evidence_edges,
+    std::size_t scored_contact_evidence_edges,
+    std::size_t evidence_connected_component_count);
 
 PbctopoIdentifiability evaluate_pbctopo_identifiability(
     std::size_t component_count,

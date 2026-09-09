@@ -380,6 +380,70 @@ ofstream open_pbctopo_hard_edge_report() {
   return out;
 }
 
+struct PbctopoH9ReportState {
+  bool initialized = false;
+  std::filesystem::path initialized_cwd;
+};
+
+template <typename HeaderWriter>
+ofstream open_pbctopo_h9_report(const char *filename,
+                                PbctopoH9ReportState &state,
+                                HeaderWriter &&write_header) {
+  namespace fs = std::filesystem;
+  std::error_code ec;
+  const fs::path cwd = fs::current_path(ec);
+  const bool reset_report =
+      !state.initialized || ec || state.initialized_cwd.empty() ||
+      state.initialized_cwd != cwd;
+  ofstream out(filename, ios::out | (reset_report ? ios::trunc : ios::app));
+  if (out.is_open()) {
+    out.imbue(locale::classic());
+    out << setprecision(numeric_limits<double>::max_digits10);
+    if (reset_report)
+      write_header(out);
+    state.initialized = true;
+    state.initialized_cwd = cwd;
+  }
+  return out;
+}
+
+ofstream open_pbctopo_h9_component_representative_report() {
+  static PbctopoH9ReportState state;
+  return open_pbctopo_h9_report(
+      "pbctopo_h9_component_representatives.csv", state,
+      [](ofstream &out) {
+        out << "schema_version,frame,time_ps,component_index,component_id,"
+               "atom_count,mass_policy,total_mass,representative_valid,"
+               "box_b00,box_b01,box_b02,box_b10,box_b11,box_b12,"
+               "box_b20,box_b21,box_b22,sx,sy,sz,x_A,y_A,z_A\n";
+      });
+}
+
+ofstream open_pbctopo_h9_evidence_component_report() {
+  static PbctopoH9ReportState state;
+  return open_pbctopo_h9_report(
+      "pbctopo_h9_evidence_components.csv", state, [](ofstream &out) {
+        out << "schema_version,frame,time_ps,component_index,component_id,"
+               "atom_count,evidence_component_label,is_canonical_root,"
+               "evidence_connected_component_count,"
+               "relative_lattice_degrees_of_freedom\n";
+      });
+}
+
+ofstream open_pbctopo_h9_orbit_report() {
+  static PbctopoH9ReportState state;
+  return open_pbctopo_h9_report(
+      "pbctopo_h9_orbit.csv", state, [](ofstream &out) {
+        out << "schema_version,frame,time_ps,qx,qy,qz,root_label,"
+               "shifted_label,within_radius,hard_certified,"
+               "evidence_evaluated,evidence_noncontradicted,accepted,"
+               "assignment_signature,evidence_state,"
+               "evidence_connected_component_count,"
+               "relative_lattice_degrees_of_freedom,evidence_edge_count,"
+               "compatible_hypothesis_count,compatible_contact_count\n";
+      });
+}
+
 ofstream open_pbctopo_temporal_path_report() {
   namespace fs = std::filesystem;
   static bool initialized = false;
@@ -4850,6 +4914,17 @@ int Multi_MOL::solve_pbc_pbctopo(Multi_MOL &mol2, arguments &Arguments,
   ofstream pbctopo_component_layout_report =
       open_pbctopo_component_layout_report();
   ofstream pbctopo_hard_edge_report = open_pbctopo_hard_edge_report();
+  const bool h9_orbit_enabled = Arguments.pbc.pbctopo_h9_orbit;
+  ofstream h9_component_representative_report;
+  ofstream h9_evidence_component_report;
+  ofstream h9_orbit_report;
+  if (h9_orbit_enabled) {
+    h9_component_representative_report =
+        open_pbctopo_h9_component_representative_report();
+    h9_evidence_component_report =
+        open_pbctopo_h9_evidence_component_report();
+    h9_orbit_report = open_pbctopo_h9_orbit_report();
+  }
   if (!pbctopo_frame_report.is_open()) {
     append_pbctopo_log_line(
         "[pbctopo] observation export unavailable: "
@@ -4869,6 +4944,14 @@ int Multi_MOL::solve_pbc_pbctopo(Multi_MOL &mol2, arguments &Arguments,
     append_pbctopo_log_line(
         "[pbctopo] observation export unavailable: "
         "artifact=pbctopo_hard_edges.csv");
+  }
+  if (h9_orbit_enabled &&
+      (!h9_component_representative_report.is_open() ||
+       !h9_evidence_component_report.is_open() ||
+       !h9_orbit_report.is_open())) {
+    append_pbctopo_log_line(
+        "[pbctopo] H9 export unavailable: one or more artifacts could not be "
+        "opened");
   }
   vector<PbctopoComponentLayoutObservation> &emitted_component_layouts =
       pbctopo_component_layout_report_state().emitted_layouts;
@@ -4916,6 +4999,22 @@ int Multi_MOL::solve_pbc_pbctopo(Multi_MOL &mol2, arguments &Arguments,
           : kPbctopoBeamWidth;
   const size_t beam_width =
       max<size_t>(1, min(requested_beam_width, kPbctopoBeamWidthMax));
+  const bool component_shell_radius_explicit =
+      Arguments.pbc.pbctopo_component_shell_radius_set;
+  const int configured_component_shell_radius =
+      component_shell_radius_explicit
+          ? Arguments.pbc.pbctopo_component_shell_radius
+          : 0;
+  if (h9_orbit_enabled &&
+      (!component_shell_radius_explicit ||
+       configured_component_shell_radius != 2)) {
+    TitanUI::print_error(
+        "PBCTOPO H9 orbit requires -pbctopo-component-shell-radius=2.");
+    append_pbctopo_log_line(
+        "[pbctopo] H9 orbit rejected: component shell radius must be "
+        "explicitly fixed at 2");
+    return 1;
+  }
   append_pbctopo_log_line("[pbctopo] begin run: frames=" +
                           to_string(frame_count) + ", pbctopo_mode=" +
                           pbctopo_solve_mode_name(solve_mode) +
@@ -4949,7 +5048,11 @@ int Multi_MOL::solve_pbc_pbctopo(Multi_MOL &mol2, arguments &Arguments,
                           to_string(runtime_cutoffs.continuity_cutoff) +
                           ", exact_component_limit=" +
                           to_string(exact_component_limit) + ", beam_width=" +
-                          to_string(beam_width));
+                          to_string(beam_width) +
+                          ", component_shell_radius=" +
+                          (component_shell_radius_explicit
+                               ? to_string(configured_component_shell_radius)
+                               : string("auto")));
   const PbctopoTrajectoryContext trajectory_context =
       build_pbctopo_trajectory_context(*this, mol2, frame_count);
   vector<titan_pbctopo::PbctopoRequiredContact> explicit_required_contacts;
@@ -4978,6 +5081,29 @@ int Multi_MOL::solve_pbc_pbctopo(Multi_MOL &mol2, arguments &Arguments,
         "[pbctopo] required interface contacts: source=none, "
         "certificate_scope=image_intercomponent_steric");
   }
+  const auto build_explicit_evidence_component_edges =
+      [&](const auto &atom_to_component, size_t component_count) {
+        vector<pair<size_t, size_t>> edges;
+        edges.reserve(explicit_required_contacts.size());
+        for (const auto &contact : explicit_required_contacts) {
+          if (contact.a >= atom_to_component.size() ||
+              contact.b >= atom_to_component.size()) {
+            continue;
+          }
+          size_t component_a = atom_to_component[contact.a];
+          size_t component_b = atom_to_component[contact.b];
+          if (component_a >= component_count || component_b >= component_count ||
+              component_a == component_b) {
+            continue;
+          }
+          if (component_b < component_a)
+            swap(component_a, component_b);
+          edges.emplace_back(component_a, component_b);
+        }
+        sort(edges.begin(), edges.end());
+        edges.erase(unique(edges.begin(), edges.end()), edges.end());
+        return edges;
+      };
   vector<vector<PbctopoCutCandidate>> temporal_cut_candidates(frame_count);
   vector<PbctopoCutCandidate> greedy_selected_candidates(frame_count);
   struct PbctopoTemporalComponentLayout {
@@ -5585,6 +5711,9 @@ int Multi_MOL::solve_pbc_pbctopo(Multi_MOL &mol2, arguments &Arguments,
         base_atoms.size(), local_edges);
     atom_component_index =
         build_atom_component_index(base_atoms.size(), components);
+    const vector<pair<size_t, size_t>> explicit_evidence_component_edges =
+        build_explicit_evidence_component_edges(atom_component_index,
+                                                components.size());
     PbctopoIdentifiability frame_identifiability =
         titan_pbctopo::evaluate_pbctopo_identifiability(
             components.size(), {}, explicit_required_contacts,
@@ -5751,6 +5880,10 @@ int Multi_MOL::solve_pbc_pbctopo(Multi_MOL &mol2, arguments &Arguments,
       ++timing.pbctopo_warm_layout_mismatches;
     if (!same_component_warm_layout)
       clear_component_trial_hints(warm_state);
+    const int component_context_shell_radius =
+        component_shell_radius_explicit
+            ? configured_component_shell_radius
+            : (components.size() == 2 ? 2 : 1);
     bool component_context_ready = false;
     auto ensure_component_context = [&]() {
       if (component_context_ready)
@@ -5759,9 +5892,13 @@ int Multi_MOL::solve_pbc_pbctopo(Multi_MOL &mol2, arguments &Arguments,
       component_atoms = apply_spatial_lift(
           base_atoms, frame_spatial_lift, this->m_mol[frame_idx].Box);
       if (can_use_component_logic) {
-        const int shell_radius = components.size() == 2 ? 2 : 1;
         shifts = build_topology_shifts(this->m_mol[frame_idx].Box,
-                                       shell_radius);
+                                       component_context_shell_radius);
+        timing.component_image_shell_max_radius =
+            max(timing.component_image_shell_max_radius,
+                static_cast<size_t>(component_context_shell_radius));
+        timing.component_image_shell_max_shift_count =
+            max(timing.component_image_shell_max_shift_count, shifts.size());
       }
       component_context_ready = true;
       ++timing.component_context_builds;
@@ -5780,6 +5917,111 @@ int Multi_MOL::solve_pbc_pbctopo(Multi_MOL &mol2, arguments &Arguments,
     };
     const PbctopoLatticeMetric certification_lattice(
         this->m_mol[frame_idx].Box);
+    if (h9_orbit_enabled &&
+        h9_component_representative_report.is_open()) {
+      ensure_component_context();
+      const vector<Int3> identity_offsets(components.size());
+      const PbctopoImageAssignment representative_layout =
+          make_pbctopo_image_assignment(identity_offsets, components,
+                                         component_atoms);
+      double v1[3]{}, v2[3]{}, v3[3]{};
+      this->m_mol[frame_idx].Box.get_v1(v1);
+      this->m_mol[frame_idx].Box.get_v2(v2);
+      this->m_mol[frame_idx].Box.get_v3(v3);
+      const auto wrap_unit_interval = [](double value) {
+        double wrapped = value - floor(value);
+        if (wrapped >= 1.0)
+          wrapped = 0.0;
+        if (wrapped < 0.0)
+          wrapped += 1.0;
+        return wrapped == 0.0 ? 0.0 : wrapped;
+      };
+      for (size_t comp_idx = 0; comp_idx < components.size(); ++comp_idx) {
+        const auto &component = components[comp_idx];
+        bool use_mass = !component.empty();
+        double total_mass = 0.0;
+        for (const size_t atom_idx : component) {
+          if (atom_idx >= component_atoms.size() ||
+              !component_atoms[atom_idx].has_atomic_mass ||
+              !isfinite(component_atoms[atom_idx].atomic_mass) ||
+              component_atoms[atom_idx].atomic_mass <= 0.0) {
+            use_mass = false;
+            break;
+          }
+          total_mass += component_atoms[atom_idx].atomic_mass;
+        }
+        if (!isfinite(total_mass) || total_mass <= 0.0)
+          use_mass = false;
+        Vec3 representative{};
+        double denominator = use_mass ? total_mass
+                                      : static_cast<double>(component.size());
+        bool representative_valid = representative_layout.valid &&
+                                    !component.empty() &&
+                                    isfinite(denominator) &&
+                                    denominator > 0.0 &&
+                                    certification_lattice.valid();
+        if (representative_valid) {
+          for (const size_t atom_idx : component) {
+            if (atom_idx >= component_atoms.size()) {
+              representative_valid = false;
+              break;
+            }
+            const double weight =
+                use_mass ? component_atoms[atom_idx].atomic_mass : 1.0;
+            representative.x += weight * component_atoms[atom_idx].x;
+            representative.y += weight * component_atoms[atom_idx].y;
+            representative.z += weight * component_atoms[atom_idx].z;
+          }
+        }
+        if (representative_valid) {
+          representative.x /= denominator;
+          representative.y /= denominator;
+          representative.z /= denominator;
+          representative_valid = isfinite(representative.x) &&
+                                 isfinite(representative.y) &&
+                                 isfinite(representative.z);
+        }
+        array<double, 3> scaled{};
+        array<double, 3> wrapped_cartesian{};
+        if (representative_valid) {
+          scaled = certification_lattice.cartesian_to_scaled(
+              representative.x, representative.y, representative.z);
+          representative_valid = isfinite(scaled[0]) && isfinite(scaled[1]) &&
+                                 isfinite(scaled[2]);
+        }
+        if (representative_valid) {
+          scaled[0] = wrap_unit_interval(scaled[0]);
+          scaled[1] = wrap_unit_interval(scaled[1]);
+          scaled[2] = wrap_unit_interval(scaled[2]);
+          wrapped_cartesian = certification_lattice.scaled_to_cartesian(
+              scaled[0], scaled[1], scaled[2]);
+          representative_valid = isfinite(wrapped_cartesian[0]) &&
+                                 isfinite(wrapped_cartesian[1]) &&
+                                 isfinite(wrapped_cartesian[2]);
+        }
+        const uint64_t component_id =
+            representative_layout.valid &&
+                    comp_idx < representative_layout.component_ids.size()
+                ? representative_layout.component_ids[comp_idx]
+                : 0;
+        h9_component_representative_report
+            << "h9_component_representative_v1," << frame_report.frame << ','
+            << this->m_mol[frame_idx].time_of_snap << ',' << comp_idx << ','
+            << component_id << ',' << component.size() << ','
+            << (use_mass ? "mass_weighted" : "atom_count_mean") << ','
+            << (use_mass ? total_mass : 0.0) << ','
+            << static_cast<int>(representative_valid) << ',' << v1[0] << ','
+            << v1[1] << ',' << v1[2] << ',' << v2[0] << ',' << v2[1] << ','
+            << v2[2] << ',' << v3[0] << ',' << v3[1] << ',' << v3[2] << ',';
+        if (representative_valid) {
+          h9_component_representative_report
+              << scaled[0] << ',' << scaled[1] << ',' << scaled[2] << ','
+              << wrapped_cartesian[0] << ',' << wrapped_cartesian[1] << ','
+              << wrapped_cartesian[2];
+        }
+        h9_component_representative_report << '\n';
+      }
+    }
     int component_certificate_domain_complete_cache = -1;
     auto component_certificate_domain_complete = [&]() {
       if (component_certificate_domain_complete_cache >= 0)
@@ -5914,8 +6156,8 @@ int Multi_MOL::solve_pbc_pbctopo(Multi_MOL &mol2, arguments &Arguments,
             return false;
           const auto audit = titan_pbctopo::audit_pbctopo_selected_hypotheses(
               span<const PbctopoAtom>(base_atoms), span<const Vec3>(points),
-              base_anchor_context.contact_hypotheses,
-              candidate.assignment, true);
+              base_anchor_context.contact_hypotheses, candidate.assignment, true,
+              explicit_evidence_component_edges);
           if (!audit || !audit->evaluated)
             return false;
           candidate.evidence_relative_relation_signature =
@@ -6404,7 +6646,7 @@ int Multi_MOL::solve_pbc_pbctopo(Multi_MOL &mol2, arguments &Arguments,
       auto try_primary_component_shell = [&](int shell_radius) {
         vector<PbctopoShift> expanded_shifts;
         const vector<PbctopoShift> *shell_shifts = &shifts;
-        if (shell_radius > 1) {
+        if (component_context_shell_radius != shell_radius) {
           expanded_shifts = build_topology_shifts(
               this->m_mol[frame_idx].Box, shell_radius);
           shell_shifts = &expanded_shifts;
@@ -6489,8 +6731,14 @@ int Multi_MOL::solve_pbc_pbctopo(Multi_MOL &mol2, arguments &Arguments,
         return true;
       };
 
-      bool primary_certified = try_primary_component_shell(1);
-      if (!primary_certified) {
+      const int primary_initial_shell_radius =
+          component_shell_radius_explicit
+              ? configured_component_shell_radius
+              : (components.size() == 2 ? 2 : 1);
+      bool primary_certified =
+          try_primary_component_shell(primary_initial_shell_radius);
+      if (!primary_certified && !component_shell_radius_explicit &&
+          primary_initial_shell_radius < 2) {
         ++timing.component_image_shell_expansions;
         primary_certified = try_primary_component_shell(2);
         if (primary_certified)
@@ -6853,12 +7101,23 @@ int Multi_MOL::solve_pbc_pbctopo(Multi_MOL &mol2, arguments &Arguments,
           ++timing.pbctopo_warm_state_commits;
           return true;
         };
+    auto apply_selected_evidence_to_frame_identifiability = [&]() {
+      titan_pbctopo::apply_pbctopo_final_selected_evidence(
+          frame_identifiability, selected_evidence_audit.evaluated,
+          selected_evidence_audit.evidence_graph_connected,
+          selected_evidence_audit.evidence_component_count,
+          selected_evidence_audit.evidence_edge_count,
+          selected_evidence_audit.explicit_contact_evidence_edges,
+          selected_evidence_audit.scored_contact_evidence_edges,
+          selected_evidence_audit.evidence_connected_component_count);
+    };
     auto audit_selected_evidence = [&](const vector<Vec3> &selected_points,
                                        const PbctopoImageAssignment &assignment) {
       const auto audit_started = clock::now();
       auto audit = titan_pbctopo::audit_pbctopo_selected_hypotheses(
           span<const PbctopoAtom>(base_atoms), span<const Vec3>(selected_points),
-          base_anchor_context.contact_hypotheses, assignment, true);
+          base_anchor_context.contact_hypotheses, assignment, true,
+          explicit_evidence_component_edges);
       timing.pbctopo_selected_evidence_audit_s +=
           chrono::duration<double>(clock::now() - audit_started).count();
       if (!audit) {
@@ -6869,11 +7128,181 @@ int Multi_MOL::solve_pbc_pbctopo(Multi_MOL &mol2, arguments &Arguments,
         return;
       }
       selected_evidence_audit = *audit;
+      apply_selected_evidence_to_frame_identifiability();
       ++timing.pbctopo_selected_evidence_audits;
       timing.pbctopo_selected_evidence_contacts_checked +=
           audit->contacts_checked;
       timing.pbctopo_selected_evidence_contacts_lost += audit->contacts_lost;
     };
+    auto export_h9_partition_and_orbit =
+        [&](const PbctopoCutCandidate &base_candidate,
+            const vector<Int3> &base_offsets) {
+          if (!h9_orbit_enabled || !selected_evidence_audit.evaluated)
+            return;
+          if (!base_candidate.assignment.valid ||
+              selected_evidence_audit.evidence_component_labels.size() !=
+                  components.size() ||
+              base_candidate.assignment.component_ids.size() !=
+                  components.size() ||
+              base_offsets.size() != components.size()) {
+            append_pbctopo_log_line(
+                "[pbctopo] H9 orbit skipped: evidence partition or assignment "
+                "layout mismatch at frame " +
+                to_string(frame_report.frame));
+            return;
+          }
+
+          size_t canonical_root = 0;
+          for (size_t comp_idx = 1; comp_idx < components.size(); ++comp_idx) {
+            if (components[comp_idx].size() >
+                    components[canonical_root].size() ||
+                (components[comp_idx].size() ==
+                     components[canonical_root].size() &&
+                 base_candidate.assignment.component_ids[comp_idx] <
+                     base_candidate.assignment.component_ids[canonical_root])) {
+              canonical_root = comp_idx;
+            }
+          }
+          const size_t root_label =
+              selected_evidence_audit
+                  .evidence_component_labels[canonical_root];
+          if (h9_evidence_component_report.is_open()) {
+            for (size_t comp_idx = 0; comp_idx < components.size(); ++comp_idx) {
+              h9_evidence_component_report
+                  << "h9_evidence_partition_v1," << frame_report.frame << ','
+                  << this->m_mol[frame_idx].time_of_snap << ',' << comp_idx
+                  << ',' << base_candidate.assignment.component_ids[comp_idx]
+                  << ',' << components[comp_idx].size() << ','
+                  << selected_evidence_audit
+                         .evidence_component_labels[comp_idx]
+                  << ',' << static_cast<int>(comp_idx == canonical_root) << ','
+                  << selected_evidence_audit
+                         .evidence_connected_component_count
+                  << ',' << selected_evidence_audit
+                                .relative_lattice_degrees_of_freedom
+                  << '\n';
+            }
+          }
+
+          const bool orbit_applicable =
+              selected_evidence_audit.evidence_connected_component_count == 2 &&
+              selected_evidence_audit.relative_lattice_degrees_of_freedom == 3 &&
+              root_label < 2;
+          if (!orbit_applicable || !h9_orbit_report.is_open())
+            return;
+          const size_t shifted_label = root_label == 0 ? 1 : 0;
+          vector<Vec3> orbit_points;
+          orbit_points.reserve(component_atoms.size());
+          for (int qx = -1; qx <= 1; ++qx) {
+            for (int qy = -1; qy <= 1; ++qy) {
+              for (int qz = -1; qz <= 1; ++qz) {
+                vector<Int3> orbit_offsets = base_offsets;
+                bool within_radius = true;
+                for (size_t comp_idx = 0; comp_idx < components.size();
+                     ++comp_idx) {
+                  if (selected_evidence_audit
+                          .evidence_component_labels[comp_idx] !=
+                      shifted_label) {
+                    continue;
+                  }
+                  Int3 shifted{};
+                  if (!titan_pbctopo::checked_int3_add(
+                          orbit_offsets[comp_idx], Int3{qx, qy, qz}, shifted)) {
+                    within_radius = false;
+                    break;
+                  }
+                  orbit_offsets[comp_idx] = shifted;
+                }
+                PbctopoCutCandidate orbit_candidate = base_candidate;
+                if (within_radius) {
+                  const PbctopoImageAssignment provisional_assignment =
+                      make_pbctopo_image_assignment(
+                          orbit_offsets, components, component_atoms);
+                  within_radius = provisional_assignment.valid;
+                  for (const Int3 &offset :
+                       provisional_assignment.component_offsets) {
+                    if (offset.x < -configured_component_shell_radius ||
+                        offset.x > configured_component_shell_radius ||
+                        offset.y < -configured_component_shell_radius ||
+                        offset.y > configured_component_shell_radius ||
+                        offset.z < -configured_component_shell_radius ||
+                        offset.z > configured_component_shell_radius) {
+                      within_radius = false;
+                      break;
+                    }
+                  }
+                }
+                bool hard_certified = false;
+                optional<PbctopoSelectedEvidenceAudit> orbit_audit;
+                if (within_radius) {
+                  double orbit_shift_norm2 = 0.0;
+                  build_component_points_from_offsets(
+                      component_atoms, components,
+                      this->m_mol[frame_idx].Box, orbit_offsets, orbit_points,
+                      orbit_shift_norm2);
+                  hard_certified = certify_candidate_for_output(
+                      orbit_candidate, orbit_points, &orbit_offsets);
+                  if (hard_certified) {
+                    auto audited =
+                        titan_pbctopo::audit_pbctopo_selected_hypotheses(
+                            span<const PbctopoAtom>(base_atoms),
+                            span<const Vec3>(orbit_points),
+                            base_anchor_context.contact_hypotheses,
+                            orbit_candidate.assignment, true,
+                            explicit_evidence_component_edges);
+                    if (audited)
+                      orbit_audit = *audited;
+                  }
+                }
+                const bool evidence_evaluated =
+                    orbit_audit.has_value() && orbit_audit->evaluated;
+                const bool evidence_noncontradicted =
+                    evidence_evaluated &&
+                    orbit_audit->state != PbctopoEvidenceState::Contradicted;
+                const bool accepted = hard_certified &&
+                                      evidence_noncontradicted;
+                h9_orbit_report
+                    << "h9_local_orbit_v1," << frame_report.frame << ','
+                    << this->m_mol[frame_idx].time_of_snap << ',' << qx << ','
+                    << qy << ',' << qz << ',' << root_label << ','
+                    << shifted_label << ',' << static_cast<int>(within_radius)
+                    << ',' << static_cast<int>(hard_certified) << ','
+                    << static_cast<int>(evidence_evaluated) << ','
+                    << static_cast<int>(evidence_noncontradicted) << ','
+                    << static_cast<int>(accepted) << ','
+                    << (orbit_candidate.assignment.valid
+                            ? orbit_candidate.assignment.signature
+                            : 0)
+                    << ','
+                    << (orbit_audit.has_value()
+                            ? titan_pbctopo::pbctopo_evidence_state_name(
+                                  orbit_audit->state)
+                            : "not_evaluated")
+                    << ','
+                    << (orbit_audit.has_value()
+                            ? orbit_audit->evidence_connected_component_count
+                            : 0)
+                    << ','
+                    << (orbit_audit.has_value()
+                            ? orbit_audit->relative_lattice_degrees_of_freedom
+                            : 0)
+                    << ','
+                    << (orbit_audit.has_value()
+                            ? orbit_audit->evidence_edge_count
+                            : 0)
+                    << ','
+                    << (orbit_audit.has_value()
+                            ? orbit_audit->compatible_hypothesis_count
+                            : 0)
+                    << ','
+                    << (orbit_audit.has_value()
+                            ? orbit_audit->selected_compatible_contact_count
+                            : 0)
+                    << '\n';
+              }
+            }
+          }
+        };
     auto finalize_frame_report =
         [&](PbctopoFrameStatus status, PbctopoFrameMode mode,
             PbctopoFailureReason reason,
@@ -6899,7 +7328,40 @@ int Multi_MOL::solve_pbc_pbctopo(Multi_MOL &mol2, arguments &Arguments,
           titan_pbctopo::apply_pbctopo_final_selected_evidence(
               frame_report.identifiability,
               selected_evidence_audit.evaluated,
-              selected_evidence_audit.evidence_graph_connected);
+              selected_evidence_audit.evidence_graph_connected,
+              selected_evidence_audit.evidence_component_count,
+              selected_evidence_audit.evidence_edge_count,
+              selected_evidence_audit.explicit_contact_evidence_edges,
+              selected_evidence_audit.scored_contact_evidence_edges,
+              selected_evidence_audit.evidence_connected_component_count);
+          if (selected_candidate != nullptr && selected_candidate->valid &&
+              selected_evidence_audit.evaluated) {
+            const bool final_output_identified =
+                pbctopo_relative_images_identified(
+                    frame_report.identifiability);
+            const bool rescue_provenance =
+                status == PbctopoFrameStatus::Rescued ||
+                mode == PbctopoFrameMode::HullRescue ||
+                mode == PbctopoFrameMode::DistanceRescue;
+            if (selected_evidence_audit.state ==
+                PbctopoEvidenceState::Contradicted) {
+              status = PbctopoFrameStatus::Contradicted;
+              reason = PbctopoFailureReason::EvidenceContradicted;
+            } else if (selected_evidence_audit.state ==
+                       PbctopoEvidenceState::WeakAmbiguous) {
+              status = PbctopoFrameStatus::WeakObservation;
+              reason = PbctopoFailureReason::EvidenceUnderdetermined;
+            } else if (selected_evidence_audit.state ==
+                           PbctopoEvidenceState::WeakDisconnected ||
+                       !final_output_identified) {
+              status = PbctopoFrameStatus::WeakObservation;
+              reason = PbctopoFailureReason::EvidenceDisconnected;
+            } else {
+              status = rescue_provenance ? PbctopoFrameStatus::Rescued
+                                         : PbctopoFrameStatus::Certified;
+              reason = PbctopoFailureReason::None;
+            }
+          }
           if (selected_evidence_audit.evaluated) {
             frame_report.soft_observed_contact_pair_hash =
                 selected_evidence_audit.observed_pair_hash;
@@ -8632,7 +9094,7 @@ int Multi_MOL::solve_pbc_pbctopo(Multi_MOL &mol2, arguments &Arguments,
             span<const PbctopoAtom>(base_atoms),
             span<const Vec3>(output_certification_points),
             base_anchor_context.contact_hypotheses, candidate.assignment,
-            true);
+            true, explicit_evidence_component_edges);
         timing.pbctopo_selected_evidence_audit_s +=
             chrono::duration<double>(clock::now() - audit_started).count();
         if (!audit || !audit->evaluated) {
@@ -8672,11 +9134,14 @@ int Multi_MOL::solve_pbc_pbctopo(Multi_MOL &mol2, arguments &Arguments,
           complete_band_winner_audit.has_value()) {
         PbctopoCutCandidate candidate = *complete_band_winner;
         selected_evidence_audit = *complete_band_winner_audit;
+        apply_selected_evidence_to_frame_identifiability();
         double output_shift_norm2 = 0.0;
         build_component_points_from_offsets(
             component_atoms, components, this->m_mol[frame_idx].Box,
             complete_band_winner_offsets, output_certification_points,
             output_shift_norm2);
+        export_h9_partition_and_orbit(candidate,
+                                      complete_band_winner_offsets);
         const bool evidence_contradicted =
             selected_evidence_audit.state ==
             PbctopoEvidenceState::Contradicted;
@@ -8777,6 +9242,7 @@ int Multi_MOL::solve_pbc_pbctopo(Multi_MOL &mol2, arguments &Arguments,
             PbctopoFailureReason::EvidenceHypothesisUnavailable);
         continue;
       }
+      export_h9_partition_and_orbit(candidate, snapshot.offsets);
       const bool evidence_contradicted =
           selected_evidence_audit.state == PbctopoEvidenceState::Contradicted;
       const bool evidence_weak =
@@ -9132,12 +9598,16 @@ int Multi_MOL::solve_pbc_pbctopo(Multi_MOL &mol2, arguments &Arguments,
                   temporal_component_layouts[layout_idx].atom_component_index,
                   greedy.assignment, chosen.assignment,
                   this->m_mol[frame_idx].Box, replayed_points)) {
+            const auto temporal_explicit_evidence_component_edges =
+                build_explicit_evidence_component_edges(
+                    temporal_component_layouts[layout_idx].atom_component_index,
+                    temporal_component_layouts[layout_idx].component_count);
             const auto temporal_audit_started = clock::now();
             auto audit = titan_pbctopo::audit_pbctopo_selected_hypotheses(
                 span<const PbctopoAtom>(replay_atoms),
                 span<const Vec3>(replayed_points),
                 temporal_contact_hypotheses[frame_idx], chosen.assignment,
-                true);
+                true, temporal_explicit_evidence_component_edges);
             timing.pbctopo_selected_evidence_audit_s +=
                 chrono::duration<double>(clock::now() - temporal_audit_started)
                     .count();
@@ -9186,7 +9656,12 @@ int Multi_MOL::solve_pbc_pbctopo(Multi_MOL &mol2, arguments &Arguments,
                 temporal_audit.evidence_graph_connected;
             titan_pbctopo::apply_pbctopo_final_selected_evidence(
                 report.identifiability, temporal_audit.evaluated,
-                temporal_audit.evidence_graph_connected);
+                temporal_audit.evidence_graph_connected,
+                temporal_audit.evidence_component_count,
+                temporal_audit.evidence_edge_count,
+                temporal_audit.explicit_contact_evidence_edges,
+                temporal_audit.scored_contact_evidence_edges,
+                temporal_audit.evidence_connected_component_count);
             report.soft_observed_contact_pair_hash =
                 temporal_audit.observed_pair_hash;
             report.soft_observed_lost_pair_hash =
