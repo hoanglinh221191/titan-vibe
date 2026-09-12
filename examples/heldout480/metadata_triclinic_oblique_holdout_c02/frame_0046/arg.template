@@ -1,0 +1,17 @@
+-ff=charmm36
+-path-a=@FF@
+-path-n=@FF@
+-f=@CASE@/oracle_v2_wrapped.pdb
+-pbctopo=true
+-pbctopo-mode=vibe
+-pbctopo-exact-component-limit=6
+-pbctopo-beam-width=256
+-pbctopo-anchor-backend=auto
+-g=0-0
+-nt=1
+-1pdb=true
+-nocal=true
+-n=@CASE@/index.ndx
+-no-dssp=true
+-noprint-side_chain_contact=true
+-opdb=oracle_v2_pbctopo.pdb

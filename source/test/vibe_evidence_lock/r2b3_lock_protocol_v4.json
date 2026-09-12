@@ -1,0 +1,132 @@
+{
+  "schema": "vibe-evidence-lock-freeze-protocol-v4",
+  "protocol_version": 4,
+  "accepted_development_baseline": {
+    "titan_sha256": "125f0f289594e22cfaed7d7c9c10aa681838c109de9e5728ae2646f1de93418c",
+    "analyzer_sha256": "e46c9e63f3fba8e07823f553076503a71cb92461c99976e4feebef9eb80c1302",
+    "provenance_v4_ledger_sha256": "4c99dcb63e646589c7ebb0eb0dcf77463f6fac1e149ede8a325ca6d799a5d515",
+    "raw_packages_ledger_sha256": "30c41dacfb1804d9f1e8d9773bf3474a7d28cc5b3485a66945b592c61a3bf314",
+    "development_root_name": "vibe_r2b3_development_replay_20260805_v3"
+  },
+  "build": {
+    "command": "mingw32-make PROFILE=native MSYS2_UCRT64_BIN=C:/msys64/ucrt64/bin -j8 titan.exe",
+    "profile": "native",
+    "compiler": "C:/msys64/ucrt64/bin/clang++.exe"
+  },
+  "release_readiness": {
+    "tag_type": "annotated",
+    "tag_must_resolve_to_head": true,
+    "originating_worktree_must_be_clean": true,
+    "snapshot_source": "annotated_candidate_tag_without_worktree_overlays",
+    "tag_gate_smoke": "test/vibe_evidence_lock/freeze_candidate_tag_gate_smoke.py",
+    "required_paths": [
+      "manual.txt"
+    ],
+    "immutable_inputs": [
+      {
+        "path": "docs/pbctopo_vibe_manuscript/VIBE_R2B3_COHERENT_IMAGE_HYPOTHESIS_SPEC_20260805.md",
+        "sha256": "899a0520e83130b3dfa113ea38ed4c406dcc7db0ae38bedad90f659b33c48bc0"
+      },
+      {
+        "path": "docs/pbctopo_vibe_manuscript/VIBE_R2B2_EVIDENCE_SEMANTICS_SPEC_20260805.md",
+        "sha256": "6be7a0966aff78725c574d096916f569cf012532b52bb088bc479fbde972c2c1"
+      }
+    ],
+    "manual_semantics": {
+      "path": "manual.txt",
+      "required_normalized_phrases": [
+        "Inter-unit contacts are optional, shift-labelled observations.",
+        "They are not topology bonds, permanent-contact constraints, or candidate-ranking terms.",
+        "A selected H0/no-supported-contact relation is weak and underdetermined; it is not a contradiction and does not prove a unique dissociated periodic image.",
+        "Hard certification does not establish evidence support, uniqueness, or trajectory truth.",
+        "Weak observations, contradicted evidence, rescue, actual fallback, and PBCI fallback are distinct outcomes and must be reported separately.",
+        "A candidate band is complete only relative to its declared bounded search domain and only when the exported complete flag is set."
+      ]
+    }
+  },
+  "forbidden_path_tokens": [
+    "heldout",
+    "held-out",
+    "holdout",
+    "reserved_seed",
+    "reserved-cell"
+  ],
+  "overlay_files": [
+    "src/hololift/phase1.h",
+    "src/hololift/phase1_serialization.h",
+    "src/hololift/serialization.cpp",
+    "src/hololift/serialization.h",
+    "src/hololift/types.h",
+    "src/hololift/validation.cpp",
+    "src/hololift/vibe_adapter.cpp",
+    "src/hololift/vibe_importer.cpp",
+    "src/hololift/vibe_importer.h",
+    "src/pbctopo/anchor_graph.cpp",
+    "src/pbctopo/assignment_set_report.cpp",
+    "src/pbctopo/candidate_scoring.cpp",
+    "src/pbctopo/certification.cpp",
+    "src/pbctopo/certification.h",
+    "src/pbctopo/evidence_audit.cpp",
+    "src/pbctopo/evidence_audit.h",
+    "src/pbctopo/observation_schema.h",
+    "src/pbctopo/report.cpp",
+    "src/pbctopo/report.h",
+    "src/pbctopo/types.h",
+    "src/pbctopo/uncertainty_band.h",
+    "src/solv_pbc_pbctopo.cpp",
+    "test/hololift_phase0_smoke.ps1",
+    "test/hololift_phase1_smoke.ps1",
+    "test/hololift_vibe_importer_smoke.ps1",
+    "test/pbctopo_anchor_same_owner_units_smoke.ps1",
+    "test/pbctopo_assignment_set_report_smoke.ps1",
+    "test/pbctopo_candidate_scoring_smoke.ps1",
+    "test/pbctopo_certification_independence_smoke.ps1",
+    "test/pbctopo_complete_uncertainty_band_policy_smoke.ps1",
+    "test/pbctopo_complete_uncertainty_band_smoke.ps1",
+    "test/pbctopo_confidence_report_smoke.ps1",
+    "test/pbctopo_evidence_semantics_smoke.ps1",
+    "test/pbctopo_interface_scope_integration_smoke.ps1",
+    "test/pbctopo_logging_smoke.ps1",
+    "test/pbctopo_observation_schema_smoke.ps1",
+    "test/pbctopo_temporal_assignment_replay_smoke.ps1",
+    "test/pbctopo_temporal_report_integration_smoke.ps1",
+    "test/pbctopo_warm_state_smoke.ps1",
+    "tools/validate_vibe_observation.py",
+    "tools/vibe_evidence_lock/README.md",
+    "tools/vibe_evidence_lock/evidence_pair_hash.py",
+    "tools/vibe_evidence_lock/freeze_candidate.py",
+    "tools/vibe_evidence_lock/oracle_v2_analyzer.py",
+    "tools/vibe_evidence_lock/production_steric_replay.cpp",
+    "tools/vibe_evidence_lock/reanalyze_existing_packages.py",
+    "test/vibe_evidence_lock/freeze_candidate_tag_gate_smoke.py",
+    "test/vibe_evidence_lock/r2b3_lock_protocol_v4.json",
+    "test/vibe_evidence_lock/run_lock_matrix.ps1"
+  ],
+  "matrix": [
+    {"name": "build", "command": "mingw32-make PROFILE=native MSYS2_UCRT64_BIN=C:/msys64/ucrt64/bin -j8 titan.exe"},
+    {"name": "complete_band_policy", "command": "& '.\\test\\pbctopo_complete_uncertainty_band_policy_smoke.ps1'"},
+    {"name": "complete_band_125", "command": "& '.\\test\\pbctopo_complete_uncertainty_band_smoke.ps1' -TitanExe '${TITAN_EXE}'"},
+    {"name": "evidence_semantics", "command": "& '.\\test\\pbctopo_evidence_semantics_smoke.ps1'"},
+    {"name": "confidence_report", "command": "& '.\\test\\pbctopo_confidence_report_smoke.ps1' -TitanExe '${TITAN_EXE}'"},
+    {"name": "observation_schema", "command": "& '.\\test\\pbctopo_observation_schema_smoke.ps1'"},
+    {"name": "assignment_set", "command": "& '.\\test\\pbctopo_assignment_set_report_smoke.ps1'"},
+    {"name": "candidate_scoring", "command": "& '.\\test\\pbctopo_candidate_scoring_smoke.ps1'"},
+    {"name": "certification", "command": "& '.\\test\\pbctopo_certification_independence_smoke.ps1'"},
+    {"name": "anchor_units", "command": "& '.\\test\\pbctopo_anchor_same_owner_units_smoke.ps1'"},
+    {"name": "temporal_replay", "command": "& '.\\test\\pbctopo_temporal_assignment_replay_smoke.ps1'"},
+    {"name": "temporal_report", "command": "& '.\\test\\pbctopo_temporal_report_integration_smoke.ps1'"},
+    {"name": "warm_state", "command": "& '.\\test\\pbctopo_warm_state_smoke.ps1'"},
+    {"name": "logging", "command": "& '.\\test\\pbctopo_logging_smoke.ps1'"},
+    {"name": "interface_scope", "command": "& '.\\test\\pbctopo_interface_scope_integration_smoke.ps1'"},
+    {"name": "hololift_phase0", "command": "& '.\\test\\hololift_phase0_smoke.ps1'"},
+    {"name": "hololift_importer", "command": "& '.\\test\\hololift_vibe_importer_smoke.ps1'"},
+    {"name": "hololift_phase1", "command": "& '.\\test\\hololift_phase1_smoke.ps1'"}
+  ],
+  "scientific_contract": {
+    "optional_contacts_are_ranking_neutral_evidence": true,
+    "h0_is_weak_or_underdetermined": true,
+    "dimer_does_not_imply_permanent_contact": true,
+    "actual_fallback_definition": "status == fallback",
+    "complete_band_definition": "retained == all_atom_certified == exported == declared_feasible_count"
+  }
+}

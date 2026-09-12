@@ -1,0 +1,3849 @@
+{
+  "purpose": "Implementation replay against archived coordinates and scientific report fields; not a new independent truth assessment",
+  "binary_sha256": "34f00e72526137bb0bee87f16729a73525a98d3751646dc1df5c57f592b0b04f",
+  "all_pass": true,
+  "completed": 480,
+  "expected": 480,
+  "results": [
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0001",
+      "exit_code": 0,
+      "elapsed_s": 4.790382000035606,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0002",
+      "exit_code": 0,
+      "elapsed_s": 5.666307199979201,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0003",
+      "exit_code": 0,
+      "elapsed_s": 5.2975077999872155,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0004",
+      "exit_code": 0,
+      "elapsed_s": 5.845900600019377,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0005",
+      "exit_code": 0,
+      "elapsed_s": 3.8734142999746837,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0006",
+      "exit_code": 0,
+      "elapsed_s": 3.5946559999720193,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0007",
+      "exit_code": 0,
+      "elapsed_s": 5.430699099961203,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0008",
+      "exit_code": 0,
+      "elapsed_s": 4.5661071999929845,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0009",
+      "exit_code": 0,
+      "elapsed_s": 3.944861600000877,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0010",
+      "exit_code": 0,
+      "elapsed_s": 3.615065500023775,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0011",
+      "exit_code": 0,
+      "elapsed_s": 4.178556600003503,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0012",
+      "exit_code": 0,
+      "elapsed_s": 3.2528113999869674,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0013",
+      "exit_code": 0,
+      "elapsed_s": 3.2045183000154793,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0014",
+      "exit_code": 0,
+      "elapsed_s": 3.7888908000313677,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0015",
+      "exit_code": 0,
+      "elapsed_s": 3.0738198999897577,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0016",
+      "exit_code": 0,
+      "elapsed_s": 3.2577536000171676,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0017",
+      "exit_code": 0,
+      "elapsed_s": 3.0676831000018865,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0018",
+      "exit_code": 0,
+      "elapsed_s": 3.2149728999938816,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0019",
+      "exit_code": 0,
+      "elapsed_s": 3.114822500036098,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0020",
+      "exit_code": 0,
+      "elapsed_s": 3.1800404000096023,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0021",
+      "exit_code": 0,
+      "elapsed_s": 3.265163099975325,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0022",
+      "exit_code": 0,
+      "elapsed_s": 3.3867357000126503,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0023",
+      "exit_code": 0,
+      "elapsed_s": 3.203076899982989,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0024",
+      "exit_code": 0,
+      "elapsed_s": 3.260457399999723,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0025",
+      "exit_code": 0,
+      "elapsed_s": 2.989956700010225,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0026",
+      "exit_code": 0,
+      "elapsed_s": 3.414874800015241,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0027",
+      "exit_code": 0,
+      "elapsed_s": 2.9613191000535153,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0028",
+      "exit_code": 0,
+      "elapsed_s": 3.124857400020119,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0029",
+      "exit_code": 0,
+      "elapsed_s": 3.494369700027164,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0030",
+      "exit_code": 0,
+      "elapsed_s": 5.473465400049463,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0031",
+      "exit_code": 0,
+      "elapsed_s": 5.023028199968394,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0032",
+      "exit_code": 0,
+      "elapsed_s": 4.883799600007478,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0033",
+      "exit_code": 0,
+      "elapsed_s": 4.437767700001132,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0034",
+      "exit_code": 0,
+      "elapsed_s": 3.955931599950418,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0035",
+      "exit_code": 0,
+      "elapsed_s": 5.244317399978172,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0036",
+      "exit_code": 0,
+      "elapsed_s": 4.380856900010258,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0037",
+      "exit_code": 0,
+      "elapsed_s": 4.148044400033541,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0038",
+      "exit_code": 0,
+      "elapsed_s": 6.007342499971855,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0039",
+      "exit_code": 0,
+      "elapsed_s": 6.801810799981467,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0040",
+      "exit_code": 0,
+      "elapsed_s": 6.690220899996348,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0041",
+      "exit_code": 0,
+      "elapsed_s": 7.090812999987975,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0042",
+      "exit_code": 0,
+      "elapsed_s": 7.941319100034889,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0043",
+      "exit_code": 0,
+      "elapsed_s": 6.78345560003072,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0044",
+      "exit_code": 0,
+      "elapsed_s": 8.659124600002542,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0045",
+      "exit_code": 0,
+      "elapsed_s": 7.721993099956308,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0046",
+      "exit_code": 0,
+      "elapsed_s": 6.136568000016268,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0047",
+      "exit_code": 0,
+      "elapsed_s": 4.5755858000484295,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0048",
+      "exit_code": 0,
+      "elapsed_s": 5.971797100035474,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0049",
+      "exit_code": 0,
+      "elapsed_s": 6.600908199965488,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0050",
+      "exit_code": 0,
+      "elapsed_s": 5.717693999991752,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0051",
+      "exit_code": 0,
+      "elapsed_s": 5.247677800012752,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0052",
+      "exit_code": 0,
+      "elapsed_s": 5.707148199959192,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0053",
+      "exit_code": 0,
+      "elapsed_s": 6.264783899998292,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0054",
+      "exit_code": 0,
+      "elapsed_s": 6.6540878000087105,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0055",
+      "exit_code": 0,
+      "elapsed_s": 6.211944299982861,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0056",
+      "exit_code": 0,
+      "elapsed_s": 4.0517379000084475,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0057",
+      "exit_code": 0,
+      "elapsed_s": 3.503855399962049,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0058",
+      "exit_code": 0,
+      "elapsed_s": 6.2563573000370525,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0059",
+      "exit_code": 0,
+      "elapsed_s": 5.138052600028459,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0060",
+      "exit_code": 0,
+      "elapsed_s": 5.380955600005109,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0061",
+      "exit_code": 0,
+      "elapsed_s": 5.753273899958003,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0062",
+      "exit_code": 0,
+      "elapsed_s": 4.3344354999717325,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0063",
+      "exit_code": 0,
+      "elapsed_s": 3.6346305000479333,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0064",
+      "exit_code": 0,
+      "elapsed_s": 3.852537399972789,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0065",
+      "exit_code": 0,
+      "elapsed_s": 3.702962000039406,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0066",
+      "exit_code": 0,
+      "elapsed_s": 4.03454869997222,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0067",
+      "exit_code": 0,
+      "elapsed_s": 3.3742628999752924,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0068",
+      "exit_code": 0,
+      "elapsed_s": 3.1008952999836765,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0069",
+      "exit_code": 0,
+      "elapsed_s": 3.128467599977739,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0070",
+      "exit_code": 0,
+      "elapsed_s": 3.654930599965155,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0071",
+      "exit_code": 0,
+      "elapsed_s": 3.005410300043877,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0072",
+      "exit_code": 0,
+      "elapsed_s": 4.1555181999574415,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0073",
+      "exit_code": 0,
+      "elapsed_s": 3.0963294000248425,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0074",
+      "exit_code": 0,
+      "elapsed_s": 3.770544599974528,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0075",
+      "exit_code": 0,
+      "elapsed_s": 3.4383278000168502,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0076",
+      "exit_code": 0,
+      "elapsed_s": 4.079422099981457,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0077",
+      "exit_code": 0,
+      "elapsed_s": 4.509351700020488,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0078",
+      "exit_code": 0,
+      "elapsed_s": 6.349911199999042,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0079",
+      "exit_code": 0,
+      "elapsed_s": 4.754229599959217,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0080",
+      "exit_code": 0,
+      "elapsed_s": 4.9046459000092,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0081",
+      "exit_code": 0,
+      "elapsed_s": 4.816690400009975,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0082",
+      "exit_code": 0,
+      "elapsed_s": 6.156834699970204,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0083",
+      "exit_code": 0,
+      "elapsed_s": 7.539534599985927,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0084",
+      "exit_code": 0,
+      "elapsed_s": 7.571971800003666,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0085",
+      "exit_code": 0,
+      "elapsed_s": 7.176209500001278,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0086",
+      "exit_code": 0,
+      "elapsed_s": 6.283431100018788,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0087",
+      "exit_code": 0,
+      "elapsed_s": 5.972827200021129,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0088",
+      "exit_code": 0,
+      "elapsed_s": 6.108820799970999,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0089",
+      "exit_code": 0,
+      "elapsed_s": 5.267552000004798,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0090",
+      "exit_code": 0,
+      "elapsed_s": 5.026277199969627,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0091",
+      "exit_code": 0,
+      "elapsed_s": 4.854723600030411,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0092",
+      "exit_code": 0,
+      "elapsed_s": 5.890070500026923,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0093",
+      "exit_code": 0,
+      "elapsed_s": 5.934141899982933,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0094",
+      "exit_code": 0,
+      "elapsed_s": 4.217955699947197,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0095",
+      "exit_code": 0,
+      "elapsed_s": 5.22605240001576,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0096",
+      "exit_code": 0,
+      "elapsed_s": 5.016702900000382,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0097",
+      "exit_code": 0,
+      "elapsed_s": 5.230094099999405,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0098",
+      "exit_code": 0,
+      "elapsed_s": 4.4712940999888815,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0099",
+      "exit_code": 0,
+      "elapsed_s": 4.576447800034657,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0100",
+      "exit_code": 0,
+      "elapsed_s": 4.52993040002184,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0001",
+      "exit_code": 0,
+      "elapsed_s": 4.541960800008383,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0002",
+      "exit_code": 0,
+      "elapsed_s": 4.316020099970046,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0003",
+      "exit_code": 0,
+      "elapsed_s": 4.990719599998556,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0004",
+      "exit_code": 0,
+      "elapsed_s": 4.643475700053386,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0005",
+      "exit_code": 0,
+      "elapsed_s": 4.606429499981459,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0006",
+      "exit_code": 0,
+      "elapsed_s": 5.452957500005141,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0007",
+      "exit_code": 0,
+      "elapsed_s": 2.4003272999543697,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0008",
+      "exit_code": 0,
+      "elapsed_s": 2.8809174000052735,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0009",
+      "exit_code": 0,
+      "elapsed_s": 2.9475525000016205,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0010",
+      "exit_code": 0,
+      "elapsed_s": 3.002826099982485,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0011",
+      "exit_code": 0,
+      "elapsed_s": 3.254378799989354,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0012",
+      "exit_code": 0,
+      "elapsed_s": 4.0125254999729805,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0013",
+      "exit_code": 0,
+      "elapsed_s": 3.782417699985672,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0014",
+      "exit_code": 0,
+      "elapsed_s": 3.3913700999692082,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0015",
+      "exit_code": 0,
+      "elapsed_s": 3.90020569995977,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0016",
+      "exit_code": 0,
+      "elapsed_s": 3.661373700015247,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0017",
+      "exit_code": 0,
+      "elapsed_s": 3.1167410999769345,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0018",
+      "exit_code": 0,
+      "elapsed_s": 2.7409411999979056,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0019",
+      "exit_code": 0,
+      "elapsed_s": 2.840290299966,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0020",
+      "exit_code": 0,
+      "elapsed_s": 2.96564250002848,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0021",
+      "exit_code": 0,
+      "elapsed_s": 3.739723499980755,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0022",
+      "exit_code": 0,
+      "elapsed_s": 3.4742573999683373,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0023",
+      "exit_code": 0,
+      "elapsed_s": 3.8252907000132836,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0024",
+      "exit_code": 0,
+      "elapsed_s": 3.3695589999551885,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0025",
+      "exit_code": 0,
+      "elapsed_s": 5.059555799991358,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0026",
+      "exit_code": 0,
+      "elapsed_s": 4.788273400045,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0027",
+      "exit_code": 0,
+      "elapsed_s": 3.9409560000058264,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0028",
+      "exit_code": 0,
+      "elapsed_s": 3.9728628000011668,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0029",
+      "exit_code": 0,
+      "elapsed_s": 5.4185632999869995,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0030",
+      "exit_code": 0,
+      "elapsed_s": 5.081561899976805,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0031",
+      "exit_code": 0,
+      "elapsed_s": 5.598299700010102,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0032",
+      "exit_code": 0,
+      "elapsed_s": 4.717353200016078,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0033",
+      "exit_code": 0,
+      "elapsed_s": 5.606267800030764,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0034",
+      "exit_code": 0,
+      "elapsed_s": 5.980775200005155,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0035",
+      "exit_code": 0,
+      "elapsed_s": 4.226393699995242,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0036",
+      "exit_code": 0,
+      "elapsed_s": 5.24360779998824,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0037",
+      "exit_code": 0,
+      "elapsed_s": 4.056772299984004,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0038",
+      "exit_code": 0,
+      "elapsed_s": 4.188294899999164,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0039",
+      "exit_code": 0,
+      "elapsed_s": 4.107914299995173,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0040",
+      "exit_code": 0,
+      "elapsed_s": 4.921231499989517,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0041",
+      "exit_code": 0,
+      "elapsed_s": 4.7625606000074185,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0042",
+      "exit_code": 0,
+      "elapsed_s": 5.107673700025771,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0043",
+      "exit_code": 0,
+      "elapsed_s": 6.530780699977186,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0044",
+      "exit_code": 0,
+      "elapsed_s": 6.154946299968287,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0045",
+      "exit_code": 0,
+      "elapsed_s": 6.557523499999661,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0046",
+      "exit_code": 0,
+      "elapsed_s": 6.577976799977478,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0047",
+      "exit_code": 0,
+      "elapsed_s": 5.414750800002366,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0048",
+      "exit_code": 0,
+      "elapsed_s": 5.511819400009699,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0049",
+      "exit_code": 0,
+      "elapsed_s": 3.2128997999825515,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0050",
+      "exit_code": 0,
+      "elapsed_s": 3.7322919000289403,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0051",
+      "exit_code": 0,
+      "elapsed_s": 4.283147499954794,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0052",
+      "exit_code": 0,
+      "elapsed_s": 5.031777099997271,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0053",
+      "exit_code": 0,
+      "elapsed_s": 4.395339699985925,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0054",
+      "exit_code": 0,
+      "elapsed_s": 4.629787399957422,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0055",
+      "exit_code": 0,
+      "elapsed_s": 4.242899600008968,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0056",
+      "exit_code": 0,
+      "elapsed_s": 3.665279600012582,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0057",
+      "exit_code": 0,
+      "elapsed_s": 3.9066254000063054,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0058",
+      "exit_code": 0,
+      "elapsed_s": 4.3938226999598555,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0059",
+      "exit_code": 0,
+      "elapsed_s": 4.781934499973431,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0060",
+      "exit_code": 0,
+      "elapsed_s": 4.0719685999793,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0061",
+      "exit_code": 0,
+      "elapsed_s": 3.892339100013487,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0062",
+      "exit_code": 0,
+      "elapsed_s": 3.7496792000019923,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0063",
+      "exit_code": 0,
+      "elapsed_s": 5.1619609000044875,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0064",
+      "exit_code": 0,
+      "elapsed_s": 4.6699740999611095,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0065",
+      "exit_code": 0,
+      "elapsed_s": 4.780003099993337,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0066",
+      "exit_code": 0,
+      "elapsed_s": 3.5255242999992333,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0067",
+      "exit_code": 0,
+      "elapsed_s": 3.1917783999815583,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0068",
+      "exit_code": 0,
+      "elapsed_s": 3.4151259000063874,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0069",
+      "exit_code": 0,
+      "elapsed_s": 3.932931900024414,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0070",
+      "exit_code": 0,
+      "elapsed_s": 4.6604476000065915,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0001",
+      "exit_code": 0,
+      "elapsed_s": 3.546827500045765,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0002",
+      "exit_code": 0,
+      "elapsed_s": 5.096369200036861,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0003",
+      "exit_code": 0,
+      "elapsed_s": 5.159352199989371,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0004",
+      "exit_code": 0,
+      "elapsed_s": 3.8538063000305556,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0005",
+      "exit_code": 0,
+      "elapsed_s": 3.7116127999615856,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0006",
+      "exit_code": 0,
+      "elapsed_s": 3.9725778000429273,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0007",
+      "exit_code": 0,
+      "elapsed_s": 5.869985400000587,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0008",
+      "exit_code": 0,
+      "elapsed_s": 5.577892100031022,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0009",
+      "exit_code": 0,
+      "elapsed_s": 5.6369722000090405,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0010",
+      "exit_code": 0,
+      "elapsed_s": 6.067017599998508,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0011",
+      "exit_code": 0,
+      "elapsed_s": 6.766815799986944,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0012",
+      "exit_code": 0,
+      "elapsed_s": 7.001515999960247,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0013",
+      "exit_code": 0,
+      "elapsed_s": 6.5928829999757,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0014",
+      "exit_code": 0,
+      "elapsed_s": 5.074552100035362,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0015",
+      "exit_code": 0,
+      "elapsed_s": 6.540121500031091,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0016",
+      "exit_code": 0,
+      "elapsed_s": 5.431354600004852,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0017",
+      "exit_code": 0,
+      "elapsed_s": 5.785663600021508,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0018",
+      "exit_code": 0,
+      "elapsed_s": 4.860120999976061,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0019",
+      "exit_code": 0,
+      "elapsed_s": 3.4032287999871187,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0020",
+      "exit_code": 0,
+      "elapsed_s": 5.088049200014211,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0021",
+      "exit_code": 0,
+      "elapsed_s": 4.648013999976683,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0022",
+      "exit_code": 0,
+      "elapsed_s": 3.7642945000552572,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0023",
+      "exit_code": 0,
+      "elapsed_s": 4.38521589996526,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0024",
+      "exit_code": 0,
+      "elapsed_s": 4.55385920003755,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0025",
+      "exit_code": 0,
+      "elapsed_s": 4.542601399996784,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0026",
+      "exit_code": 0,
+      "elapsed_s": 4.377895999990869,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0027",
+      "exit_code": 0,
+      "elapsed_s": 3.78927740000654,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0028",
+      "exit_code": 0,
+      "elapsed_s": 5.686334599973634,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0029",
+      "exit_code": 0,
+      "elapsed_s": 5.984125100017991,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0030",
+      "exit_code": 0,
+      "elapsed_s": 5.584638600004837,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0031",
+      "exit_code": 0,
+      "elapsed_s": 4.7695366000407375,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0032",
+      "exit_code": 0,
+      "elapsed_s": 3.459897499997169,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0033",
+      "exit_code": 0,
+      "elapsed_s": 4.349179000011645,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0034",
+      "exit_code": 0,
+      "elapsed_s": 3.426810499979183,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0035",
+      "exit_code": 0,
+      "elapsed_s": 3.7571912999846973,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0036",
+      "exit_code": 0,
+      "elapsed_s": 3.7673786000232212,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0037",
+      "exit_code": 0,
+      "elapsed_s": 4.253271299996413,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0038",
+      "exit_code": 0,
+      "elapsed_s": 3.8184950000140816,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0039",
+      "exit_code": 0,
+      "elapsed_s": 3.9660529000102542,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0040",
+      "exit_code": 0,
+      "elapsed_s": 3.324625700013712,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0041",
+      "exit_code": 0,
+      "elapsed_s": 3.286287800001446,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0042",
+      "exit_code": 0,
+      "elapsed_s": 5.334390100033488,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0043",
+      "exit_code": 0,
+      "elapsed_s": 3.17717789998278,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0044",
+      "exit_code": 0,
+      "elapsed_s": 4.107009900035337,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0045",
+      "exit_code": 0,
+      "elapsed_s": 5.149612299981527,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0046",
+      "exit_code": 0,
+      "elapsed_s": 4.593661000020802,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0047",
+      "exit_code": 0,
+      "elapsed_s": 3.4464846000191756,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0048",
+      "exit_code": 0,
+      "elapsed_s": 4.667818300018553,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0049",
+      "exit_code": 0,
+      "elapsed_s": 4.454813299991656,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0050",
+      "exit_code": 0,
+      "elapsed_s": 4.312546000001021,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0051",
+      "exit_code": 0,
+      "elapsed_s": 4.230392700002994,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0052",
+      "exit_code": 0,
+      "elapsed_s": 5.197803899995051,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0053",
+      "exit_code": 0,
+      "elapsed_s": 5.20276209997246,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0054",
+      "exit_code": 0,
+      "elapsed_s": 5.377391899994109,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0055",
+      "exit_code": 0,
+      "elapsed_s": 5.965931400016416,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0056",
+      "exit_code": 0,
+      "elapsed_s": 5.183638499991503,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0057",
+      "exit_code": 0,
+      "elapsed_s": 6.200127899996005,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0058",
+      "exit_code": 0,
+      "elapsed_s": 5.837789200013503,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0059",
+      "exit_code": 0,
+      "elapsed_s": 6.23905219999142,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0060",
+      "exit_code": 0,
+      "elapsed_s": 5.011470599973109,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0061",
+      "exit_code": 0,
+      "elapsed_s": 4.909655000024941,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0062",
+      "exit_code": 0,
+      "elapsed_s": 4.517398500000127,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0063",
+      "exit_code": 0,
+      "elapsed_s": 4.092371799983084,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0064",
+      "exit_code": 0,
+      "elapsed_s": 4.333365999977104,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0065",
+      "exit_code": 0,
+      "elapsed_s": 5.032128499995451,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0066",
+      "exit_code": 0,
+      "elapsed_s": 6.128542900027242,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0067",
+      "exit_code": 0,
+      "elapsed_s": 5.053158499998972,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0068",
+      "exit_code": 0,
+      "elapsed_s": 4.9722977000055835,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0069",
+      "exit_code": 0,
+      "elapsed_s": 4.0609397000516765,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0070",
+      "exit_code": 0,
+      "elapsed_s": 4.234682900016196,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0001",
+      "exit_code": 0,
+      "elapsed_s": 4.344154599995818,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0002",
+      "exit_code": 0,
+      "elapsed_s": 3.85042810003506,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0003",
+      "exit_code": 0,
+      "elapsed_s": 2.9262493000132963,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0004",
+      "exit_code": 0,
+      "elapsed_s": 2.773666499997489,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0005",
+      "exit_code": 0,
+      "elapsed_s": 2.9990720999776386,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0006",
+      "exit_code": 0,
+      "elapsed_s": 3.098354100016877,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0007",
+      "exit_code": 0,
+      "elapsed_s": 3.1331269000074826,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0008",
+      "exit_code": 0,
+      "elapsed_s": 3.983100600016769,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0009",
+      "exit_code": 0,
+      "elapsed_s": 3.398858200001996,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0010",
+      "exit_code": 0,
+      "elapsed_s": 3.1701037000166252,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0011",
+      "exit_code": 0,
+      "elapsed_s": 4.4516335999942385,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0012",
+      "exit_code": 0,
+      "elapsed_s": 3.3616320999572054,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0013",
+      "exit_code": 0,
+      "elapsed_s": 3.6592290999833494,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0014",
+      "exit_code": 0,
+      "elapsed_s": 3.817939100030344,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0015",
+      "exit_code": 0,
+      "elapsed_s": 4.448124299990013,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0016",
+      "exit_code": 0,
+      "elapsed_s": 4.043249000038486,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0017",
+      "exit_code": 0,
+      "elapsed_s": 3.6462991000153124,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0018",
+      "exit_code": 0,
+      "elapsed_s": 4.632039300049655,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0019",
+      "exit_code": 0,
+      "elapsed_s": 3.1147239999845624,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0020",
+      "exit_code": 0,
+      "elapsed_s": 3.068673799978569,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0021",
+      "exit_code": 0,
+      "elapsed_s": 3.6051449000369757,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0022",
+      "exit_code": 0,
+      "elapsed_s": 4.350074400019366,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0023",
+      "exit_code": 0,
+      "elapsed_s": 3.562654500012286,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0024",
+      "exit_code": 0,
+      "elapsed_s": 3.485083499981556,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0025",
+      "exit_code": 0,
+      "elapsed_s": 3.6628810000256635,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0026",
+      "exit_code": 0,
+      "elapsed_s": 4.62994199997047,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0027",
+      "exit_code": 0,
+      "elapsed_s": 3.878249200002756,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0028",
+      "exit_code": 0,
+      "elapsed_s": 3.9681472000083886,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0029",
+      "exit_code": 0,
+      "elapsed_s": 3.859460100007709,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0030",
+      "exit_code": 0,
+      "elapsed_s": 5.2595823999727145,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0031",
+      "exit_code": 0,
+      "elapsed_s": 5.31101059995126,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0032",
+      "exit_code": 0,
+      "elapsed_s": 6.996816399972886,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0033",
+      "exit_code": 0,
+      "elapsed_s": 5.846252899966203,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0034",
+      "exit_code": 0,
+      "elapsed_s": 4.917467699968256,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0035",
+      "exit_code": 0,
+      "elapsed_s": 4.8712845999980345,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0036",
+      "exit_code": 0,
+      "elapsed_s": 5.124580100004096,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0037",
+      "exit_code": 0,
+      "elapsed_s": 5.476512499968521,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0038",
+      "exit_code": 0,
+      "elapsed_s": 5.804880600015167,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0039",
+      "exit_code": 0,
+      "elapsed_s": 5.743715700053144,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0040",
+      "exit_code": 0,
+      "elapsed_s": 5.5035164000000805,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0041",
+      "exit_code": 0,
+      "elapsed_s": 5.172687800019048,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0042",
+      "exit_code": 0,
+      "elapsed_s": 6.961320700007491,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0043",
+      "exit_code": 0,
+      "elapsed_s": 6.814879000012297,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0044",
+      "exit_code": 0,
+      "elapsed_s": 5.993955599959008,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0045",
+      "exit_code": 0,
+      "elapsed_s": 5.566763599985279,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0046",
+      "exit_code": 0,
+      "elapsed_s": 5.837876600038726,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0047",
+      "exit_code": 0,
+      "elapsed_s": 5.939937299990561,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0048",
+      "exit_code": 0,
+      "elapsed_s": 5.800569200015161,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0049",
+      "exit_code": 0,
+      "elapsed_s": 5.63428549998207,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0050",
+      "exit_code": 0,
+      "elapsed_s": 3.6214028000249527,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0051",
+      "exit_code": 0,
+      "elapsed_s": 4.268757999991067,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0052",
+      "exit_code": 0,
+      "elapsed_s": 4.560388900048565,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0053",
+      "exit_code": 0,
+      "elapsed_s": 4.419823699980043,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0054",
+      "exit_code": 0,
+      "elapsed_s": 3.7043477999977767,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0055",
+      "exit_code": 0,
+      "elapsed_s": 4.432643500040285,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0056",
+      "exit_code": 0,
+      "elapsed_s": 5.126871399988886,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0057",
+      "exit_code": 0,
+      "elapsed_s": 4.20437910000328,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0058",
+      "exit_code": 0,
+      "elapsed_s": 4.021127599989995,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0059",
+      "exit_code": 0,
+      "elapsed_s": 4.455309799988754,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0060",
+      "exit_code": 0,
+      "elapsed_s": 5.5384220000123605,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0061",
+      "exit_code": 0,
+      "elapsed_s": 5.084987300040666,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0062",
+      "exit_code": 0,
+      "elapsed_s": 4.269941300037317,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0063",
+      "exit_code": 0,
+      "elapsed_s": 4.576567000010982,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0064",
+      "exit_code": 0,
+      "elapsed_s": 4.163190899998881,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0065",
+      "exit_code": 0,
+      "elapsed_s": 3.935202900029253,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0066",
+      "exit_code": 0,
+      "elapsed_s": 4.053140800038818,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0067",
+      "exit_code": 0,
+      "elapsed_s": 3.3901953999884427,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0068",
+      "exit_code": 0,
+      "elapsed_s": 3.894488400022965,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0069",
+      "exit_code": 0,
+      "elapsed_s": 4.847156599978916,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0070",
+      "exit_code": 0,
+      "elapsed_s": 4.734340999973938,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0071",
+      "exit_code": 0,
+      "elapsed_s": 4.573095800005831,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0072",
+      "exit_code": 0,
+      "elapsed_s": 4.407593399984762,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0073",
+      "exit_code": 0,
+      "elapsed_s": 4.7588682000059634,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0074",
+      "exit_code": 0,
+      "elapsed_s": 4.517742099997122,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0075",
+      "exit_code": 0,
+      "elapsed_s": 5.899605899991002,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0076",
+      "exit_code": 0,
+      "elapsed_s": 4.53490609995788,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0077",
+      "exit_code": 0,
+      "elapsed_s": 5.009596500021871,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0078",
+      "exit_code": 0,
+      "elapsed_s": 5.811357899976429,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0079",
+      "exit_code": 0,
+      "elapsed_s": 5.375985199993011,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0080",
+      "exit_code": 0,
+      "elapsed_s": 6.826501599978656,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0081",
+      "exit_code": 0,
+      "elapsed_s": 7.029725099971984,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0082",
+      "exit_code": 0,
+      "elapsed_s": 7.002274799975567,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0083",
+      "exit_code": 0,
+      "elapsed_s": 7.247467799985316,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0084",
+      "exit_code": 0,
+      "elapsed_s": 5.9114916999824345,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0085",
+      "exit_code": 0,
+      "elapsed_s": 5.063599599990994,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0086",
+      "exit_code": 0,
+      "elapsed_s": 4.625865099951625,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0087",
+      "exit_code": 0,
+      "elapsed_s": 5.858420300006401,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0088",
+      "exit_code": 0,
+      "elapsed_s": 4.258315999992192,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0089",
+      "exit_code": 0,
+      "elapsed_s": 5.529996299999766,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0090",
+      "exit_code": 0,
+      "elapsed_s": 5.837052599992603,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0091",
+      "exit_code": 0,
+      "elapsed_s": 5.026984700001776,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0092",
+      "exit_code": 0,
+      "elapsed_s": 5.265524799993727,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0093",
+      "exit_code": 0,
+      "elapsed_s": 6.204906899947673,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0094",
+      "exit_code": 0,
+      "elapsed_s": 6.302224999992177,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0095",
+      "exit_code": 0,
+      "elapsed_s": 6.149773100041784,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0096",
+      "exit_code": 0,
+      "elapsed_s": 6.410302899952512,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0097",
+      "exit_code": 0,
+      "elapsed_s": 8.274754800018854,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0098",
+      "exit_code": 0,
+      "elapsed_s": 6.468329499999527,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0099",
+      "exit_code": 0,
+      "elapsed_s": 7.740374400047585,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0100",
+      "exit_code": 0,
+      "elapsed_s": 6.905535999976564,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0001",
+      "exit_code": 0,
+      "elapsed_s": 6.175162100000307,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0002",
+      "exit_code": 0,
+      "elapsed_s": 6.572230399993714,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0003",
+      "exit_code": 0,
+      "elapsed_s": 5.721023500023875,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0004",
+      "exit_code": 0,
+      "elapsed_s": 5.740763400041033,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0005",
+      "exit_code": 0,
+      "elapsed_s": 5.814163600036409,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0006",
+      "exit_code": 0,
+      "elapsed_s": 5.376211500028148,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0007",
+      "exit_code": 0,
+      "elapsed_s": 5.096359599963762,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0008",
+      "exit_code": 0,
+      "elapsed_s": 4.133917599974666,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0009",
+      "exit_code": 0,
+      "elapsed_s": 3.273566399991978,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0010",
+      "exit_code": 0,
+      "elapsed_s": 3.0543081000214443,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0011",
+      "exit_code": 0,
+      "elapsed_s": 2.948035700013861,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0012",
+      "exit_code": 0,
+      "elapsed_s": 3.047653599991463,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0013",
+      "exit_code": 0,
+      "elapsed_s": 3.2049955999827944,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0014",
+      "exit_code": 0,
+      "elapsed_s": 4.154099599982146,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0015",
+      "exit_code": 0,
+      "elapsed_s": 3.0830235999892466,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0016",
+      "exit_code": 0,
+      "elapsed_s": 3.3514071000390686,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0017",
+      "exit_code": 0,
+      "elapsed_s": 2.955595299950801,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0018",
+      "exit_code": 0,
+      "elapsed_s": 2.9270258999895304,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0019",
+      "exit_code": 0,
+      "elapsed_s": 3.135505100013688,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0020",
+      "exit_code": 0,
+      "elapsed_s": 3.410178200050723,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0021",
+      "exit_code": 0,
+      "elapsed_s": 4.919800400035456,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0022",
+      "exit_code": 0,
+      "elapsed_s": 4.204457900021225,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0023",
+      "exit_code": 0,
+      "elapsed_s": 5.539586599974427,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0024",
+      "exit_code": 0,
+      "elapsed_s": 5.661312100011855,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0025",
+      "exit_code": 0,
+      "elapsed_s": 6.006400699960068,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0026",
+      "exit_code": 0,
+      "elapsed_s": 6.182762500015087,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0027",
+      "exit_code": 0,
+      "elapsed_s": 6.556358399975579,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0028",
+      "exit_code": 0,
+      "elapsed_s": 7.5970871999743395,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0029",
+      "exit_code": 0,
+      "elapsed_s": 6.993557500012685,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0030",
+      "exit_code": 0,
+      "elapsed_s": 6.958406499994453,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0031",
+      "exit_code": 0,
+      "elapsed_s": 6.510263299976941,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0032",
+      "exit_code": 0,
+      "elapsed_s": 7.944057199987583,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0033",
+      "exit_code": 0,
+      "elapsed_s": 8.00218239997048,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0034",
+      "exit_code": 0,
+      "elapsed_s": 7.594138699991163,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0035",
+      "exit_code": 0,
+      "elapsed_s": 7.354138900001999,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0036",
+      "exit_code": 0,
+      "elapsed_s": 5.685291000001598,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0037",
+      "exit_code": 0,
+      "elapsed_s": 5.525481700024102,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0038",
+      "exit_code": 0,
+      "elapsed_s": 6.381223300006241,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0039",
+      "exit_code": 0,
+      "elapsed_s": 5.638708699960262,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0040",
+      "exit_code": 0,
+      "elapsed_s": 6.100901800033171,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0041",
+      "exit_code": 0,
+      "elapsed_s": 10.633698199992068,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0042",
+      "exit_code": 0,
+      "elapsed_s": 11.860597300052177,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0043",
+      "exit_code": 0,
+      "elapsed_s": 10.025581299967598,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0044",
+      "exit_code": 0,
+      "elapsed_s": 9.04180720000295,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0045",
+      "exit_code": 0,
+      "elapsed_s": 4.337446099962108,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0046",
+      "exit_code": 0,
+      "elapsed_s": 5.876103199960198,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0047",
+      "exit_code": 0,
+      "elapsed_s": 6.6347899999818765,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0048",
+      "exit_code": 0,
+      "elapsed_s": 6.488534100004472,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0049",
+      "exit_code": 0,
+      "elapsed_s": 5.210186700045597,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0050",
+      "exit_code": 0,
+      "elapsed_s": 4.124370999983512,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0051",
+      "exit_code": 0,
+      "elapsed_s": 3.9331861999817193,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0052",
+      "exit_code": 0,
+      "elapsed_s": 3.7962746000266634,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0053",
+      "exit_code": 0,
+      "elapsed_s": 3.9856377000105567,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0054",
+      "exit_code": 0,
+      "elapsed_s": 4.053518700005952,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0055",
+      "exit_code": 0,
+      "elapsed_s": 4.469830700021703,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0056",
+      "exit_code": 0,
+      "elapsed_s": 4.601708800008055,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0057",
+      "exit_code": 0,
+      "elapsed_s": 4.167273900005966,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0058",
+      "exit_code": 0,
+      "elapsed_s": 4.0856970000313595,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0059",
+      "exit_code": 0,
+      "elapsed_s": 3.824836099985987,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0060",
+      "exit_code": 0,
+      "elapsed_s": 3.991309300006833,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0061",
+      "exit_code": 0,
+      "elapsed_s": 3.6779014999629,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0062",
+      "exit_code": 0,
+      "elapsed_s": 3.3612827999750152,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0063",
+      "exit_code": 0,
+      "elapsed_s": 3.9990015999646857,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0064",
+      "exit_code": 0,
+      "elapsed_s": 3.819275599962566,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0065",
+      "exit_code": 0,
+      "elapsed_s": 4.0090104000410065,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0066",
+      "exit_code": 0,
+      "elapsed_s": 3.143525799969211,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0067",
+      "exit_code": 0,
+      "elapsed_s": 3.1934260999551043,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0068",
+      "exit_code": 0,
+      "elapsed_s": 3.181571300025098,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0069",
+      "exit_code": 0,
+      "elapsed_s": 3.0701735999900848,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0070",
+      "exit_code": 0,
+      "elapsed_s": 3.232880799972918,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0001",
+      "exit_code": 0,
+      "elapsed_s": 3.3572713999892585,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0002",
+      "exit_code": 0,
+      "elapsed_s": 3.769097000011243,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0003",
+      "exit_code": 0,
+      "elapsed_s": 3.25309280003421,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0004",
+      "exit_code": 0,
+      "elapsed_s": 3.5570727000012994,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0005",
+      "exit_code": 0,
+      "elapsed_s": 3.9040022999979556,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0006",
+      "exit_code": 0,
+      "elapsed_s": 3.3546750000095926,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0007",
+      "exit_code": 0,
+      "elapsed_s": 3.2938164999941364,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0008",
+      "exit_code": 0,
+      "elapsed_s": 3.950685899995733,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0009",
+      "exit_code": 0,
+      "elapsed_s": 5.124615999986418,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0010",
+      "exit_code": 0,
+      "elapsed_s": 4.506075999990571,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0011",
+      "exit_code": 0,
+      "elapsed_s": 4.940069600008428,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0012",
+      "exit_code": 0,
+      "elapsed_s": 3.5581905999570154,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0013",
+      "exit_code": 0,
+      "elapsed_s": 3.8663082999992184,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0014",
+      "exit_code": 0,
+      "elapsed_s": 4.928145200014114,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0015",
+      "exit_code": 0,
+      "elapsed_s": 5.115761000022758,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0016",
+      "exit_code": 0,
+      "elapsed_s": 5.503968700009864,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0017",
+      "exit_code": 0,
+      "elapsed_s": 3.8010759000317194,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0018",
+      "exit_code": 0,
+      "elapsed_s": 6.47847080003703,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0019",
+      "exit_code": 0,
+      "elapsed_s": 4.936509599967394,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0020",
+      "exit_code": 0,
+      "elapsed_s": 6.368003499985207,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0021",
+      "exit_code": 0,
+      "elapsed_s": 4.463197499979287,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0022",
+      "exit_code": 0,
+      "elapsed_s": 3.6370030000107363,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0023",
+      "exit_code": 0,
+      "elapsed_s": 4.740250799979549,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0024",
+      "exit_code": 0,
+      "elapsed_s": 4.960087899991777,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0025",
+      "exit_code": 0,
+      "elapsed_s": 4.937572999973781,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0026",
+      "exit_code": 0,
+      "elapsed_s": 3.7675607999553904,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0027",
+      "exit_code": 0,
+      "elapsed_s": 4.742642000026535,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0028",
+      "exit_code": 0,
+      "elapsed_s": 4.074955900025088,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0029",
+      "exit_code": 0,
+      "elapsed_s": 3.8187035999726504,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0030",
+      "exit_code": 0,
+      "elapsed_s": 4.581227699993178,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0031",
+      "exit_code": 0,
+      "elapsed_s": 5.124566500016954,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0032",
+      "exit_code": 0,
+      "elapsed_s": 4.735041900014039,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0033",
+      "exit_code": 0,
+      "elapsed_s": 4.233400300028734,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0034",
+      "exit_code": 0,
+      "elapsed_s": 4.192795799986925,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0035",
+      "exit_code": 0,
+      "elapsed_s": 3.694524899998214,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0036",
+      "exit_code": 0,
+      "elapsed_s": 3.7051074000191875,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0037",
+      "exit_code": 0,
+      "elapsed_s": 3.636014299991075,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0038",
+      "exit_code": 0,
+      "elapsed_s": 3.7388108000159264,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0039",
+      "exit_code": 0,
+      "elapsed_s": 3.2724602000089362,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0040",
+      "exit_code": 0,
+      "elapsed_s": 3.2353307000012137,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0041",
+      "exit_code": 0,
+      "elapsed_s": 3.7576582999899983,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0042",
+      "exit_code": 0,
+      "elapsed_s": 3.7822991999564692,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0043",
+      "exit_code": 0,
+      "elapsed_s": 3.9646937000215985,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0044",
+      "exit_code": 0,
+      "elapsed_s": 4.217818000004627,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0045",
+      "exit_code": 0,
+      "elapsed_s": 4.408116500009783,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0046",
+      "exit_code": 0,
+      "elapsed_s": 4.251518200035207,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0047",
+      "exit_code": 0,
+      "elapsed_s": 4.177106299961451,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0048",
+      "exit_code": 0,
+      "elapsed_s": 4.248530599987134,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0049",
+      "exit_code": 0,
+      "elapsed_s": 4.613101000024471,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0050",
+      "exit_code": 0,
+      "elapsed_s": 4.86174589995062,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0051",
+      "exit_code": 0,
+      "elapsed_s": 4.729710299987346,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0052",
+      "exit_code": 0,
+      "elapsed_s": 4.853771800000686,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0053",
+      "exit_code": 0,
+      "elapsed_s": 5.212371699977666,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0054",
+      "exit_code": 0,
+      "elapsed_s": 4.91510450001806,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0055",
+      "exit_code": 0,
+      "elapsed_s": 4.359942900016904,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0056",
+      "exit_code": 0,
+      "elapsed_s": 4.300254100002348,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0057",
+      "exit_code": 0,
+      "elapsed_s": 4.1806496000499465,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0058",
+      "exit_code": 0,
+      "elapsed_s": 4.161443900025915,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0059",
+      "exit_code": 0,
+      "elapsed_s": 3.8945433999761008,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0060",
+      "exit_code": 0,
+      "elapsed_s": 4.062420000031125,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0061",
+      "exit_code": 0,
+      "elapsed_s": 3.7542842000257224,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0062",
+      "exit_code": 0,
+      "elapsed_s": 3.682297000021208,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0063",
+      "exit_code": 0,
+      "elapsed_s": 4.1032064000028186,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0064",
+      "exit_code": 0,
+      "elapsed_s": 3.9668340000207536,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0065",
+      "exit_code": 0,
+      "elapsed_s": 3.754386999993585,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0066",
+      "exit_code": 0,
+      "elapsed_s": 4.021290400007274,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0067",
+      "exit_code": 0,
+      "elapsed_s": 3.7307070999522693,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0068",
+      "exit_code": 0,
+      "elapsed_s": 4.593331299955025,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0069",
+      "exit_code": 0,
+      "elapsed_s": 4.164878799987491,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    },
+    {
+      "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0070",
+      "exit_code": 0,
+      "elapsed_s": 4.1392007999820635,
+      "coordinate_hash_matches": true,
+      "field_mismatches": {},
+      "pass": true
+    }
+  ]
+}

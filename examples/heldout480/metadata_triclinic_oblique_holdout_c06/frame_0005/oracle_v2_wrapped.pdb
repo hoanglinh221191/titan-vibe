@@ -1,0 +1,30 @@
+REMARK    PBCTOPO oracle-v2 pilot
+TITLE     Title t= 0.00000 step= 0
+CRYST1   53.000   61.000   67.000  58.00 112.00  71.00 P 1           1
+MODEL        1
+ATOM      1  C1  ALA A   1      33.420  80.635  22.208  1.00  0.00      O2V  C
+ATOM      2  C2  ALA A   1      33.144  80.620  21.501  1.00  0.00      O2V  C
+ATOM      3  C3  ALA A   1      32.875  80.909  21.974  1.00  0.00      O2V  C
+ATOM      4  C4  ALA A   1      33.439  80.940  21.697  1.00  0.00      O2V  C
+ATOM      5  C1  ALA B   1      11.807  23.757  19.419  1.00  0.00      O2V  C
+ATOM      6  C2  ALA B   1      11.535  23.793  18.787  1.00  0.00      O2V  C
+ATOM      7  C3  ALA B   1      11.288  24.105  19.252  1.00  0.00      O2V  C
+ATOM      8  C4  ALA B   1      11.883  24.073  18.986  1.00  0.00      O2V  C
+ATOM      9  C1  ALA C   1      10.030  24.985  16.878  1.00  0.00      O2V  C
+ATOM     10  C2  ALA C   1       9.805  25.019  16.189  1.00  0.00      O2V  C
+ATOM     11  C3  ALA C   1       9.477  25.337  16.568  1.00  0.00      O2V  C
+ATOM     12  C4  ALA C   1      10.152  25.307  16.363  1.00  0.00      O2V  C
+ATOM     13  C1  ALA D   1       9.001  26.271  13.903  1.00  0.00      O2V  C
+ATOM     14  C2  ALA D   1       8.703  26.207  13.214  1.00  0.00      O2V  C
+ATOM     15  C3  ALA D   1       8.399  26.543  13.665  1.00  0.00      O2V  C
+ATOM     16  C4  ALA D   1       9.007  26.541  13.360  1.00  0.00      O2V  C
+ATOM     17  C1  ALA E   1       7.216  27.369  11.381  1.00  0.00      O2V  C
+ATOM     18  C2  ALA E   1       6.896  27.436  10.716  1.00  0.00      O2V  C
+ATOM     19  C3  ALA E   1       6.687  27.757  11.203  1.00  0.00      O2V  C
+ATOM     20  C4  ALA E   1       7.318  27.716  10.904  1.00  0.00      O2V  C
+ATOM     21  C1  ALA F   1       5.648  28.433   8.644  1.00  0.00      O2V  C
+ATOM     22  C2  ALA F   1       5.340  28.307   8.017  1.00  0.00      O2V  C
+ATOM     23  C3  ALA F   1       5.049  28.632   8.383  1.00  0.00      O2V  C
+ATOM     24  C4  ALA F   1       5.690  28.655   8.166  1.00  0.00      O2V  C
+ENDMDL
+END

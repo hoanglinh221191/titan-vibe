@@ -1,0 +1,26 @@
+{
+  "binary_sha256": "34f00e72526137bb0bee87f16729a73525a98d3751646dc1df5c57f592b0b04f",
+  "all_frames_requested": true,
+  "all_pass": true,
+  "systems_completed": 2,
+  "results": {
+    "S1_tetramer": {
+      "exit_code": 0,
+      "elapsed_s": 73.32453889999306,
+      "atom_records": 2575904,
+      "coordinates_identical_at_PDB_precision": true,
+      "frames": 101,
+      "scientific_fields_identical": true,
+      "pass": true
+    },
+    "S2_hexamer": {
+      "exit_code": 0,
+      "elapsed_s": 139.37973899999633,
+      "atom_records": 3863452,
+      "coordinates_identical_at_PDB_precision": true,
+      "frames": 101,
+      "scientific_fields_identical": true,
+      "pass": true
+    }
+  }
+}

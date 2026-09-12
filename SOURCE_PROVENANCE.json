@@ -1,8 +1,8 @@
 {
   "schema": "titan-vibe-source-provenance-v1",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "source_commit": "6a8385cf1c63c42046b8a38053f003311e85e633",
-  "prior_public_commit": "5fe21aaf55dfa7a084133cadd68f83b07e322431",
+  "prior_public_commit": "136155a74c45ee49ec2f2579eb96dff1acfb1e98",
   "normalization": "CRLF normalized to LF before SHA256",
   "host_adapters": "Minimal declarations retained from prior public release; arguments.h adds three fields with source defaults.",
   "tests": "Public 31-test suite retained. Identifiability test calls adapted to the expanded API without removing regression assertions. Existing portable compiler wrapper retained.",
@@ -595,5 +595,6 @@
       "source_sha256_lf": "29390fb9347759c3c4ecbf9253290f4a60d0a2cbb9d06268658e4138f891ad2a",
       "public_sha256_lf": "29390fb9347759c3c4ecbf9253290f4a60d0a2cbb9d06268658e4138f891ad2a"
     }
-  ]
+  ],
+  "version_1_0_2": "Focused library source retained unchanged; runnable TITAN host snapshot added under source/; see SOURCE_AUDIT.json and source/SOURCE_PROVENANCE.json."
 }

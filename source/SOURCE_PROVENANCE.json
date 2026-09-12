@@ -1,0 +1,11 @@
+{
+  "base_commit": "6a8385cf1c63c42046b8a38053f003311e85e633",
+  "package": "TITAN host for VIBE v1.0.1",
+  "hololift_included": false,
+  "changes": [
+    "Exclude HoloLift source, tests and standalone H9 target",
+    "Pin source-export build metadata to base commit and mark modified",
+    "Default to portable profile"
+  ],
+  "public_vibe_source": "https://doi.org/10.5281/zenodo.22669272"
+}

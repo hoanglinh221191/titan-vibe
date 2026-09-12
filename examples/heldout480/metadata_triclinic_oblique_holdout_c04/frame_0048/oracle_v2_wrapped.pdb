@@ -1,0 +1,22 @@
+REMARK    PBCTOPO oracle-v2 pilot
+TITLE     Title t= 0.00000 step= 0
+CRYST1   53.000   61.000   67.000  58.00 112.00  71.00 P 1           1
+MODEL        1
+ATOM      1  C1  ALA A   1      48.466  54.472  21.858  1.00  0.00      O2V  C
+ATOM      2  C2  ALA A   1      49.118  54.873  21.859  1.00  0.00      O2V  C
+ATOM      3  C3  ALA A   1      49.096  54.320  22.096  1.00  0.00      O2V  C
+ATOM      4  C4  ALA A   1      48.917  54.582  21.502  1.00  0.00      O2V  C
+ATOM      5  C1  ALA B   1       2.645  54.813  22.104  1.00  0.00      O2V  C
+ATOM      6  C2  ALA B   1       3.262  55.145  22.178  1.00  0.00      O2V  C
+ATOM      7  C3  ALA B   1       3.210  54.569  22.416  1.00  0.00      O2V  C
+ATOM      8  C4  ALA B   1       3.129  54.830  21.799  1.00  0.00      O2V  C
+ATOM      9  C1  ALA C   1       9.868  54.545  22.385  1.00  0.00      O2V  C
+ATOM     10  C2  ALA C   1      10.481  54.858  22.407  1.00  0.00      O2V  C
+ATOM     11  C3  ALA C   1      10.430  54.328  22.679  1.00  0.00      O2V  C
+ATOM     12  C4  ALA C   1      10.325  54.559  22.045  1.00  0.00      O2V  C
+ATOM     13  C1  ALA D   1      17.175  54.947  21.916  1.00  0.00      O2V  C
+ATOM     14  C2  ALA D   1      17.824  55.202  21.911  1.00  0.00      O2V  C
+ATOM     15  C3  ALA D   1      17.763  54.690  22.130  1.00  0.00      O2V  C
+ATOM     16  C4  ALA D   1      17.612  54.939  21.566  1.00  0.00      O2V  C
+ENDMDL
+END

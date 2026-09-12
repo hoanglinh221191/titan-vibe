@@ -1,27 +1,20 @@
 # Release scope
 
-This repository contains the source code needed to inspect, compile, and test
-the VIBE periodic-reconstruction method. It is a focused extraction from the
-TITAN research codebase, not a distribution of the complete TITAN program.
+Version 1.0.2 includes both the focused VIBE static reference library in `src/`
+and the runnable complete TITAN host under `source/`, with `titan.exe` at the
+repository root. The host supplies input, topology parsing, output, logging,
+PBCI fallback and existing TITAN analysis functions. Unlike 1.0.1, this release
+includes the host Poisson-Boltzmann and other analysis source needed by its build.
+HoloLift implementation files and its standalone runner are excluded from the
+host source and linked executable. Optional VIBE H9 diagnostic exports do not
+include the HoloLift solver.
 
-Included:
+The VIBE algorithm files have not changed from 1.0.1. The eight-contact cap is
+applied before retained-contact translation hypotheses are constructed. Contact
+support and ambiguity are conditional on that retained set, not on every contact
+that could be found in the input.
 
-- the VIBE algorithms in `src/pbctopo/`;
-- the frame-level TITAN adapter in `src/solv_pbc_pbctopo.cpp`;
-- the molecular-topology graph builder;
-- minimal host data declarations required to compile the adapter;
-- independent algorithm-level tests.
-
-The source-identical frame adapter includes optional H9 diagnostic exports
-(disabled by default). These exports do not include the HoloLift solver.
-
-Excluded:
-
-- HoloLift and all trajectory-wide lifting code;
-- Poisson-Boltzmann, boundary-element, and TABI solvers;
-- unrelated TITAN analysis modules and the private TITAN executable;
-- molecular trajectories and unpublished validation archives.
-
-The static library preserves unresolved host calls in the adapter by design.
-Applications embedding VIBE must supply coordinate storage, trajectory I/O,
-logging, and output writing through their host integration.
+The top-level CMake target still builds the focused static library. The Makefile
+under `source/` builds the runnable host. The README provides commands for both
+prebuilt execution and rebuilding the host. Large molecular frame subsets remain
+in the separate data deposit; 480 compact held-out input cases are included.

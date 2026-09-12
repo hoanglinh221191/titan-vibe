@@ -1,14 +1,24 @@
 {
   "title": "TITAN-VIBE: Virtual Intact Block Extraction for periodic reconstruction",
-  "description": "Reference implementation of VIBE, a framewise periodic-boundary reconstruction method with certified triclinic nearest-copy calculations and explicit uncertainty reporting.",
+  "description": "TITAN-VIBE 1.0.2 adds a runnable Windows x86-64 executable, complete buildable TITAN host source with HoloLift omitted, and replay drivers for the deposited VIBE inputs. VIBE algorithms are unchanged from v1.0.1. Distribution version 1.0.2 is separate from the embedded frozen TITAN host build identity. Release checks and input/output provenance are included.",
   "license": "MIT",
   "upload_type": "software",
   "creators": [
-    {"name": "O, My Na"},
-    {"name": "Dao, Duy Quang"},
-    {"name": "Nguyen, Thi Le Anh"},
-    {"name": "Li, Mai Suan"},
-    {"name": "Nguyen, Hoang Linh"}
+    {
+      "name": "O, My Na"
+    },
+    {
+      "name": "Dao, Duy Quang"
+    },
+    {
+      "name": "Nguyen, Thi Le Anh"
+    },
+    {
+      "name": "Li, Mai Suan"
+    },
+    {
+      "name": "Nguyen, Hoang Linh"
+    }
   ],
   "keywords": [
     "periodic boundary conditions",
@@ -16,5 +26,7 @@
     "triclinic lattice",
     "molecular reconstruction",
     "uncertainty"
-  ]
+  ],
+  "version": "1.0.2",
+  "publication_date": "2026-09-12"
 }

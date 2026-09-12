@@ -1,0 +1,327 @@
+# ==========================================
+# TITAN PROJECT MAKEFILE (Cross-platform)
+# Windows: Clang (C++23) | Linux: GCC/Clang (C++23)
+# Tích hợp Auto Dependency Tracking (.d)
+# ==========================================
+
+# Pinned source-export provenance; HoloLift exclusion is a local build change.
+export TITAN_GIT_COMMIT = 6a8385cf1c63c42046b8a38053f003311e85e633
+export TITAN_BUILD_NUMBER = 242
+export TITAN_GIT_DIRTY = true
+export TITAN_RELEASE_BUILD = false
+export SOURCE_DATE_EPOCH = 1787664798
+PROFILE ?= portable
+TOOLCHAIN ?= auto
+TITAN_CXX23_FLOOR ?= clang20-gxx13
+LLVM_VERSION ?= 22
+LLVM_PREFIX ?= /usr/lib/llvm-$(LLVM_VERSION)
+BUILD_ROOT = build
+BUILD_DIR = $(BUILD_ROOT)/$(PROFILE)
+SRC_ROOT = src
+GENERATED_DIR = $(BUILD_DIR)/generated
+VERSION_FILE = VERSION
+BUILD_INFO_GENERATOR = tools/generate_build_info.py
+BUILD_INFO_TEST = tools/test_build_metadata.py
+BUILD_INFO_HEADER = $(GENERATED_DIR)/titan_version_generated.h
+BUILD_INFO_MANIFEST = $(GENERATED_DIR)/titan_build_manifest.json
+BUILD_INFO_RC = $(GENERATED_DIR)/titan_version.rc
+CLI_REGISTRY_GENERATOR = tools/generate_cli_registry.py
+CLI_PARSER_SOURCE = $(SRC_ROOT)/cli/parse_arguments.cpp
+CLI_REGISTRY_HEADER = $(GENERATED_DIR)/titan_cli_registry_generated.h
+CLI_VALIDATION_TEST = tools/test_cli_validation.py
+INCLUDE_DIRS = -I$(GENERATED_DIR) -I$(SRC_ROOT) -I$(SRC_ROOT)/gmxtraj/include -I$(SRC_ROOT)/eigen
+
+COMMON_CXX_DEFINES = -DTITAN_CXX23_FLOOR_CLANG20_GXX13=1 -DTITAN_RUNTIME_DISPATCH_HOTSPOTS=1
+ifeq ($(PROFILE),native)
+    COMMON_CXX_DEFINES += -DTITAN_BUILD_PROFILE_TOKEN=native
+else ifeq ($(PROFILE),portable)
+    COMMON_CXX_DEFINES += -DTITAN_BUILD_PROFILE_TOKEN=portable
+else
+    COMMON_CXX_DEFINES += -DTITAN_BUILD_PROFILE_TOKEN=unknown
+endif
+
+LOWMEM_CXXFLAGS = $(filter-out -O3 -pipe,$(CXXFLAGS)) -O1
+
+ifeq ($(PROFILE),native)
+    ARCH_FLAGS = -march=native
+else ifeq ($(PROFILE),portable)
+    ARCH_FLAGS = -mavx2 -mfma -mtune=generic
+else
+    $(error Unsupported PROFILE '$(PROFILE)'. Use PROFILE=native or PROFILE=portable)
+endif
+
+ifeq ($(OS),Windows_NT)
+    # ─── CẤU HÌNH CHO WINDOWS (CLANG) ───
+    MSYS2_UCRT64_BIN ?= C:/msys64/ucrt64/bin
+    CXX  = $(MSYS2_UCRT64_BIN)/clang++.exe
+    PYTHON ?= $(MSYS2_UCRT64_BIN)/python.exe
+    WINDRES ?= $(MSYS2_UCRT64_BIN)/windres.exe
+    TARGET = titan.exe
+    PIPE_FLAG = -pipe
+    STACK_NOTE_FLAG =
+    
+    # Clang Flags: Thêm cờ chặn cảnh báo rác của Clang
+    # Force Eigen to use its own aligned allocator on Windows.
+    # This avoids AVX-aligned loads/stores from touching only 16-byte-aligned buffers.
+    CXXFLAGS = $(INCLUDE_DIRS) -O3 $(ARCH_FLAGS) -fopenmp $(PIPE_FLAG) $(STACK_NOTE_FLAG) -std=c++23 -Wall -Wno-unused-command-line-argument -MMD -MP $(COMMON_CXX_DEFINES)
+    
+    # Ép dùng LLD linker siêu tốc của LLVM
+    LDFLAGS = -fuse-ld=lld -static -static-libgcc -static-libstdc++ -fopenmp
+    
+    # Clang dùng ThinLTO đa luồng
+    LTO_FLAG = -flto=thin
+    
+    # Lệnh dọn dẹp trên Windows CMD/MSYS2
+    # Keep recipe syntax aligned with the shell that invokes mingw32-make.
+    # GitHub Actions uses an MSYS2 shell, while local PowerShell/CMD builds do not.
+    ifneq ($(strip $(MSYSTEM)),)
+        RM = rm -f
+        MKDIR_CMD = mkdir -p "$(@D)"
+        CLEAN_CMD = rm -rf $(BUILD_DIR) $(TARGET)
+        CLEAN_ALL_CMD = rm -rf $(BUILD_ROOT) $(TARGET)
+        CLEAN_GENERATED_CMD = $(RM) network_edges.csv network_nodes.csv network_communities.csv network_community_summary.csv network_supergraph.csv pca_fel.csv tica_projections.csv extract_basins.sh tmp_test_dham*.in 2>/dev/null || true
+    else
+        RM = del /Q /F
+        MKDIR_CMD = if not exist "$(subst /,\,$(@D))" mkdir "$(subst /,\,$(@D))"
+        CLEAN_CMD = if exist "$(subst /,\,$(BUILD_DIR))" rmdir /S /Q "$(subst /,\,$(BUILD_DIR))" & if exist "$(TARGET)" del /Q /F "$(TARGET)"
+        CLEAN_ALL_CMD = if exist "$(subst /,\,$(BUILD_ROOT))" rmdir /S /Q "$(subst /,\,$(BUILD_ROOT))" & if exist "$(TARGET)" del /Q /F "$(TARGET)"
+        CLEAN_GENERATED_CMD = $(RM) network_edges.csv network_nodes.csv network_communities.csv network_community_summary.csv network_supergraph.csv pca_fel.csv tica_projections.csv extract_basins.sh tmp_test_dham*.in 2>nul || exit 0
+    endif
+else
+    # ─── CẤU HÌNH CHO LINUX (GCC 13) ───
+    TOOLCHAIN_NAME := $(TOOLCHAIN)
+    ifeq ($(TOOLCHAIN_NAME),auto)
+        ifneq ($(findstring clang,$(notdir $(CXX))),)
+            TOOLCHAIN_NAME := clang
+        else
+            TOOLCHAIN_NAME := gcc
+        endif
+    endif
+    ifeq ($(TOOLCHAIN_NAME),clang)
+        ifeq ($(origin CXX),default)
+            CXX = clang++-22
+        endif
+        ifeq ($(origin CC),default)
+        endif
+        OPENMP_FLAG = -fopenmp=libomp
+        CXX_STDLIB_FLAG = -stdlib=libc++
+        CLANG_STDLIB_INCLUDE_FLAGS = -nostdinc++ -isystem $(LLVM_PREFIX)/include/c++/v1 -isystem $(LLVM_PREFIX)/include/x86_64-pc-linux-gnu/c++/v1
+        CLANG_OMP_INCLUDE_FLAGS = -isystem $(LLVM_PREFIX)/lib/clang/$(LLVM_VERSION)/include
+        CLANG_STDLIB_LINK_FLAGS = -L$(LLVM_PREFIX)/lib -Wl,-rpath,$(LLVM_PREFIX)/lib
+        CLANG_STDLIB_LIBS = -lc++abi
+        STDLIB_LINK_FLAGS =
+        LTO_FLAG = -flto=thin
+    else ifeq ($(TOOLCHAIN_NAME),gcc)
+        ifeq ($(origin CXX),default)
+            CXX = g++
+        endif
+        ifeq ($(origin CC),default)
+        endif
+        OPENMP_FLAG = -fopenmp
+        CXX_STDLIB_FLAG =
+        CLANG_STDLIB_INCLUDE_FLAGS =
+        CLANG_OMP_INCLUDE_FLAGS =
+        CLANG_STDLIB_LINK_FLAGS =
+        CLANG_STDLIB_LIBS =
+        STDLIB_LINK_FLAGS = -static-libgcc -static-libstdc++
+        LTO_FLAG = -flto=auto
+    else
+        $(error Unsupported TOOLCHAIN '$(TOOLCHAIN)'. Use TOOLCHAIN=auto, gcc, or clang)
+    endif
+    RM   = rm -f
+    PYTHON ?= python3
+    TARGET = titan
+    PIPE_FLAG =
+    STACK_NOTE_FLAG = -Wa,--noexecstack
+    
+    # GCC Flags: Chuẩn C++23, loại bỏ các cờ đặc thù của Clang
+    # Keep Eigen on its own aligned-allocation path across Linux builds too.
+    CXXFLAGS = $(INCLUDE_DIRS) -O3 $(ARCH_FLAGS) $(OPENMP_FLAG) $(CXX_STDLIB_FLAG) $(CLANG_STDLIB_INCLUDE_FLAGS) $(CLANG_OMP_INCLUDE_FLAGS) $(PIPE_FLAG) $(STACK_NOTE_FLAG) -std=c++23 -Wall -MMD -MP $(COMMON_CXX_DEFINES)
+    
+    # Linker mặc định của GCC (ld)
+    LDFLAGS = $(STDLIB_LINK_FLAGS) $(CLANG_STDLIB_LINK_FLAGS) $(OPENMP_FLAG) $(CXX_STDLIB_FLAG) $(CLANG_STDLIB_LIBS)
+    
+    # GCC dùng LTO tự động nhận diện số nhân CPU
+    
+    # Lệnh dọn dẹp trên Linux bash
+    CLEAN_CMD = rm -rf $(BUILD_DIR) $(TARGET)
+    CLEAN_ALL_CMD = rm -rf $(BUILD_ROOT) $(TARGET)
+    CLEAN_GENERATED_CMD = $(RM) network_edges.csv network_nodes.csv network_communities.csv network_community_summary.csv network_supergraph.csv pca_fel.csv tica_projections.csv extract_basins.sh tmp_test_dham*.in 2>/dev/null || true
+endif
+
+# ─── Tệp nguồn (Sources) ───
+ROOT_SRCS = $(filter-out $(SRC_ROOT)/parse_arguments.cpp,$(wildcard $(SRC_ROOT)/*.cpp))
+CLI_SRCS = $(wildcard $(SRC_ROOT)/cli/*.cpp)
+PBE_GRID_SRCS = $(wildcard $(SRC_ROOT)/pbe/grid/*.cpp)
+BIE_SRCS = $(wildcard $(SRC_ROOT)/bie/*.cpp) \
+           $(wildcard $(SRC_ROOT)/bie/fmm/cartesian/*.cpp)
+PBE_SRCS  = $(wildcard $(SRC_ROOT)/tabi/*.cpp) $(BIE_SRCS) $(PBE_GRID_SRCS)
+PBCTOPO_SRCS = $(wildcard $(SRC_ROOT)/pbctopo/*.cpp)
+HOLOLIFT_SRCS = # HoloLift excluded from the reviewer build
+GMXTRAJ_SRCS = $(wildcard $(SRC_ROOT)/gmxtraj/*.cpp)
+SRCS  = $(ROOT_SRCS) $(CLI_SRCS) $(PBE_SRCS) $(PBCTOPO_SRCS) $(HOLOLIFT_SRCS) $(GMXTRAJ_SRCS)
+OBJS  = $(patsubst %.cpp,$(BUILD_DIR)/%.o,$(SRCS))
+DEPS  = $(OBJS:.o=.d)
+
+ifeq ($(OS),Windows_NT)
+    RESOURCE_OBJ = $(BUILD_DIR)/titan_version_resource.o
+    SCHEMA_SMOKE_TARGET = $(BUILD_DIR)/titan_build_schema_smoke.exe
+    CLI_VALIDATION_SMOKE_TARGET = $(BUILD_DIR)/titan_cli_validation_smoke.exe
+    H9_BASELINE_TARGET = $(BUILD_DIR)/h9_component_temporal_baselines.exe
+else
+    RESOURCE_OBJ =
+    SCHEMA_SMOKE_TARGET = $(BUILD_DIR)/titan_build_schema_smoke
+    CLI_VALIDATION_SMOKE_TARGET = $(BUILD_DIR)/titan_cli_validation_smoke
+    H9_BASELINE_TARGET = $(BUILD_DIR)/h9_component_temporal_baselines
+endif
+LINK_INPUTS = $(OBJS) $(RESOURCE_OBJ)
+SCHEMA_SMOKE_CXXFLAGS = $(filter-out -MMD -MP,$(CXXFLAGS))
+
+# ==========================================
+# BUILD RULES
+# ==========================================
+
+.DELETE_ON_ERROR:
+.PHONY: all build-info cli-registry build-metadata-test version-smoke cli-validation-test h9-component-temporal-baselines clean clean-all clean-generated release native portable release-native release-portable print-config FORCE
+
+FORCE:
+
+$(BUILD_INFO_HEADER): FORCE $(VERSION_FILE) $(BUILD_INFO_GENERATOR)
+	@$(PYTHON) $(BUILD_INFO_GENERATOR) --repo-root . --version-file $(VERSION_FILE) --header-output $(BUILD_INFO_HEADER) --manifest-output $(BUILD_INFO_MANIFEST) --rc-output $(BUILD_INFO_RC) --profile $(PROFILE) --executable-name $(notdir $(TARGET))
+
+build-info: $(BUILD_INFO_HEADER)
+
+$(CLI_REGISTRY_HEADER): $(CLI_PARSER_SOURCE) $(CLI_REGISTRY_GENERATOR)
+	@$(PYTHON) $(CLI_REGISTRY_GENERATOR) --parser $(CLI_PARSER_SOURCE) --output $(CLI_REGISTRY_HEADER)
+
+cli-registry: $(CLI_REGISTRY_HEADER)
+
+build-metadata-test:
+	@$(PYTHON) $(BUILD_INFO_TEST)
+
+$(SCHEMA_SMOKE_TARGET): tools/titan_build_schema_smoke.cpp $(SRC_ROOT)/titan_config_schema.cpp $(BUILD_INFO_HEADER)
+	@echo Compiling build-schema smoke...
+	@$(CXX) $(SCHEMA_SMOKE_CXXFLAGS) tools/titan_build_schema_smoke.cpp $(SRC_ROOT)/titan_config_schema.cpp -o $@ $(LDFLAGS)
+
+$(CLI_VALIDATION_SMOKE_TARGET): tools/titan_cli_validation_smoke.cpp $(CLI_REGISTRY_HEADER)
+	@echo Compiling CLI validation smoke...
+	@$(CXX) $(SCHEMA_SMOKE_CXXFLAGS) tools/titan_cli_validation_smoke.cpp -o $@ $(LDFLAGS)
+
+$(H9_BASELINE_TARGET): tools/h9_component_temporal_baselines.cpp \
+                       $(SRC_ROOT)/pbctopo/lattice_math.cpp \
+                       $(SRC_ROOT)/gmxtraj/xdrfile.cpp \
+                       $(SRC_ROOT)/gmxtraj/xdrfile_xtc.cpp
+	@echo Compiling H9 component temporal baselines...
+	@$(CXX) $(SCHEMA_SMOKE_CXXFLAGS) $^ -o $@ $(LDFLAGS)
+
+h9-component-temporal-baselines: $(H9_BASELINE_TARGET)
+
+
+all: $(TARGET)
+
+$(OBJS): | $(BUILD_INFO_HEADER) $(CLI_REGISTRY_HEADER)
+
+ifeq ($(OS),Windows_NT)
+$(RESOURCE_OBJ): $(BUILD_INFO_HEADER) $(BUILD_INFO_GENERATOR)
+	@echo Compiling Windows version resource...
+	@$(WINDRES) --input-format=rc --output-format=coff -i $(BUILD_INFO_RC) -o $@
+endif
+
+$(TARGET): $(LINK_INPUTS)
+	@echo Linking $(TARGET) [$(PROFILE)]...
+	@$(CXX) -o $@ $^ $(LDFLAGS)
+	@echo Build successful!
+
+version-smoke: all $(SCHEMA_SMOKE_TARGET)
+	@$(PYTHON) $(BUILD_INFO_TEST) --binary $(TARGET) --manifest $(BUILD_INFO_MANIFEST) --schema-driver $(SCHEMA_SMOKE_TARGET)
+
+cli-validation-test: all $(CLI_VALIDATION_SMOKE_TARGET)
+	@$(CLI_VALIDATION_SMOKE_TARGET)
+	@$(PYTHON) $(CLI_VALIDATION_TEST) --binary $(TARGET)
+
+$(BUILD_DIR)/$(SRC_ROOT)/titan_rf_model.o: CXXFLAGS := $(filter-out -O3,$(CXXFLAGS)) -O0
+
+ifneq ($(OS),Windows_NT)
+$(BUILD_DIR)/$(SRC_ROOT)/solv_pbc_pbctopo.o: CXXFLAGS := $(LOWMEM_CXXFLAGS)
+$(BUILD_DIR)/$(SRC_ROOT)/pbctopo/anchor_graph.o: CXXFLAGS := $(LOWMEM_CXXFLAGS)
+$(BUILD_DIR)/$(SRC_ROOT)/pbctopo/component_graph.o: CXXFLAGS := $(LOWMEM_CXXFLAGS)
+$(BUILD_DIR)/$(SRC_ROOT)/pbctopo/component_refine.o: CXXFLAGS := $(LOWMEM_CXXFLAGS)
+$(BUILD_DIR)/$(SRC_ROOT)/pbctopo/component_search.o: CXXFLAGS := $(LOWMEM_CXXFLAGS)
+$(BUILD_DIR)/$(SRC_ROOT)/pbctopo/component_search_pair_table.o: CXXFLAGS := $(LOWMEM_CXXFLAGS)
+$(BUILD_DIR)/$(SRC_ROOT)/pbctopo/llps_local.o: CXXFLAGS := $(LOWMEM_CXXFLAGS)
+$(BUILD_DIR)/$(SRC_ROOT)/pbctopo/local_graph.o: CXXFLAGS := $(LOWMEM_CXXFLAGS)
+$(BUILD_DIR)/$(SRC_ROOT)/engine_postproc.o: CXXFLAGS := $(LOWMEM_CXXFLAGS)
+$(BUILD_DIR)/$(SRC_ROOT)/impl_engine.o: CXXFLAGS := $(LOWMEM_CXXFLAGS)
+$(BUILD_DIR)/$(SRC_ROOT)/solv_pbc_new_al.o: CXXFLAGS := $(LOWMEM_CXXFLAGS)
+$(BUILD_DIR)/$(SRC_ROOT)/find_pull_direction.o: CXXFLAGS := $(LOWMEM_CXXFLAGS)
+$(BUILD_DIR)/$(SRC_ROOT)/pull_direction_pathway.o: CXXFLAGS := $(LOWMEM_CXXFLAGS)
+$(BUILD_DIR)/$(SRC_ROOT)/titan_rf_model.o: CXXFLAGS := $(filter-out -O3 -pipe,$(CXXFLAGS)) -O0
+endif
+
+$(BUILD_DIR)/%.o: %.cpp
+	@echo Compiling $<...
+ifeq ($(OS),Windows_NT)
+	@$(MKDIR_CMD)
+else
+	@mkdir -p $(@D)
+endif
+	@$(CXX) $(CXXFLAGS) -c $< -o $@
+
+clean:
+	@echo Cleaning up...
+	@-$(CLEAN_CMD)
+	@echo Clean done!
+
+clean-all:
+	@echo Cleaning all profile build directories...
+	@-$(CLEAN_ALL_CMD)
+	@echo Clean all done!
+
+clean-generated:
+	@echo Cleaning generated analysis outputs...
+	@-$(CLEAN_GENERATED_CMD)
+	@echo Clean generated done!
+
+# Rule 'release' tự động gắn cờ LTO phù hợp với hệ điều hành
+release: CXXFLAGS += $(LTO_FLAG)
+release: LDFLAGS += $(LTO_FLAG)
+release: clean all
+
+native: PROFILE := native
+native: clean all
+
+portable: PROFILE := portable
+portable: clean all
+
+release-native: PROFILE := native
+release-native: release
+
+release-portable: PROFILE := portable
+release-portable: release
+
+print-config:
+	@echo PROFILE=$(PROFILE)
+	@echo TOOLCHAIN=$(TOOLCHAIN)
+	@echo LLVM_VERSION=$(LLVM_VERSION)
+	@echo LLVM_PREFIX=$(LLVM_PREFIX)
+	@echo CXX=$(CXX)
+	@echo TITAN_CXX23_FLOOR=$(TITAN_CXX23_FLOOR)
+	@echo BUILD_DIR=$(BUILD_DIR)
+	@echo GENERATED_DIR=$(GENERATED_DIR)
+	@echo VERSION_FILE=$(VERSION_FILE)
+	@echo BUILD_INFO_MANIFEST=$(BUILD_INFO_MANIFEST)
+	@echo CLI_REGISTRY_HEADER=$(CLI_REGISTRY_HEADER)
+	@echo PYTHON=$(PYTHON)
+	@echo ARCH_FLAGS=$(ARCH_FLAGS)
+	@echo COMMON_CXX_DEFINES=$(COMMON_CXX_DEFINES)
+	@echo OPENMP_FLAG=$(OPENMP_FLAG)
+	@echo CXX_STDLIB_FLAG=$(CXX_STDLIB_FLAG)
+	@echo CLANG_STDLIB_INCLUDE_FLAGS=$(CLANG_STDLIB_INCLUDE_FLAGS)
+	@echo CLANG_OMP_INCLUDE_FLAGS=$(CLANG_OMP_INCLUDE_FLAGS)
+	@echo CLANG_STDLIB_LINK_FLAGS=$(CLANG_STDLIB_LINK_FLAGS)
+	@echo CLANG_STDLIB_LIBS=$(CLANG_STDLIB_LIBS)
+	@echo CXXFLAGS=$(CXXFLAGS)
+	@echo LDFLAGS=$(LDFLAGS)
+
+# Nạp cây phụ thuộc (Dependency Tracking)
+-include $(DEPS)

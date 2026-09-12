@@ -1,0 +1,26 @@
+{
+  "binary_sha256": "34f00e72526137bb0bee87f16729a73525a98d3751646dc1df5c57f592b0b04f",
+  "all_frames_requested": false,
+  "all_pass": true,
+  "systems_completed": 2,
+  "results": {
+    "S1_tetramer/t116400": {
+      "exit_code": 0,
+      "elapsed_s": 1.897012400033418,
+      "atom_records": 25504,
+      "coordinates_identical_at_PDB_precision": true,
+      "frames": 1,
+      "scientific_fields_identical": true,
+      "pass": true
+    },
+    "S3_protein_glycan/t112000": {
+      "exit_code": 0,
+      "elapsed_s": 9.522316400019918,
+      "atom_records": 14393,
+      "coordinates_identical_at_PDB_precision": true,
+      "frames": 1,
+      "scientific_fields_identical": true,
+      "pass": true
+    }
+  }
+}
