@@ -5,11 +5,11 @@
 # ==========================================
 
 # Pinned source-export provenance; HoloLift exclusion is a local build change.
-export TITAN_GIT_COMMIT = 6a8385cf1c63c42046b8a38053f003311e85e633
-export TITAN_BUILD_NUMBER = 242
+export TITAN_GIT_COMMIT = 50ed41edecfe7b9cc5b72fec1ed5d38827d4c6ac
+export TITAN_BUILD_NUMBER = 304
 export TITAN_GIT_DIRTY = true
 export TITAN_RELEASE_BUILD = false
-export SOURCE_DATE_EPOCH = 1787664798
+export SOURCE_DATE_EPOCH = 1790315460
 PROFILE ?= portable
 TOOLCHAIN ?= auto
 TITAN_CXX23_FLOOR ?= clang20-gxx13
@@ -40,7 +40,14 @@ else
     COMMON_CXX_DEFINES += -DTITAN_BUILD_PROFILE_TOKEN=unknown
 endif
 
-LOWMEM_CXXFLAGS = $(filter-out -O3 -pipe,$(CXXFLAGS)) -O1
+# Large translation units that exhausted compiler memory at -O3 on Linux.
+# These hold per-frame numeric kernels (streaming engine loop, PBC reconstruction),
+# so -O1 left the hottest Linux code path materially slower than the Windows -O3
+# build. -O2 keeps the peak-memory relief while restoring inlining and
+# vectorisation; TITAN_LOWMEM_OPT allows a per-host fallback to -O1 without
+# editing the Makefile.
+TITAN_LOWMEM_OPT ?= -O2
+LOWMEM_CXXFLAGS = $(filter-out -O3 -pipe,$(CXXFLAGS)) $(TITAN_LOWMEM_OPT)
 
 ifeq ($(PROFILE),native)
     ARCH_FLAGS = -march=native
@@ -150,16 +157,45 @@ else
 endif
 
 # ─── Tệp nguồn (Sources) ───
-ROOT_SRCS = $(filter-out $(SRC_ROOT)/parse_arguments.cpp,$(wildcard $(SRC_ROOT)/*.cpp))
+# Opt-in full translation-unit instrumentation. Use a separate BUILD_ROOT so
+# sanitized and ordinary objects are never mixed. No default build is changed.
+SANITIZERS ?=
+ifneq ($(strip $(SANITIZERS)),)
+ifeq ($(OS),Windows_NT)
+    $(error SANITIZERS is currently supported by the Linux toolchain only)
+endif
+    CXXFLAGS := $(filter-out -O3 -O2,$(CXXFLAGS)) -O1 -g1 -fno-omit-frame-pointer -fsanitize=$(SANITIZERS)
+    LDFLAGS += -fsanitize=$(SANITIZERS)
+endif
+
+# KIN-10: the bundled random-forest affinity model is closed pending a model
+# card, and the engine no longer emits a pKd. Link the closed stub instead of
+# the 199,809-line generated source, which costs ~6 s and ~843 MB of peak
+# compiler memory on GCC 13.3 and adds a 3.3-4.9 MB object to the binary.
+#
+# TITAN_ENABLE_RF_MODEL=1 restores the generated model. Run a clean when you
+# change this value: make is timestamp driven and cannot see that the
+# configuration changed, so an existing binary would otherwise be left in place
+# with the other RF object still linked in.
+#   make clean && make TITAN_ENABLE_RF_MODEL=1
+TITAN_ENABLE_RF_MODEL ?= 0
+ifeq ($(TITAN_ENABLE_RF_MODEL),1)
+    RF_MODEL_EXCLUDED_SRC = $(SRC_ROOT)/titan_rf_model_closed.cpp
+else
+    RF_MODEL_EXCLUDED_SRC = $(SRC_ROOT)/titan_rf_model.cpp
+endif
+
+ROOT_SRCS = $(filter-out $(SRC_ROOT)/parse_arguments.cpp $(RF_MODEL_EXCLUDED_SRC),$(wildcard $(SRC_ROOT)/*.cpp))
 CLI_SRCS = $(wildcard $(SRC_ROOT)/cli/*.cpp)
 PBE_GRID_SRCS = $(wildcard $(SRC_ROOT)/pbe/grid/*.cpp)
 BIE_SRCS = $(wildcard $(SRC_ROOT)/bie/*.cpp) \
            $(wildcard $(SRC_ROOT)/bie/fmm/cartesian/*.cpp)
 PBE_SRCS  = $(wildcard $(SRC_ROOT)/tabi/*.cpp) $(BIE_SRCS) $(PBE_GRID_SRCS)
 PBCTOPO_SRCS = $(wildcard $(SRC_ROOT)/pbctopo/*.cpp)
-HOLOLIFT_SRCS = # HoloLift excluded from the reviewer build
+HOLOLIFT_SRCS = # HoloLift excluded from the public build
+TITAN_PATH_SRCS = $(wildcard $(SRC_ROOT)/titan_path/*.cpp)
 GMXTRAJ_SRCS = $(wildcard $(SRC_ROOT)/gmxtraj/*.cpp)
-SRCS  = $(ROOT_SRCS) $(CLI_SRCS) $(PBE_SRCS) $(PBCTOPO_SRCS) $(HOLOLIFT_SRCS) $(GMXTRAJ_SRCS)
+SRCS  = $(ROOT_SRCS) $(CLI_SRCS) $(PBE_SRCS) $(PBCTOPO_SRCS) $(HOLOLIFT_SRCS) $(TITAN_PATH_SRCS) $(GMXTRAJ_SRCS)
 OBJS  = $(patsubst %.cpp,$(BUILD_DIR)/%.o,$(SRCS))
 DEPS  = $(OBJS:.o=.d)
 
@@ -167,12 +203,10 @@ ifeq ($(OS),Windows_NT)
     RESOURCE_OBJ = $(BUILD_DIR)/titan_version_resource.o
     SCHEMA_SMOKE_TARGET = $(BUILD_DIR)/titan_build_schema_smoke.exe
     CLI_VALIDATION_SMOKE_TARGET = $(BUILD_DIR)/titan_cli_validation_smoke.exe
-    H9_BASELINE_TARGET = $(BUILD_DIR)/h9_component_temporal_baselines.exe
 else
     RESOURCE_OBJ =
     SCHEMA_SMOKE_TARGET = $(BUILD_DIR)/titan_build_schema_smoke
     CLI_VALIDATION_SMOKE_TARGET = $(BUILD_DIR)/titan_cli_validation_smoke
-    H9_BASELINE_TARGET = $(BUILD_DIR)/h9_component_temporal_baselines
 endif
 LINK_INPUTS = $(OBJS) $(RESOURCE_OBJ)
 SCHEMA_SMOKE_CXXFLAGS = $(filter-out -MMD -MP,$(CXXFLAGS))
@@ -182,7 +216,7 @@ SCHEMA_SMOKE_CXXFLAGS = $(filter-out -MMD -MP,$(CXXFLAGS))
 # ==========================================
 
 .DELETE_ON_ERROR:
-.PHONY: all build-info cli-registry build-metadata-test version-smoke cli-validation-test h9-component-temporal-baselines clean clean-all clean-generated release native portable release-native release-portable print-config FORCE
+.PHONY: all build-info cli-registry build-metadata-test tracked-includes-test version-smoke cli-validation-test clean clean-all clean-generated release native portable release-native release-portable print-config FORCE
 
 FORCE:
 
@@ -196,6 +230,9 @@ $(CLI_REGISTRY_HEADER): $(CLI_PARSER_SOURCE) $(CLI_REGISTRY_GENERATOR)
 
 cli-registry: $(CLI_REGISTRY_HEADER)
 
+tracked-includes-test:
+	$(PYTHON) tools/check_tracked_includes.py
+
 build-metadata-test:
 	@$(PYTHON) $(BUILD_INFO_TEST)
 
@@ -206,16 +243,6 @@ $(SCHEMA_SMOKE_TARGET): tools/titan_build_schema_smoke.cpp $(SRC_ROOT)/titan_con
 $(CLI_VALIDATION_SMOKE_TARGET): tools/titan_cli_validation_smoke.cpp $(CLI_REGISTRY_HEADER)
 	@echo Compiling CLI validation smoke...
 	@$(CXX) $(SCHEMA_SMOKE_CXXFLAGS) tools/titan_cli_validation_smoke.cpp -o $@ $(LDFLAGS)
-
-$(H9_BASELINE_TARGET): tools/h9_component_temporal_baselines.cpp \
-                       $(SRC_ROOT)/pbctopo/lattice_math.cpp \
-                       $(SRC_ROOT)/gmxtraj/xdrfile.cpp \
-                       $(SRC_ROOT)/gmxtraj/xdrfile_xtc.cpp
-	@echo Compiling H9 component temporal baselines...
-	@$(CXX) $(SCHEMA_SMOKE_CXXFLAGS) $^ -o $@ $(LDFLAGS)
-
-h9-component-temporal-baselines: $(H9_BASELINE_TARGET)
-
 
 all: $(TARGET)
 

@@ -109,6 +109,10 @@ foreach ($pattern in @(
         'component_graph_ultraclash=1',
         'component_search_frames=1',
         'pbctopo_output_certification_band_recoveries=1',
+        # The search winner sits one cell from its partner, so its offsets
+        # come back rebased; certifying them against unrebased points once
+        # flagged every atom.
+        'pbctopo_certification_assignment_point_residuals=0,',
         'pbci_fallback_frames=0'
     )) {
     if ($debugText -notmatch $pattern) {
@@ -120,9 +124,17 @@ if ($debugText -notmatch 'component graph fell through to search') {
 }
 
 $report = Import-Csv -LiteralPath (Join-Path $WorkRoot 'pbctopo_frame_report.csv')
-if ($report.status -ne 'certified' -or $report.component_count -ne '2' -or
-    $report.hard_certified -ne '1') {
+if ($report.component_count -ne '2' -or $report.hard_certified -ne '1' -or
+    $report.hard_clashes -ne '0') {
     throw 'Certification band did not recover an all-atom-safe image assignment'
+}
+# The only contact-supported relative image puts H2 on C1, so the recovered
+# image has no contact support. Since R2B3 (2654075a) that is weak_ambiguous
+# evidence rather than a certified frame.
+if ($report.status -ne 'weak_observation' -or
+    $report.evidence_state -ne 'weak_ambiguous' -or
+    $report.fallback_reason -ne 'evidence_underdetermined') {
+    throw "Unsupported recovered image was not reported as weak evidence: status=$($report.status), evidence_state=$($report.evidence_state), fallback_reason=$($report.fallback_reason)"
 }
 
 Write-Host 'PASS pbctopo_component_clash_scope_smoke'

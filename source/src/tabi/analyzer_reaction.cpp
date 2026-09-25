@@ -59,11 +59,18 @@ using analyzer_impl_detail::sample_process_memory;
 
 namespace {
 
-double debye_kappa_inv_a(double salt_m, double temp_k) noexcept {
+// Second copy of the screening length, for the grid path.  Keep it in step
+// with the boundary-integral copy in tabi_solver.cpp: kappa scales as
+// 1/sqrt(eps_r*T) and the 0.3291 prefactor already contains eps_r = 78.5.
+double debye_kappa_inv_a(double salt_m, double temp_k,
+                         double eps_out) noexcept {
   if (salt_m <= 0.0)
     return 0.0;
+  constexpr double kReferenceEpsOut = 78.5;
   const double temp_scale = std::sqrt(298.15 / std::max(1.0, temp_k));
-  return 0.3291 * std::sqrt(salt_m) * temp_scale;
+  const double diel_scale =
+      std::sqrt(kReferenceEpsOut / std::max(1.0e-6, eps_out));
+  return 0.3291 * std::sqrt(salt_m) * temp_scale * diel_scale;
 }
 
 class TabiPrepareProgressWriter {
@@ -203,7 +210,7 @@ AnalyzerImpl::solve_reaction_field(const std::vector<Atom> &atoms,
   const bool reuse_gate = pbsa_grid_reuse_gate();
   const bool validate_reuse = args_.pbsa_grid_reuse == "validate" && reuse_gate;
   const bool auto_reuse = args_.pbsa_grid_reuse == "auto" && reuse_gate;
-  const double solvent_kappa = debye_kappa_inv_a(args_.salt, args_.temp);
+  const double solvent_kappa = debye_kappa_inv_a(args_.salt, args_.temp, args_.ext_diel);
   FieldSolve solvent;
   {
     PbsaTimingScope timing_scope(*this, solvent_timing, capture_pbsa_timing);
@@ -768,6 +775,7 @@ AnalyzerImpl::solve_tabi_reaction_field(const std::vector<Atom> &atoms,
   options.ses_max_grid_vertices = args_.tabi_ses_max_grid_vertices;
   options.sphere_mesh_mode = args_.tabi_sphere_mesh;
   options.tree_leaf_size = args_.tabi_tree_leaf_size;
+  options.curved_pair_cache_mb = args_.tabi_curved_pair_cache_mb;
   options.tree_leaf_size_explicit = args_.tabi_tree_leaf_size_explicit;
   options.tree_opening_theta = args_.tabi_tree_opening_theta;
   options.tree_opening_theta_explicit =
@@ -958,6 +966,7 @@ AnalyzerImpl::solve_tabi_reaction_field(const std::vector<Atom> &atoms,
   solve.tabi_surface_point_count_requested = tabi.surface_point_count_requested;
   solve.tabi_panel_density_per_a2 = tabi.panel_density_per_a2;
   solve.tabi_panel_budget_status = tabi.panel_budget_status;
+  solve.tabi_charge_resolution = tabi.charge_resolution;
   solve.tabi_surface_exposed_points = tabi.exposed_points;
   solve.tabi_surface_buried_points = tabi.buried_points;
   solve.tabi_tree_build_ms = tabi.tree_build_ms;
@@ -1804,6 +1813,7 @@ AnalyzerImpl::solve_tabi_reaction_field(const std::vector<Atom> &atoms,
   solve.tabi_avg_valence = tabi.avg_valence;
   solve.tabi_nonmanifold_edges = tabi.nonmanifold_edges;
   solve.tabi_solid_angle_fallbacks = tabi.solid_angle_fallbacks;
+  solve.tabi_solid_angle_clamps = tabi.solid_angle_clamps;
   solve.tabi_diag_min = tabi.diag_min;
   solve.tabi_diag_max = tabi.diag_max;
   solve.tabi_taylor_order = tabi.taylor_order;
@@ -1930,6 +1940,7 @@ AnalyzerImpl::solve_tabi_reaction_field(const std::vector<Atom> &atoms,
       tabi.preconditioner_coarse_verify_rel_error_max;
   solve.tabi_surface_generator = tabi.surface_generator;
   solve.tabi_discretization = tabi.discretization;
+  solve.tabi_node_patch_representation = tabi.node_patch_representation;
   solve.tabi_rhs_scale = tabi.rhs_scale;
   solve.tabi_dielectric_contrast = tabi.dielectric_contrast;
   solve.tabi_operator_contrast = tabi.operator_contrast;

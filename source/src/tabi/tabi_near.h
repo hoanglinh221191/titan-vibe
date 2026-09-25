@@ -10,6 +10,15 @@
 
 namespace TitanPBE::Tabi {
 
+// Vertices are on the unit sphere. This is geometry-only preparation; the
+// dielectric contrast is applied when evaluating the scalar Poisson kernel.
+std::shared_ptr<const SpherePatchQuadrature> prepare_sphere_patch_quadrature(
+    const std::array<double, 3> &a, const std::array<double, 3> &b,
+    const std::array<double, 3> &c,
+    std::shared_ptr<const std::vector<std::array<double, 4>>> spheres,
+    bool clipped = false);
+std::size_t sphere_patch_quadrature_storage_bytes(const std::vector<Panel> &panels);
+
 struct JcpNearAccum {
   double phi{0.0};
   double phin{0.0};

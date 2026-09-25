@@ -775,11 +775,11 @@ JcpChannelValues jcp_direct_pair_channels(const PrototypePanel &target,
       target.nx * source.nx + target.ny * source.ny + target.nz * source.nz;
   const double nxu_nyu = nxu * nyu;
   const double tangent_metric = nxny - nxu_nyu;
-  const double mixed0 = inv_four_pi * inv_r3 * (3.0 * nxu_nyu - nxny);
+  const double mixed0 = inv_four_pi * inv_r3 * (nxny - 3.0 * nxu_nyu);
   const double fprime_k_over_r = -expkr * one_plus_kr * inv_four_pi * inv_r3;
   const double fsecond_k = expkr * inv_four_pi *
                            (kk * kk * inv_r + 2.0 * kk * inv_r2 + 2.0 * inv_r3);
-  const double mixedk = fsecond_k * nxu_nyu + fprime_k_over_r * tangent_metric;
+  const double mixedk = -fsecond_k * nxu_nyu - fprime_k_over_r * tangent_metric;
   const double phi = source_phi;
   channels[0] = source.area * (g0 - gk) * phin;
   channels[1] = source.area * (safe_eps_ratio * source_dk - source_d0) * phi;
@@ -892,11 +892,11 @@ JcpChannelValues jcp_far_cell_channels(const PrototypePanel &target,
                       target.nz * moments.phi_nz;
   const double nxu_nyu = nxu * nyu;
   const double tangent_metric = nxny - nxu_nyu;
-  const double mixed0 = inv_four_pi * inv_r3 * (3.0 * nxu_nyu - nxny);
+  const double mixed0 = inv_four_pi * inv_r3 * (nxny - 3.0 * nxu_nyu);
   const double fprime_k_over_r = -expkr * one_plus_kr * inv_four_pi * inv_r3;
   const double fsecond_k = expkr * inv_four_pi *
                            (kk * kk * inv_r + 2.0 * kk * inv_r2 + 2.0 * inv_r3);
-  const double mixedk = fsecond_k * nxu_nyu + fprime_k_over_r * tangent_metric;
+  const double mixedk = -fsecond_k * nxu_nyu - fprime_k_over_r * tangent_metric;
   const double k4 = mixedk - mixed0;
 
   channels[0] = k1;
@@ -1060,6 +1060,26 @@ struct FmmM2lAnalyticContext::Impl {
   // Krylov apply. Build its packed representation lazily once production
   // triangle geometry is available, then only refresh density SoA values.
   mutable std::unique_ptr<PackedJcpFallbackPlan> degree1_packed_near_plan;
+  // The packed AVX2 near path evaluates every non-self pair with the centroid
+  // monopole kernel.  For coupled node-patch panels the correct one-ring rule
+  // is the patch integral (tabi_near.cpp, the `node_patch_pair &&
+  // selected.one_ring` branch added in 7ba6ee23), so those pairs need
+  // K_patch - K_centroid added back.  The Cartesian full route already does
+  // this in its own adapter; production did not, and the two operators
+  // disagreed by 81% on barstar with zero far pairs.  See
+  // docs/TITAN_NODE_PATCH_ROOT_CAUSE_2026-09-16.md.  The near worklist is
+  // immutable across Krylov applies, so the deltas are built once with the
+  // plan and only contracted with the densities afterwards.
+  struct NodePatchOneRingCorrection {
+    std::uint32_t target{0};
+    std::uint32_t source{0};
+    double dk1{0.0};
+    double dk2{0.0};
+    double dk3{0.0};
+    double dk4{0.0};
+  };
+  mutable std::vector<NodePatchOneRingCorrection>
+      degree1_packed_one_ring_corrections;
   mutable std::mutex degree1_apply_mutex;
   mutable std::vector<PanelSourceMoments> degree1_moment_workspace;
   bool local_p4_prepared{false};
@@ -1610,11 +1630,58 @@ JcpAnalyticOperatorResult FmmM2lAnalyticContext::apply_into(
       impl_->degree1_packed_near_plan = std::make_unique<PackedJcpFallbackPlan>(
           build_packed_jcp_fallback_plan(
               *production_panels, impl_->source_tree.order, leaves, 4, 32));
+      // Built from the same leaves the plan is built from, so the corrected
+      // pairs are exactly the pairs the packed kernel evaluated.  Only pairs
+      // the near kernel itself reports as one-ring are corrected; self pairs
+      // already take the scalar path inside the packed loop.
+      impl_->degree1_packed_one_ring_corrections.clear();
+      if (coupled && node_patch_sources) {
+        const std::vector<TitanPBE::Tabi::Panel> &np = *production_panels;
+        for (const PackedFallbackLeafInput &leaf : leaves) {
+          for (const std::size_t target : leaf.target_panels) {
+            for (const auto &span : leaf.source_spans) {
+              for (std::size_t pos = span.first_panel;
+                   pos < span.first_panel + span.panel_count; ++pos) {
+                const std::size_t source = impl_->source_tree.order[pos];
+                if (source == target)
+                  continue;
+                const auto analytic =
+                    TitanPBE::Tabi::evaluate_jcp_near_pair_kernel(
+                        np[target], target, np[source], source,
+                        impl_->eps_ratio, impl_->kappa, true,
+                        "analytic_singular", "off", nullptr);
+                if (!analytic.valid || !analytic.one_ring)
+                  continue;
+                const auto centroid =
+                    TitanPBE::Tabi::evaluate_jcp_centroid_monopole_kernel(
+                        np[target], np[source], impl_->eps_ratio,
+                        impl_->kappa);
+                if (!centroid.valid)
+                  throw std::runtime_error(
+                      "packed node-patch one-ring correction is invalid");
+                impl_->degree1_packed_one_ring_corrections.push_back(
+                    {static_cast<std::uint32_t>(target),
+                     static_cast<std::uint32_t>(source),
+                     analytic.k1 - centroid.k1, analytic.k2 - centroid.k2,
+                     analytic.k3 - centroid.k3, analytic.k4 - centroid.k4});
+              }
+            }
+          }
+        }
+      }
     }
     const PackedFallbackApplyMetrics packed = accumulate_packed_jcp_fallback(
         *impl_->degree1_packed_near_plan, *production_panels, phi_values,
         phin_values, impl_->eps_ratio, impl_->kappa, coupled, near_integration,
         quad_buffer, "packed-avx2", executor, phi_out, phin_out);
+    for (const auto &c : impl_->degree1_packed_one_ring_corrections) {
+      phi_out[c.target] +=
+          c.dk2 * phi_values[c.source] + c.dk1 * phin_values[c.source];
+      phin_out[c.target] +=
+          c.dk3 * phin_values[c.source] + c.dk4 * phi_values[c.source];
+    }
+    result.near_one_ring_pairs +=
+        impl_->degree1_packed_one_ring_corrections.size();
     result.near_self_pairs = packed.scalar_self_pairs;
     if (node_patch_sources) {
       result.near_duffy_pairs = packed.scalar_self_pairs;
@@ -3904,14 +3971,14 @@ compute_direct_derivative_reference(const std::vector<PrototypePanel> &panels,
           target.nx * source.nx + target.ny * source.ny + target.nz * source.nz;
       const double nxu_nyu = nxu * nyu;
       const double tangent_metric = nxny - nxu_nyu;
-      const double mixed0 = inv_four_pi * inv_r3 * (3.0 * nxu_nyu - nxny);
+      const double mixed0 = inv_four_pi * inv_r3 * (nxny - 3.0 * nxu_nyu);
       const double fprime_k_over_r =
           -expkr * one_plus_kr * inv_four_pi * inv_r3;
       const double fsecond_k =
           expkr * inv_four_pi *
           (kk * kk * inv_r + 2.0 * kk * inv_r2 + 2.0 * inv_r3);
       const double mixedk =
-          fsecond_k * nxu_nyu + fprime_k_over_r * tangent_metric;
+          -fsecond_k * nxu_nyu - fprime_k_over_r * tangent_metric;
       const double phi = source.scalar_density;
       const double phin = jcp_phin_for_panel(source, j);
       ref.k2[i] += source.area * (eps_ratio * source_dk - source_d0) * phi;
@@ -4170,7 +4237,7 @@ run_jcp_derivative_bridge_probe(const PrototypeConfig &input_config,
         (k4_lap_plus.approx[i] - k4_lap_minus.approx[i]) / (2.0 * h);
     const double yuk_mixed =
         (k4_yuk_plus.approx[i] - k4_yuk_minus.approx[i]) / (2.0 * h);
-    approx_k4[i] = lap_mixed - yuk_mixed;
+    approx_k4[i] = yuk_mixed - lap_mixed;
   }
 
   PrototypeMetrics e2, e3, e4;
@@ -4327,7 +4394,7 @@ evaluate_jcp_offline_operator(const PrototypeConfig &input_config,
         (k4_lap_plus.approx[i] - k4_lap_minus.approx[i]) / (2.0 * h);
     const double yuk_mixed =
         (k4_yuk_plus.approx[i] - k4_yuk_minus.approx[i]) / (2.0 * h);
-    const double k4 = lap_mixed - yuk_mixed;
+    const double k4 = yuk_mixed - lap_mixed;
     result.phi[i] = k1 + k2;
     result.phin[i] = k3 + k4;
     result.finite_outputs = result.finite_outputs &&

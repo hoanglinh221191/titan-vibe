@@ -22,6 +22,7 @@ struct GromacsMoleculeType {
   std::string name;
   std::uint32_t atom_count = 0;
   std::vector<std::string> atom_types;
+  std::vector<double> explicit_masses;
   std::vector<MolTopologyBond> bonds;
 };
 
@@ -40,6 +41,7 @@ struct ExpandedGromacsTopology {
   std::vector<MolTopologyBond> bonds;
   std::vector<MolTopologyMoleculeRange> molecule_ranges;
   std::vector<double> vdw_radii;
+  std::vector<double> atomic_masses;
 };
 
 double gromacs_vdw_radius_angstrom(const GromacsLennardJonesType &lj,
@@ -104,7 +106,8 @@ std::string topology_section_name(const std::string &line) {
 
 void collect_topology_file_list(const std::filesystem::path &current_file,
                                 std::vector<std::filesystem::path> &out_files,
-                                std::unordered_set<std::string> &visited) {
+                                std::unordered_set<std::string> &visited,
+                                bool &includes_complete) {
   namespace fs = std::filesystem;
 
   const fs::path normalized = current_file.lexically_normal();
@@ -114,22 +117,27 @@ void collect_topology_file_list(const std::filesystem::path &current_file,
 
   out_files.emplace_back(normalized);
   std::fstream input(normalized, std::ios::in);
-  if (!input.is_open())
+  if (!input.is_open()) {
+    includes_complete = false;
     return;
+  }
 
   for (std::string raw_line; std::getline(input, raw_line);) {
     const auto include_target = TitanTopo::extract_include_target(raw_line);
     if (!include_target)
       continue;
+    bool resolved = false;
     for (const auto &candidate :
          TitanTopo::build_include_candidates(key, *include_target)) {
       std::fstream included(candidate, std::ios::in);
       if (!included.is_open())
         continue;
       included.close();
-      collect_topology_file_list(candidate, out_files, visited);
+      resolved = true;
+      collect_topology_file_list(candidate, out_files, visited, includes_complete);
       break;
     }
+    if (!resolved) includes_complete = false;
   }
 }
 
@@ -148,12 +156,15 @@ parse_and_expand_gromacs_topology(std::string_view topology_path) {
 
   std::vector<fs::path> files;
   std::unordered_set<std::string> visited;
-  collect_topology_file_list(root_path, files, visited);
+  bool includes_complete = true;
+  collect_topology_file_list(root_path, files, visited, includes_complete);
   if (files.empty())
     return std::unexpected("no topology files collected");
 
   std::unordered_map<std::string, GromacsMoleculeType> molecule_types;
   std::unordered_map<std::string, GromacsLennardJonesType> atom_types;
+  std::unordered_map<std::string, double> atom_type_masses;
+  bool mass_binding_supported = includes_complete;
   std::unordered_map<std::string, GromacsLennardJonesType>
       self_nonbond_parameters;
   std::vector<std::string> molecule_type_order;
@@ -168,16 +179,23 @@ parse_and_expand_gromacs_topology(std::string_view topology_path) {
     std::string section;
     GromacsMoleculeType *current_molecule = nullptr;
     bool expect_moleculetype_name = false;
+    unsigned conditional_depth = 0;
 
     for (std::string raw_line; std::getline(input, raw_line);) {
       std::string line = trim_topology_line(std::move(raw_line));
       if (line.empty())
         continue;
-      if (line[0] == '#')
+      if (line[0] == '#') {
+        if (line.starts_with("#if")) ++conditional_depth;
+        else if (line.starts_with("#endif") && conditional_depth) --conditional_depth;
         continue;
+      }
 
       if (line.front() == '[') {
         section = topology_section_name(line);
+        if (conditional_depth && (section == "atoms" || section == "atomtypes" ||
+                                  section == "moleculetype" || section == "molecules"))
+          mass_binding_supported = false;
         expect_moleculetype_name = (section == "moleculetype");
         continue;
       }
@@ -188,6 +206,7 @@ parse_and_expand_gromacs_topology(std::string_view topology_path) {
         int nrexcl = 0;
         if (iss >> name >> nrexcl) {
           auto [it, inserted] = molecule_types.try_emplace(name);
+          if (!inserted) mass_binding_supported = false;
           if (inserted) {
             it->second.name = name;
             molecule_type_order.emplace_back(name);
@@ -210,6 +229,7 @@ parse_and_expand_gromacs_topology(std::string_view topology_path) {
       }
 
       if (section == "atomtypes") {
+        if (conditional_depth) mass_binding_supported = false;
         std::istringstream iss(line);
         std::vector<std::string> fields;
         for (std::string field; iss >> field;)
@@ -220,6 +240,13 @@ parse_and_expand_gromacs_topology(std::string_view topology_path) {
           const double first = std::stod(fields[fields.size() - 2]);
           const double second = std::stod(fields.back());
           atom_types[fields.front()] = {first, second};
+          // The optional bond-type/atomic-number fields precede mass; the
+          // trailing fields are always mass, charge, ptype, sigma/C6, epsilon/C12.
+          if (fields.size() >= 6) {
+            const double mass = std::stod(fields[fields.size() - 5]);
+            const auto [it, inserted] = atom_type_masses.emplace(fields.front(), mass);
+            if (!inserted && it->second != mass) mass_binding_supported = false;
+          }
         } catch (const std::exception &) {
         }
         continue;
@@ -238,17 +265,38 @@ parse_and_expand_gromacs_topology(std::string_view topology_path) {
       }
 
       if (section == "atoms") {
+        if (conditional_depth) mass_binding_supported = false;
         if (current_molecule == nullptr)
           continue;
         std::istringstream iss(line);
         std::uint32_t atom_index = 0;
         std::string atom_type;
-        if (iss >> atom_index >> atom_type) {
+        if (iss >> atom_index >> atom_type && atom_index > 0) {
           current_molecule->atom_count =
               std::max(current_molecule->atom_count, atom_index);
           if (current_molecule->atom_types.size() < atom_index)
             current_molecule->atom_types.resize(atom_index);
+          if (!current_molecule->atom_types[atom_index - 1].empty())
+            mass_binding_supported = false;
           current_molecule->atom_types[atom_index - 1] = std::move(atom_type);
+          current_molecule->explicit_masses.resize(current_molecule->atom_types.size(),
+              std::numeric_limits<double>::quiet_NaN());
+          std::string resnr, residue, atomname, cgnr, charge, mass_text;
+          if (!(iss >> resnr >> residue >> atomname >> cgnr >> charge)) {
+            mass_binding_supported = false;
+          } else if (iss >> mass_text) {
+            try {
+              std::size_t consumed = 0;
+              const double mass = std::stod(mass_text, &consumed);
+              if (consumed != mass_text.size()) mass_binding_supported = false;
+              current_molecule->explicit_masses[atom_index - 1] = mass;
+              std::string type_b, charge_b, mass_b;
+              if (iss >> type_b) {
+                if (!(iss >> charge_b >> mass_b) || std::stod(mass_b) != mass)
+                  mass_binding_supported = false;
+              }
+            } catch (const std::exception &) { mass_binding_supported = false; }
+          }
         }
         continue;
       }
@@ -274,6 +322,7 @@ parse_and_expand_gromacs_topology(std::string_view topology_path) {
       }
 
       if (section == "molecules") {
+        if (conditional_depth) mass_binding_supported = false;
         std::istringstream iss(line);
         std::string name;
         std::uint32_t count = 0;
@@ -303,10 +352,19 @@ parse_and_expand_gromacs_topology(std::string_view topology_path) {
       expanded.molecule_ranges.push_back({begin, end, instance.name, copy});
       expanded.vdw_radii.resize(
           end, std::numeric_limits<double>::quiet_NaN());
+      expanded.atomic_masses.resize(end, std::numeric_limits<double>::quiet_NaN());
       for (std::uint32_t atom = 0; atom < type.atom_count; ++atom) {
         if (atom >= type.atom_types.size() || type.atom_types[atom].empty())
           continue;
         const std::string &atom_type = type.atom_types[atom];
+        if (mass_binding_supported) {
+          if (atom < type.explicit_masses.size() &&
+              !std::isnan(type.explicit_masses[atom]))
+            expanded.atomic_masses[begin + atom] = type.explicit_masses[atom];
+          else if (const auto mass_it = atom_type_masses.find(atom_type);
+                   mass_it != atom_type_masses.end())
+            expanded.atomic_masses[begin + atom] = mass_it->second;
+        }
         const GromacsLennardJonesType *lj = nullptr;
         if (const auto self_it = self_nonbond_parameters.find(atom_type);
             self_it != self_nonbond_parameters.end()) {
@@ -484,6 +542,18 @@ MolTopology::vdw_radius(std::uint32_t atom) const noexcept {
   return vdw_radii_[atom];
 }
 
+std::optional<double>
+MolTopology::atomic_mass(std::uint32_t atom) const noexcept {
+  if (atom >= atomic_masses_.size() || !std::isfinite(atomic_masses_[atom]) ||
+      atomic_masses_[atom] <= 0.0) return std::nullopt;
+  return atomic_masses_[atom];
+}
+
+void MolTopology::set_atomic_masses(std::vector<double> masses) {
+  atomic_masses_.clear();
+  if (masses.size() == atom_count_) atomic_masses_ = std::move(masses);
+}
+
 MolTopologyVdwRadiusSource
 MolTopology::vdw_radius_source(std::uint32_t atom) const noexcept {
   if (atom >= vdw_radius_sources_.size())
@@ -499,6 +569,7 @@ void MolTopology::clear() noexcept {
   col_indices_.clear();
   source_atom_ids_.clear();
   vdw_radii_.clear();
+  atomic_masses_.clear();
   vdw_radius_sources_.clear();
   vdw_radius_count_ = 0;
 }
@@ -509,6 +580,7 @@ void MolTopology::set_bonds(
     std::vector<std::uint32_t> source_atom_ids,
     std::vector<double> vdw_radii) {
   atom_count_ = atom_count;
+  atomic_masses_.clear();
   bonds_.clear();
   bonds_.reserve(bonds.size());
 
@@ -643,7 +715,19 @@ build_gromacs_mol_topology(std::string_view topology_path,
 
   std::vector<double> projected_vdw_radii(
       selection_info.size(), std::numeric_limits<double>::quiet_NaN());
+  std::vector<double> projected_masses(selection_info.size(),
+      std::numeric_limits<double>::quiet_NaN());
+  // Do not accept the legacy sequential fallback when explicit IDs disagree.
+  const bool exact_mass_identity = std::all_of(source_to_local.begin(), source_to_local.end(),
+      [&](const auto &entry) {
+        const auto [source, local] = entry;
+        return local < selection_info.size() &&
+            selection_info[local].has_original_atom_id() &&
+            selection_info[local].get_original_atom_id() == source;
+      });
   for (const auto &[source, local] : source_to_local) {
+    if (exact_mass_identity && source < expanded.atomic_masses.size() &&
+        local < projected_masses.size()) projected_masses[local] = expanded.atomic_masses[source];
     if (source < expanded.vdw_radii.size() &&
         local < projected_vdw_radii.size())
       projected_vdw_radii[local] = expanded.vdw_radii[source];
@@ -657,6 +741,7 @@ build_gromacs_mol_topology(std::string_view topology_path,
                      std::move(projected_bonds), std::move(molecule_ranges),
                      std::move(source_atom_ids),
                      std::move(projected_vdw_radii));
+  topology.set_atomic_masses(std::move(projected_masses));
   return topology;
 }
 

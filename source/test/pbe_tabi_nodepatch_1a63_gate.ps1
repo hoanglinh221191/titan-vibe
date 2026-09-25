@@ -76,16 +76,31 @@ if ([int]$node.profile.iterations -gt $IterationGate) {
 if ([double]$node.profile.true_residual_rel -gt 1.0e-4) {
     throw "Node-patch true residual gate failed: $($node.profile.true_residual_rel)"
 }
-if ([int64]$node.profile.matvec_audit_rows -lt 128 -or
-    [double]$node.profile.tree_vs_direct_matvec_rel -gt 2.0e-2) {
-    throw "Node-patch pre-GMRES operator audit failed: rows=$($node.profile.matvec_audit_rows) rel=$($node.profile.tree_vs_direct_matvec_rel)"
+if ($node.profile.fmm_cartesian_pre_audit_enabled -ne 'true' -or
+    [int64]$node.profile.fmm_cartesian_pre_audit_rows -lt 128 -or
+    [double]$node.profile.fmm_cartesian_pre_audit_aggregate_rel -gt 2.0e-2) {
+    throw "Node-patch pre-GMRES operator audit failed: enabled=$($node.profile.fmm_cartesian_pre_audit_enabled) rows=$($node.profile.fmm_cartesian_pre_audit_rows) rel=$($node.profile.fmm_cartesian_pre_audit_aggregate_rel)"
 }
-if ([int64]$nodeNoAudit.profile.matvec_audit_rows -ne 0) {
-    throw "Node-patch audit-off still evaluated direct rows: $($nodeNoAudit.profile.matvec_audit_rows)"
+if ([math]::Abs([double]$node.profile.tree_vs_direct_matvec_rel -
+        [double]$node.profile.fmm_cartesian_pre_audit_aggregate_rel) -gt 1.0e-12 -or
+    [int64]$node.profile.matvec_audit_rows -ne
+        [int64]$node.profile.fmm_cartesian_pre_audit_rows -or
+    [math]::Abs([double]$node.profile.matvec_audit_seconds -
+        [double]$node.profile.fmm_cartesian_pre_audit_seconds) -gt 1.0e-12) {
+    throw 'Node-patch legacy audit telemetry no longer preserves the fixed pre-GMRES audit.'
+}
+if ($nodeNoAudit.profile.fmm_cartesian_pre_audit_enabled -ne 'false' -or
+    [int64]$nodeNoAudit.profile.fmm_cartesian_pre_audit_rows -ne 0 -or
+    [double]$nodeNoAudit.profile.tree_vs_direct_matvec_rel -ne 0.0 -or
+    [int64]$nodeNoAudit.profile.matvec_audit_rows -ne 0) {
+    throw "Node-patch audit-off still evaluated direct rows: enabled=$($nodeNoAudit.profile.fmm_cartesian_pre_audit_enabled) rows=$($nodeNoAudit.profile.fmm_cartesian_pre_audit_rows)"
 }
 if ([int]$nodeNoAudit.profile.iterations -ne [int]$node.profile.iterations -or
     [double]$nodeNoAudit.profile.true_residual_rel -gt 1.0e-4) {
     throw "Node-patch audit-off solve drifted: iterations=$($nodeNoAudit.profile.iterations) residual=$($nodeNoAudit.profile.true_residual_rel)"
+}
+if ([int64]$node.profile.matvec_calls -ne [int64]$nodeNoAudit.profile.matvec_calls) {
+    throw "Node-patch pre-audit contaminated matvec telemetry: audited=$($node.profile.matvec_calls) off=$($nodeNoAudit.profile.matvec_calls)"
 }
 $auditOffEnergyRel = [math]::Abs(
     ([double]$nodeNoAudit.energy.E_rxn_kJmol - [double]$node.energy.E_rxn_kJmol) /
@@ -123,7 +138,7 @@ $summary = @(
         mode='centroid'; panels=$centroid.profile.panels
         unknowns=$centroid.profile.unknown_count; iterations=$centroid.profile.iterations
         true_residual=$centroid.profile.true_residual_rel
-        operator_audit_rel=$centroid.profile.tree_vs_direct_matvec_rel
+        operator_audit_rel=$centroid.profile.fmm_cartesian_pre_audit_aggregate_rel
         total_seconds=$centroid.profile.total_seconds
         peak_rss_mb=$centroid.run.peak_working_set_mb
         energy_kj_mol=$centroid.energy.E_rxn_kJmol
@@ -132,7 +147,7 @@ $summary = @(
         mode='node-patch'; panels=$node.profile.panels
         unknowns=$node.profile.unknown_count; iterations=$node.profile.iterations
         true_residual=$node.profile.true_residual_rel
-        operator_audit_rel=$node.profile.tree_vs_direct_matvec_rel
+        operator_audit_rel=$node.profile.fmm_cartesian_pre_audit_aggregate_rel
         total_seconds=$node.profile.total_seconds
         peak_rss_mb=$node.run.peak_working_set_mb
         energy_kj_mol=$node.energy.E_rxn_kJmol
@@ -141,7 +156,7 @@ $summary = @(
         mode='node-patch-audit-off'; panels=$nodeNoAudit.profile.panels
         unknowns=$nodeNoAudit.profile.unknown_count; iterations=$nodeNoAudit.profile.iterations
         true_residual=$nodeNoAudit.profile.true_residual_rel
-        operator_audit_rel=$nodeNoAudit.profile.tree_vs_direct_matvec_rel
+        operator_audit_rel=$nodeNoAudit.profile.fmm_cartesian_pre_audit_aggregate_rel
         total_seconds=$nodeNoAudit.profile.total_seconds
         peak_rss_mb=$nodeNoAudit.run.peak_working_set_mb
         energy_kj_mol=$nodeNoAudit.energy.E_rxn_kJmol
@@ -149,6 +164,6 @@ $summary = @(
 )
 $summary | Export-Csv -LiteralPath (Join-Path $WorkRoot 'nodepatch_1a63_gate.csv') -NoTypeInformation
 Write-Host ("PBE TABI node-patch 1A63 gate PASS: iterations={0} audit={1} rows={2} node_s={3} no_audit_s={4} centroid_s={5}" -f `
-    $node.profile.iterations, $node.profile.tree_vs_direct_matvec_rel,
-    $node.profile.matvec_audit_rows, $node.profile.total_seconds,
+    $node.profile.iterations, $node.profile.fmm_cartesian_pre_audit_aggregate_rel,
+    $node.profile.fmm_cartesian_pre_audit_rows, $node.profile.total_seconds,
     $nodeNoAudit.profile.total_seconds, $centroid.profile.total_seconds)

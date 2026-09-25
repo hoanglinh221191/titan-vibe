@@ -1,520 +1,62 @@
 {
-  "binary_sha256": "34f00e72526137bb0bee87f16729a73525a98d3751646dc1df5c57f592b0b04f",
+  "binary_sha256": "f4dc1e68d8a1ff40b9c1834bd0f526dcf90bf67a8816f931e3da4a2887099270",
+  "all_frames_requested": false,
   "all_pass": true,
+  "systems_completed": 5,
   "results": {
-    "S1_tetramer": {
+    "S1_tetramer/A": {
       "exit_code": 0,
-      "elapsed_s": 1.1560021999757737,
-      "atoms_new": 25504,
-      "atoms_archived": 25504,
-      "max_abs_coordinate_deviation_A": 0.0,
-      "fields": {
-        "status": {
-          "release": "certified",
-          "archived": "certified",
-          "same": true
-        },
-        "mode": {
-          "release": "component_graph",
-          "archived": "component_graph",
-          "same": true
-        },
-        "component_count": {
-          "release": "4",
-          "archived": "4",
-          "same": true
-        },
-        "evidence_state": {
-          "release": "supported_connected",
-          "archived": "supported_connected",
-          "same": true
-        },
-        "fallback_reason": {
-          "release": "none",
-          "archived": "none",
-          "same": true
-        },
-        "hard_feasible": {
-          "release": "1",
-          "archived": "1",
-          "same": true
-        },
-        "hard_certified": {
-          "release": "1",
-          "archived": "1",
-          "same": true
-        },
-        "evidence_graph_connected": {
-          "release": "1",
-          "archived": "1",
-          "same": true
-        },
-        "soft_observed_contacts_checked": {
-          "release": "40",
-          "archived": "40",
-          "same": true
-        },
-        "soft_observed_selected_compatible_contact_count": {
-          "release": "40",
-          "archived": "40",
-          "same": true
-        },
-        "soft_observed_hypothesis_count": {
-          "release": "5",
-          "archived": "5",
-          "same": true
-        },
-        "soft_observed_compatible_hypothesis_count": {
-          "release": "5",
-          "archived": "5",
-          "same": true
-        },
-        "soft_observed_ambiguous_relation_count": {
-          "release": "0",
-          "archived": "0",
-          "same": true
-        },
-        "soft_observed_no_support_relation_count": {
-          "release": "0",
-          "archived": "0",
-          "same": true
-        },
-        "soft_observed_alternative_hypothesis_contact_count": {
-          "release": "0",
-          "archived": "0",
-          "same": true
-        },
-        "feasible_assignment_set_enumerated": {
-          "release": "0",
-          "archived": "0",
-          "same": true
-        },
-        "feasible_assignments_within_domain": {
-          "release": "0",
-          "archived": "0",
-          "same": true
-        },
-        "wrapped_coordinate_hash": {
-          "release": "71ecfef3afe440b15ca8a48702c12728",
-          "archived": "71ecfef3afe440b15ca8a48702c12728",
-          "same": true
-        }
-      },
-      "all_fields_same": true,
-      "producer_release": "0.2.0-dev.242+g6a8385cf1c63.dirty",
-      "producer_archived": "0.2.0-dev.242+g6a8385cf1c63",
+      "elapsed_s": 1.5571911999868462,
+      "atom_records": 25504,
+      "coordinates_identical_at_PDB_precision": true,
+      "frames": 1,
+      "scientific_fields_identical": true,
+      "route_changes": 0,
+      "input_checksum_changes": 0,
       "pass": true
     },
-    "S2_hexamer": {
+    "S2_hexamer/A": {
       "exit_code": 0,
-      "elapsed_s": 2.2337336000055075,
-      "atoms_new": 38252,
-      "atoms_archived": 38252,
-      "max_abs_coordinate_deviation_A": 0.0,
-      "fields": {
-        "status": {
-          "release": "certified",
-          "archived": "certified",
-          "same": true
-        },
-        "mode": {
-          "release": "component_graph",
-          "archived": "component_graph",
-          "same": true
-        },
-        "component_count": {
-          "release": "6",
-          "archived": "6",
-          "same": true
-        },
-        "evidence_state": {
-          "release": "supported_connected",
-          "archived": "supported_connected",
-          "same": true
-        },
-        "fallback_reason": {
-          "release": "none",
-          "archived": "none",
-          "same": true
-        },
-        "hard_feasible": {
-          "release": "1",
-          "archived": "1",
-          "same": true
-        },
-        "hard_certified": {
-          "release": "1",
-          "archived": "1",
-          "same": true
-        },
-        "evidence_graph_connected": {
-          "release": "1",
-          "archived": "1",
-          "same": true
-        },
-        "soft_observed_contacts_checked": {
-          "release": "96",
-          "archived": "96",
-          "same": true
-        },
-        "soft_observed_selected_compatible_contact_count": {
-          "release": "96",
-          "archived": "96",
-          "same": true
-        },
-        "soft_observed_hypothesis_count": {
-          "release": "12",
-          "archived": "12",
-          "same": true
-        },
-        "soft_observed_compatible_hypothesis_count": {
-          "release": "12",
-          "archived": "12",
-          "same": true
-        },
-        "soft_observed_ambiguous_relation_count": {
-          "release": "0",
-          "archived": "0",
-          "same": true
-        },
-        "soft_observed_no_support_relation_count": {
-          "release": "0",
-          "archived": "0",
-          "same": true
-        },
-        "soft_observed_alternative_hypothesis_contact_count": {
-          "release": "0",
-          "archived": "0",
-          "same": true
-        },
-        "feasible_assignment_set_enumerated": {
-          "release": "0",
-          "archived": "0",
-          "same": true
-        },
-        "feasible_assignments_within_domain": {
-          "release": "0",
-          "archived": "0",
-          "same": true
-        },
-        "wrapped_coordinate_hash": {
-          "release": "cc59a639ac6a7258b8c5be59acd0c15d",
-          "archived": "cc59a639ac6a7258b8c5be59acd0c15d",
-          "same": true
-        }
-      },
-      "all_fields_same": true,
-      "producer_release": "0.2.0-dev.242+g6a8385cf1c63.dirty",
-      "producer_archived": "0.2.0-dev.242+g6a8385cf1c63",
+      "elapsed_s": 2.2390087000094354,
+      "atom_records": 38252,
+      "coordinates_identical_at_PDB_precision": true,
+      "frames": 1,
+      "scientific_fields_identical": true,
+      "route_changes": 0,
+      "input_checksum_changes": 0,
       "pass": true
     },
-    "S3_protein_glycan": {
+    "S3_protein_glycan/A": {
       "exit_code": 0,
-      "elapsed_s": 4.64561710000271,
-      "atoms_new": 14393,
-      "atoms_archived": 14393,
-      "max_abs_coordinate_deviation_A": 0.0,
-      "fields": {
-        "status": {
-          "release": "certified",
-          "archived": "certified",
-          "same": true
-        },
-        "mode": {
-          "release": "component_exact",
-          "archived": "component_exact",
-          "same": true
-        },
-        "component_count": {
-          "release": "2",
-          "archived": "2",
-          "same": true
-        },
-        "evidence_state": {
-          "release": "supported_connected",
-          "archived": "supported_connected",
-          "same": true
-        },
-        "fallback_reason": {
-          "release": "none",
-          "archived": "none",
-          "same": true
-        },
-        "hard_feasible": {
-          "release": "1",
-          "archived": "1",
-          "same": true
-        },
-        "hard_certified": {
-          "release": "1",
-          "archived": "1",
-          "same": true
-        },
-        "evidence_graph_connected": {
-          "release": "1",
-          "archived": "1",
-          "same": true
-        },
-        "soft_observed_contacts_checked": {
-          "release": "8",
-          "archived": "8",
-          "same": true
-        },
-        "soft_observed_selected_compatible_contact_count": {
-          "release": "8",
-          "archived": "8",
-          "same": true
-        },
-        "soft_observed_hypothesis_count": {
-          "release": "1",
-          "archived": "1",
-          "same": true
-        },
-        "soft_observed_compatible_hypothesis_count": {
-          "release": "1",
-          "archived": "1",
-          "same": true
-        },
-        "soft_observed_ambiguous_relation_count": {
-          "release": "0",
-          "archived": "0",
-          "same": true
-        },
-        "soft_observed_no_support_relation_count": {
-          "release": "0",
-          "archived": "0",
-          "same": true
-        },
-        "soft_observed_alternative_hypothesis_contact_count": {
-          "release": "0",
-          "archived": "0",
-          "same": true
-        },
-        "feasible_assignment_set_enumerated": {
-          "release": "1",
-          "archived": "1",
-          "same": true
-        },
-        "feasible_assignments_within_domain": {
-          "release": "125",
-          "archived": "125",
-          "same": true
-        },
-        "wrapped_coordinate_hash": {
-          "release": "64ec77c56ba7f6020093ccc95f60ec22",
-          "archived": "64ec77c56ba7f6020093ccc95f60ec22",
-          "same": true
-        }
-      },
-      "all_fields_same": true,
-      "producer_release": "0.2.0-dev.242+g6a8385cf1c63.dirty",
-      "producer_archived": "0.2.0-dev.242+g6a8385cf1c63",
+      "elapsed_s": 2.190553299995372,
+      "atom_records": 14393,
+      "coordinates_identical_at_PDB_precision": true,
+      "frames": 1,
+      "scientific_fields_identical": true,
+      "route_changes": 0,
+      "input_checksum_changes": 0,
       "pass": true
     },
-    "S4_peptide_pair": {
+    "S4_peptide_pair/A": {
       "exit_code": 0,
-      "elapsed_s": 0.5871122000389732,
-      "atoms_new": 1254,
-      "atoms_archived": 1254,
-      "max_abs_coordinate_deviation_A": 0.0,
-      "fields": {
-        "status": {
-          "release": "weak_observation",
-          "archived": "weak_observation",
-          "same": true
-        },
-        "mode": {
-          "release": "component_graph",
-          "archived": "component_graph",
-          "same": true
-        },
-        "component_count": {
-          "release": "2",
-          "archived": "2",
-          "same": true
-        },
-        "evidence_state": {
-          "release": "weak_ambiguous",
-          "archived": "weak_ambiguous",
-          "same": true
-        },
-        "fallback_reason": {
-          "release": "evidence_underdetermined",
-          "archived": "evidence_underdetermined",
-          "same": true
-        },
-        "hard_feasible": {
-          "release": "1",
-          "archived": "1",
-          "same": true
-        },
-        "hard_certified": {
-          "release": "1",
-          "archived": "1",
-          "same": true
-        },
-        "evidence_graph_connected": {
-          "release": "1",
-          "archived": "1",
-          "same": true
-        },
-        "soft_observed_contacts_checked": {
-          "release": "8",
-          "archived": "8",
-          "same": true
-        },
-        "soft_observed_selected_compatible_contact_count": {
-          "release": "6",
-          "archived": "6",
-          "same": true
-        },
-        "soft_observed_hypothesis_count": {
-          "release": "2",
-          "archived": "2",
-          "same": true
-        },
-        "soft_observed_compatible_hypothesis_count": {
-          "release": "1",
-          "archived": "1",
-          "same": true
-        },
-        "soft_observed_ambiguous_relation_count": {
-          "release": "1",
-          "archived": "1",
-          "same": true
-        },
-        "soft_observed_no_support_relation_count": {
-          "release": "0",
-          "archived": "0",
-          "same": true
-        },
-        "soft_observed_alternative_hypothesis_contact_count": {
-          "release": "2",
-          "archived": "2",
-          "same": true
-        },
-        "feasible_assignment_set_enumerated": {
-          "release": "1",
-          "archived": "1",
-          "same": true
-        },
-        "feasible_assignments_within_domain": {
-          "release": "125",
-          "archived": "125",
-          "same": true
-        },
-        "wrapped_coordinate_hash": {
-          "release": "73edc846d716d16772a5b49df6c85d44",
-          "archived": "73edc846d716d16772a5b49df6c85d44",
-          "same": true
-        }
-      },
-      "all_fields_same": true,
-      "producer_release": "0.2.0-dev.242+g6a8385cf1c63.dirty",
-      "producer_archived": "0.2.0-dev.242+g6a8385cf1c63",
+      "elapsed_s": 0.5420862000028137,
+      "atom_records": 1254,
+      "coordinates_identical_at_PDB_precision": true,
+      "frames": 1,
+      "scientific_fields_identical": true,
+      "route_changes": 0,
+      "input_checksum_changes": 0,
       "pass": true
     },
-    "S5_phase_separated": {
+    "S5_phase_separated/A": {
       "exit_code": 0,
-      "elapsed_s": 3.7265605999855325,
-      "atoms_new": 10624,
-      "atoms_archived": 10624,
-      "max_abs_coordinate_deviation_A": 0.0,
-      "fields": {
-        "status": {
-          "release": "local_unwrap",
-          "archived": "local_unwrap",
-          "same": true
-        },
-        "mode": {
-          "release": "llps-local",
-          "archived": "llps-local",
-          "same": true
-        },
-        "component_count": {
-          "release": "128",
-          "archived": "128",
-          "same": true
-        },
-        "evidence_state": {
-          "release": "not_applicable",
-          "archived": "not_applicable",
-          "same": true
-        },
-        "fallback_reason": {
-          "release": "none",
-          "archived": "none",
-          "same": true
-        },
-        "hard_feasible": {
-          "release": "0",
-          "archived": "0",
-          "same": true
-        },
-        "hard_certified": {
-          "release": "0",
-          "archived": "0",
-          "same": true
-        },
-        "evidence_graph_connected": {
-          "release": "0",
-          "archived": "0",
-          "same": true
-        },
-        "soft_observed_contacts_checked": {
-          "release": "0",
-          "archived": "0",
-          "same": true
-        },
-        "soft_observed_selected_compatible_contact_count": {
-          "release": "0",
-          "archived": "0",
-          "same": true
-        },
-        "soft_observed_hypothesis_count": {
-          "release": "0",
-          "archived": "0",
-          "same": true
-        },
-        "soft_observed_compatible_hypothesis_count": {
-          "release": "0",
-          "archived": "0",
-          "same": true
-        },
-        "soft_observed_ambiguous_relation_count": {
-          "release": "0",
-          "archived": "0",
-          "same": true
-        },
-        "soft_observed_no_support_relation_count": {
-          "release": "0",
-          "archived": "0",
-          "same": true
-        },
-        "soft_observed_alternative_hypothesis_contact_count": {
-          "release": "0",
-          "archived": "0",
-          "same": true
-        },
-        "feasible_assignment_set_enumerated": {
-          "release": "0",
-          "archived": "0",
-          "same": true
-        },
-        "feasible_assignments_within_domain": {
-          "release": "0",
-          "archived": "0",
-          "same": true
-        },
-        "wrapped_coordinate_hash": {
-          "release": "c8d840908f61dd953653db6dfe918090",
-          "archived": "c8d840908f61dd953653db6dfe918090",
-          "same": true
-        }
-      },
-      "all_fields_same": true,
-      "producer_release": "0.2.0-dev.242+g6a8385cf1c63.dirty",
-      "producer_archived": "0.2.0-dev.242+g6a8385cf1c63",
+      "elapsed_s": 5.4609982999973,
+      "atom_records": 10624,
+      "coordinates_identical_at_PDB_precision": true,
+      "frames": 1,
+      "scientific_fields_identical": true,
+      "route_changes": 0,
+      "input_checksum_changes": 0,
       "pass": true
     }
   }

@@ -27,7 +27,9 @@ def main():
         result['coordinate_hash_matches']=pdb.is_file() and hashlib.sha256(pdb.read_bytes()).hexdigest()==case['expected_pdb_sha256']
         if report.is_file():
             current=next(csv.DictReader(report.open()))
-            result['field_mismatches']={k:{'expected':v,'actual':current.get(k)} for k,v in case['expected_fields'].items() if current.get(k)!=v}
+            # the search route name is recorded, not compared: equal outputs can be reached by different routes
+            result['field_mismatches']={k:{'expected':v,'actual':current.get(k)} for k,v in case['expected_fields'].items() if k!='mode' and current.get(k)!=v}
+            result['route']={'expected':case['expected_fields'].get('mode'),'actual':current.get('mode')}
         else:result['field_mismatches']={'report':'missing'}
         result['pass']=run.returncode==0 and result['coordinate_hash_matches'] and not result['field_mismatches']
         return result

@@ -39,6 +39,7 @@ struct AuxiliarySurfaceResult {
   double local_sliver_ms{0.0};
   double full_projection_ms{0.0};
   double seam_weld_ms{0.0};
+  double refused_sliver_repair_ms{0.0};
   double certificate_cleanup_ms{0.0};
   double orientation_repair_ms{0.0};
   double wide_repair_ms{0.0};
@@ -109,6 +110,21 @@ struct AuxiliarySurfaceResult {
   double sampled_hausdorff_proxy{0.0};
   std::size_t analytic_vertex_projection_misses{0};
   double analytic_vertex_residual_max{0.0};
+  // Vertices whose certified projection target could not be committed because
+  // an incident face would reverse.  The certificate tolerates these while
+  // the largest outstanding move stays a small fraction of the spacing, so
+  // both numbers are reported rather than collapsed into a pass/fail bit.
+  std::size_t analytic_vertex_refused{0};
+  double analytic_vertex_refused_distance_max{0.0};
+  // The subset refused to keep a one ring from being sheared, rather than
+  // because a face would have reversed.  These are the commit's own choice
+  // and the only refusals that trade surface position for triangle shape.
+  std::size_t analytic_vertex_refused_for_shape{0};
+  std::size_t refused_sliver_collapses{0};
+  // Inverted faces whose own vertex normals are mutually opposed.  These
+  // join two facing sheets of the surface across a gap narrower than the
+  // grid can separate, so they are a spacing limit, not a mesh defect.
+  std::size_t analytic_sheet_bridge_faces{0};
   bool analytic_vertex_certificate{false};
   std::string analytic_orientation_status{"not_run"};
   std::size_t analytic_orientation_certified_faces{0};

@@ -1,6 +1,6 @@
 ﻿// Split from titan_llps_cluster.cpp. Keep TITAN_LLPS public behavior unchanged.
 #include "titan_llps_cluster.h"
-#include "BoxMatrix.h"
+#include "titan_exact_periodic_box.h"
 #include "box_type.h"
 #include "titan_executor.h"
 #include "titan_llps_stats.h"
@@ -215,7 +215,7 @@ void TitanLLPSCluster::update_dynamics(
   current_unwrapped_y_buf_.assign(chain_count, 0.0);
   current_unwrapped_z_buf_.assign(chain_count, 0.0);
 
-  const BoxMatrix bmat(Box);
+  const TitanExactPeriodicBox bmat(Box);
   for (std::size_t i = 0; i < frame_chains.size(); ++i) {
     const auto &summary = frame_chains[i];
     const std::size_t chain_index = chain_indices[i];

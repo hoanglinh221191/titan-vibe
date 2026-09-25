@@ -256,7 +256,8 @@ int Multi_MOL::topo_protein(std::string_view input_topo,
     }
     input.close();
 
-    if (std::string(force_f).find("CHARMM") != std::string::npos) {
+    if (std::string(force_f).find("CHARMM") != std::string::npos ||
+        std::string(force_f).find("GROMOS") != std::string::npos) {
       collect_nonbond_params(filename, parameters);
     }
 

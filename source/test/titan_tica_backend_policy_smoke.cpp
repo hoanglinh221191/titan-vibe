@@ -18,7 +18,7 @@ long double gib(long double value) {
   return value * 1024.0L * 1024.0L * 1024.0L;
 }
 
-void large_pairwise_case_prefers_randomized_even_when_ram_is_available() {
+void large_pairwise_case_uses_exact_streaming_when_ram_is_available() {
   TitanTicaBackendPolicyConfig cfg;
   cfg.requested_backend = TicaBackend::Auto;
   cfg.available_ram_bytes = gib(256.0L);
@@ -33,7 +33,7 @@ void large_pairwise_case_prefers_randomized_even_when_ram_is_available() {
 
   const auto decision = select_tica_backend_for_policy(cfg);
 
-  require_true(decision.selected_backend == TicaBackend::Randomized,
+  require_true(decision.selected_backend == TicaBackend::ExactStreaming,
                "48-replica pairwise case should auto-select randomized");
   require_true(decision.large_matrix_limit_exceeded,
                "large feature matrix limit should be reported");
@@ -79,8 +79,8 @@ void projection_cache_still_rewrites_small_exact_dense_to_exact_dual() {
 
   const auto decision = select_tica_backend_for_policy(cfg);
 
-  require_true(decision.selected_backend == TicaBackend::ExactDual,
-               "small projection-cache case should still use exact_dual");
+  require_true(decision.selected_backend == TicaBackend::ExactStreaming,
+               "small projection-cache case should use exact_streaming");
 }
 
 void explicit_exact_dual_is_kept_when_it_fits_the_hard_cap() {
@@ -119,14 +119,9 @@ void laptop_exact_dual_is_overridden_by_hard_cap() {
       3.0L * cfg.estimated_frames * cfg.feature_dim * sizeof(double);
   cfg.need_projection_cache = true;
 
-  const auto decision = select_tica_backend_for_policy(cfg);
-
-  require_true(decision.selected_backend == TicaBackend::Randomized,
-               "24 GiB laptop must override unsafe exact_dual");
-  require_true(decision.hard_memory_cap_exceeded,
-               "24 GiB case should report the hard-cap violation");
-  require_true(decision.explicit_exact_dual_overridden,
-               "explicit exact_dual override should be recorded");
+  bool rejected=false;
+  try { select_tica_backend_for_policy(cfg); } catch(const std::runtime_error &) { rejected=true; }
+  require_true(rejected, "explicit exact_dual must not be replaced by an approximation");
 }
 
 void projection_cache_rewrite_cannot_bypass_hard_cap() {
@@ -144,8 +139,8 @@ void projection_cache_rewrite_cannot_bypass_hard_cap() {
 
   const auto decision = select_tica_backend_for_policy(cfg);
 
-  require_true(decision.selected_backend == TicaBackend::Randomized,
-               "projection replay must not rewrite an unsafe backend to exact_dual");
+  require_true(decision.selected_backend == TicaBackend::ExactStreaming,
+               "projection replay must use exact streaming when dense covariance fits");
   require_true(decision.hard_memory_cap_exceeded,
                "projection replay case should retain the hard-cap diagnostic");
 }
@@ -153,7 +148,7 @@ void projection_cache_rewrite_cannot_bypass_hard_cap() {
 } // namespace
 
 int main() {
-  large_pairwise_case_prefers_randomized_even_when_ram_is_available();
+  large_pairwise_case_uses_exact_streaming_when_ram_is_available();
   small_case_keeps_existing_exact_dense_behavior();
   projection_cache_still_rewrites_small_exact_dense_to_exact_dual();
   explicit_exact_dual_is_kept_when_it_fits_the_hard_cap();

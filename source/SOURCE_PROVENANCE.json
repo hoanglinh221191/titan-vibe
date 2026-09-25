@@ -1,11 +1,42 @@
 {
-  "base_commit": "6a8385cf1c63c42046b8a38053f003311e85e633",
-  "package": "TITAN host for VIBE v1.0.1",
+  "base_commit": "50ed41edecfe7b9cc5b72fec1ed5d38827d4c6ac",
+  "package": "TITAN host for TITAN-VIBE 1.0.3",
   "hololift_included": false,
   "changes": [
-    "Exclude HoloLift source, tests and standalone H9 target",
+    "Exclude HoloLift source, tests and tools",
     "Pin source-export build metadata to base commit and mark modified",
     "Default to portable profile"
   ],
-  "public_vibe_source": "https://doi.org/10.5281/zenodo.22669272"
+  "removed_paths": [
+    "src/hololift/artifact_write.h",
+    "src/hololift/durable_artifact.h",
+    "src/hololift/frame_binding.cpp",
+    "src/hololift/frame_binding.h",
+    "src/hololift/identity.cpp",
+    "src/hololift/identity.h",
+    "src/hololift/integration.h",
+    "src/hololift/lattice_transport.cpp",
+    "src/hololift/lattice_transport.h",
+    "src/hololift/phase0.h",
+    "src/hololift/phase1.cpp",
+    "src/hololift/phase1.h",
+    "src/hololift/phase1_serialization.cpp",
+    "src/hololift/phase1_serialization.h",
+    "src/hololift/serialization.cpp",
+    "src/hololift/serialization.h",
+    "src/hololift/spatial_lift.cpp",
+    "src/hololift/spatial_lift.h",
+    "src/hololift/types.h",
+    "src/hololift/validation.cpp",
+    "src/hololift/validation.h",
+    "src/hololift/vibe_adapter.cpp",
+    "src/hololift/vibe_adapter.h",
+    "src/hololift/vibe_contract.cpp",
+    "src/hololift/vibe_contract.h",
+    "src/hololift/vibe_importer.cpp",
+    "src/hololift/vibe_importer.h",
+    "test/hololift_phase0_smoke.ps1",
+    "test/hololift_phase1_smoke.ps1",
+    "test/hololift_vibe_importer_smoke.ps1"
+  ]
 }

@@ -1,10 +1,13 @@
-#include"amino_a.h"
-#include"functions.h"
-#include<fstream>
-#include<sstream>
-#include<algorithm>
+#include "amino_a.h"
+#include "functions.h"
+#include "titan_fflib_rtp_parser.h"
+
+#include <cstdlib>
+#include <fstream>
+#include <iostream>
 using namespace std;
-int take_amino_acids(amino_acid &amine, int &num_amine, string &force_f, const arguments& Arguments)
+int take_amino_acids(amino_acid &amine, int &num_amine, string &force_f,
+                     const arguments &Arguments)
 {
 	/*string amine_name[36][2]{};
 	amine_name[0][0] = "HD11"; amine_name[0][1] = "1HD1"; amine_name[1][0] = "HD12"; amine_name[1][1] = "2HD1"; amine_name[2][0] = "HD13"; amine_name[2][1] = "3HD1";
@@ -33,28 +36,13 @@ int take_amino_acids(amino_acid &amine, int &num_amine, string &force_f, const a
 			return 0;
 	}
 
-	for (string str{}; getline(amino, str);)
-	{
-		size_t end_line{ str.find(";") }; if (end_line != string::npos)str = str.substr(0, end_line);
-		size_t f1{ str.find("]") };
-		if (str.length() > 4 && f1 != string::npos && str[0] == '[' && str.find("bondedtypes") == string::npos 
-			&& str.find("cmap") == string::npos	&& str.find("impropers") == string::npos && str[0] != ';')
-		{
-			string a_name{ str.substr(2, f1 - 3) };
-			getline(amino, str);
-			++num_amine;
-			while (getline(amino, str) && str.length() >= 1 
-				&& (str != " [ bonds ]" && str[0]!='['))
-			{
-				istringstream i_temp(str);
-				string str_2{}, str_3{};
-				double q{};
-				int chrg{};
-				i_temp >> str_2 >> str_3 >> q >> chrg;
-				amine.amino_acids[a_name].emplace_back(chrg, q, 1.0, 0.0, 0.0, 0.0, str_2, str_3);
-			}
-		}
+	const auto parsed = TitanFfLib::parse_gromacs_rtp_atoms(amino, amine);
+	if (!parsed) {
+		cerr << "Cannot parse " << force_f
+		     << "_aminoacids.rtp: " << parsed.error() << '\n';
+		exit(EXIT_FAILURE);
 	}
+	num_amine += static_cast<int>(parsed->residue_count);
 	amino.close();
 	return 0;
 }

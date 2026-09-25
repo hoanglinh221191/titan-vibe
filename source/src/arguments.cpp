@@ -192,6 +192,10 @@ int arguments::post_process() {
     exit(EXIT_FAILURE);
   }
   if (dham.flag_dham) {
+    if (!dham.segment_map_file.empty() && !dham.ener_list_file.empty()) {
+      TitanUI::print_error("DHAM: -dham-segment-map and -dham-ener are mutually exclusive.");
+      exit(EXIT_FAILURE);
+    }
     std::transform(dham.ensemble.begin(), dham.ensemble.end(),
                    dham.ensemble.begin(), [](unsigned char c) {
                      return static_cast<char>(std::tolower(c));
@@ -1197,9 +1201,15 @@ int arguments::post_process() {
         de.pull_opt != "de-jso" && de.pull_opt != "de-jso+pattern" &&
         de.pull_opt != "de-nl-shade-lbc" &&
         de.pull_opt != "de-nl-shade-lbc+pattern" && de.pull_opt != "direct" &&
-        de.pull_opt != "direct+pattern") {
+        de.pull_opt != "direct+pattern" && de.pull_opt != "corridor-grid") {
       TitanUI::print_error(
-          "Pull-direction optimizer: supported values are de, de+pattern, de-shade, de-l-shade, de-jso, de-jso+pattern, de-nl-shade-lbc, de-nl-shade-lbc+pattern, direct, and direct+pattern.");
+          "Pull-direction optimizer: supported values are de, de+pattern, de-shade, de-l-shade, de-jso, de-jso+pattern, de-nl-shade-lbc, de-nl-shade-lbc+pattern, direct, direct+pattern, and corridor-grid.");
+      exit(EXIT_FAILURE);
+    }
+    if (de.pull_opt == "corridor-grid" &&
+        (!de.flag_pathway || de.pathway_file.empty())) {
+      TitanUI::print_error(
+          "Pull-direction corridor-grid requires pathway mode with -pathway-file.");
       exit(EXIT_FAILURE);
     }
     const bool use_legacy_de =
@@ -1295,6 +1305,110 @@ int arguments::post_process() {
           "Pull-direction DE pathway: -de-pathway-radius must be > 0.");
       exit(EXIT_FAILURE);
     }
+    if (de.flag_pathway && !de.pathway_file.empty() &&
+        de.user_set_pathway_group) {
+      TitanUI::print_error(
+          "TITAN-Path: use either -pathway-file or -de-pathway-group, not both.");
+      exit(EXIT_FAILURE);
+    }
+    if (de.flag_pathway && !de.pathway_route_id.empty() &&
+        de.pathway_file.empty()) {
+      TitanUI::print_error(
+          "TITAN-Path: -pathway-route-id requires -pathway-file.");
+      exit(EXIT_FAILURE);
+    }
+    if (de.flag_pathway &&
+        (!de.path_previous_status.empty() || de.path_continuity_window != 0.0) &&
+        (de.path_previous_status.empty() || de.pathway_file.empty() ||
+         !std::isfinite(de.path_continuity_window) || de.path_continuity_window <= 0.0)) {
+      TitanUI::print_error(
+          "TITAN-Path: continuity requires -pathway-file, -pathway-previous-status and a positive finite -pathway-continuity-window.");
+      exit(EXIT_FAILURE);
+    }
+    if (de.flag_pathway &&
+        (de.path_graph_edge_cutoff <= 0.0 ||
+          de.path_recovery_enter_radius <= 0.0 ||
+          de.path_recovery_exit_radius <= 0.0 ||
+          de.path_recovery_max_turn_angle <= 0.0 ||
+          de.path_recovery_max_turn_angle > 180.0 ||
+         de.path_corridor_spacing <= 0.0 ||
+         de.path_registration_max_rmsd <= 0.0 ||
+         de.path_completion_tolerance <= 0.0 ||
+          de.path_completion_min_separation < 0.0 ||
+          de.path_max_turn_angle <= 0.0 || de.path_max_turn_angle > 180.0 ||
+          de.path_energy_key_epsilon < 0.0 || de.path_min_clearance <= 0.0 ||
+          de.path_probe_length < 0.0 ||
+          !std::isfinite(de.path_navigation_tube_weight) ||
+          de.path_navigation_tube_weight < 0.0 ||
+          !std::isfinite(de.path_navigation_backtrack_weight) ||
+          de.path_navigation_backtrack_weight < 0.0 ||
+          !std::isfinite(de.path_navigation_cost_epsilon) ||
+          de.path_navigation_cost_epsilon < 0.0 ||
+          !std::isfinite(de.path_navigation_seed_amplitude) ||
+          de.path_navigation_seed_amplitude < 0.0)) {
+      TitanUI::print_error(
+          "TITAN-Path: pathway cutoffs, radii, spacing, registration RMSD, completion tolerance, and minimum clearance must be positive; completion separation, probe length, and energy epsilon must be non-negative; advance and recovery max turn angles must be in (0,180].");
+      exit(EXIT_FAILURE);
+    }
+    if (de.flag_pathway && de.path_navigation_seed_radial_samples > 64) {
+      TitanUI::print_error(
+          "TITAN-Path: -pathway-navigation-seed-radial-samples must be <= 64.");
+      exit(EXIT_FAILURE);
+    }
+    if (de.flag_pathway && de.path_navigation_enabled &&
+        (de.pathway_file.empty() || de.path_probe_length <= 0.0)) {
+      TitanUI::print_error(
+          "TITAN-Path: navigation requires an explicit -pathway-file and a positive fixed probe length or ladder.");
+      exit(EXIT_FAILURE);
+    }
+    if (de.flag_pathway && de.path_clearance_mode != "endpoint-center" &&
+        de.path_clearance_mode != "swept-linear-center") {
+      TitanUI::print_error(
+          "TITAN-Path: -pathway-clearance-mode must be endpoint-center or swept-linear-center.");
+      exit(EXIT_FAILURE);
+    }
+    if (de.flag_pathway &&
+        de.path_clearance_mode == "swept-linear-center" &&
+        de.path_probe_length <= 0.0) {
+      TitanUI::print_error(
+          "TITAN-Path: swept-linear-center clearance requires a positive fixed probe length or ladder.");
+      exit(EXIT_FAILURE);
+    }
+    if (de.flag_pathway &&
+        de.path_clearance_mode == "swept-linear-center" &&
+        !pbc.solv_pbcn && !pbc.solv_pbctopo) {
+      TitanUI::print_error(
+          "TITAN-Path: swept-linear-center clearance requires -pbcn or -pbctopo so receptor and ligand coordinates are reconstructed into one upstream PBC-resolved Cartesian frame.");
+      exit(EXIT_FAILURE);
+    }
+    if (de.flag_pathway && de.path_corridor_radial_samples > 4096) {
+      TitanUI::print_error(
+          "TITAN-Path: -pathway-corridor-radial-samples must be <= 4096.");
+      exit(EXIT_FAILURE);
+    }
+    if (de.flag_pathway && de.path_probe_lengths.size() > 16) {
+      TitanUI::print_error(
+          "TITAN-Path: -pathway-probe-lengths supports at most 16 distances.");
+      exit(EXIT_FAILURE);
+    }
+    if (de.flag_pathway && !de.path_probe_lengths.empty()) {
+      for (std::size_t index = 0; index < de.path_probe_lengths.size(); ++index) {
+        const double value = de.path_probe_lengths[index];
+        if (!std::isfinite(value) || value <= 0.0 ||
+            (index > 0 &&
+             value >= de.path_probe_lengths[index - 1] - 1.0e-12)) {
+          TitanUI::print_error(
+              "TITAN-Path: -pathway-probe-lengths must be a strictly decreasing list of positive finite distances.");
+          exit(EXIT_FAILURE);
+        }
+      }
+    }
+    if (de.flag_pathway &&
+        de.path_recovery_exit_radius > de.path_recovery_enter_radius) {
+      TitanUI::print_error(
+          "TITAN-Path: -pathway-recovery-exit must be <= -pathway-recovery-enter.");
+      exit(EXIT_FAILURE);
+    }
     if (use_shade_family &&
         (de.user_set_de_diff_weight || de.user_set_de_cross_prob ||
          de.user_set_de_F || de.user_set_de_algorithm ||
@@ -1342,6 +1456,10 @@ int arguments::post_process() {
         "with -cas=true.");
     exit(EXIT_FAILURE);
   }
+  if (gist.flag_gist && flag_nocal) {
+    TitanUI::print_error("GIST requires the standard analysis path; -gist cannot be combined with -nocal.");
+    exit(EXIT_FAILURE);
+  }
   if (flag_cas && !flag_gbsa) {
     flag_gbsa = true;
     TitanUI::print_info(
@@ -1357,6 +1475,14 @@ int arguments::post_process() {
   }
 
   if (flag_gbsa) {
+    if (igb == 66) {
+      flag_alpb = true;
+      if (flag_cas || std::isfinite(gbsa_rgbmax) ||
+          !std::isfinite(gbnsr6_spacing) || gbnsr6_spacing < .1 || gbnsr6_spacing > 1.) {
+        TitanUI::print_error("GBNSR6 requires spacing in [0.1,1.0] A, rgbmax=off, and no CAS.");
+        exit(EXIT_FAILURE);
+      }
+    }
     if (gbsa_perf != "off" && gbsa_perf != "summary" &&
         gbsa_perf != "detail") {
       cout << "GBSA Error: -gbsa-perf must be off, summary, or detail.\n";
@@ -1372,9 +1498,9 @@ int arguments::post_process() {
           "option for Free Energy completeness!");
       entropy = true;
     }
-    if (igb != 1 && igb != 2 && igb != 5) {
+    if (igb != 1 && igb != 2 && igb != 5 && igb != 8 && igb != 66) {
       cout << "GBSA Error: Invalid igb model! Only igb=1 (HCT), igb=2 (OBC1), "
-              "and igb=5 (OBC2) are supported.\n";
+              "igb=5 (OBC2), igb=8 (GBn2), and igb=66 (GBNSR6) are supported.\n";
       exit(EXIT_FAILURE);
     }
     if (ext_diel <= 0.0 || int_diel <= 0.0) {
@@ -1554,16 +1680,20 @@ int arguments::post_process() {
       exit(EXIT_FAILURE);
     }
     if (pbe.tabi_analytic_ses_engine != "current" &&
+        pbe.tabi_analytic_ses_engine != "current-dense" &&
         pbe.tabi_analytic_ses_engine != "patch-ray-experimental") {
       TitanUI::print_error(
-          "PBE: -pbe-bie-analytic-ses-engine must be current or patch-ray-experimental.");
+          "PBE: -pbe-bie-analytic-ses-engine must be current, current-dense, or patch-ray-experimental.");
       exit(EXIT_FAILURE);
     }
-    if (pbe.tabi_analytic_ses_engine != "current" &&
+    // Only a non-default engine is worth rejecting here.  The value is inert
+    // unless the analytic SES builder runs, so holding the default must not
+    // fail a sphere-patch or grid-ses run.
+    if (pbe.tabi_analytic_ses_engine != kTabiDefaultAnalyticSesEngine &&
         (pbe.backend != "tabi" ||
          pbe.tabi_primary_surface != "analytic-ses")) {
       TitanUI::print_error(
-          "PBE: -pbe-bie-analytic-ses-engine=patch-ray-experimental requires -pbe=bie and -pbe-bie-primary-surface=analytic-ses.");
+          "PBE: -pbe-bie-analytic-ses-engine only applies to -pbe=bie with -pbe-bie-primary-surface=analytic-ses.");
       exit(EXIT_FAILURE);
     }
     if (!std::isfinite(pbe.tabi_ses_grid_spacing) ||
@@ -2222,14 +2352,24 @@ int arguments::post_process() {
           "PBE: -pbe-bie-fmm-cartesian-error-audit must be off, channel-shadow, or channel-shadow-retry-global-theta015.");
       exit(EXIT_FAILURE);
     }
+    // Order 4 is admitted alongside order 1 so that a matched per-channel
+    // O1/O4 comparison can be run at all.  The audit itself is order
+    // agnostic -- it reuses the pre-audit's sampled target set and compares
+    // each channel's direct sum against whatever the Cartesian operator
+    // produced -- and the previous restriction to order 1 was the scope of
+    // the study that qualified it, not a property of the measurement.  The
+    // P4 closeout records the consequence as its first open item: "P2A
+    // channel controls unavailable".  Admitting order 4 supplies the
+    // control; it does not certify order 4 for anything else.
     if (pbe.tabi_fmm_cartesian_error_audit == "channel-shadow" &&
         !(pbe.backend == "tabi" && pbe.tabi_sum == "treecode" &&
           pbe.tabi_fmm_engine == "cartesian-full-experimental" &&
-          pbe.bie_fmm_cartesian_order == 1 &&
+          (pbe.bie_fmm_cartesian_order == 1 ||
+           pbe.bie_fmm_cartesian_order == 4) &&
           pbe.tabi_discretization == "node-patch" && pbe.salt > 0.0 &&
           pbe.tabi_node_patch_operator_audit == "on")) {
       TitanUI::print_error(
-          "PBE: -pbe-bie-fmm-cartesian-error-audit=channel-shadow requires coupled node-patch Cartesian full FMM order 1 with -pbe-bie-node-patch-operator-audit=on.");
+          "PBE: -pbe-bie-fmm-cartesian-error-audit=channel-shadow requires coupled node-patch Cartesian full FMM order 1 or 4 with -pbe-bie-node-patch-operator-audit=on.");
       exit(EXIT_FAILURE);
     }
     if (pbe.tabi_fmm_cartesian_error_audit ==

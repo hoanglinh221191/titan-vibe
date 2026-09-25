@@ -1,6 +1,7 @@
 #ifndef ARGUMENTS_H
 #define ARGUMENTS_H
 #include <cmath>
+#include <limits>
 #include <string>
 #include <vector>
 using namespace std;
@@ -34,6 +35,7 @@ struct PbcArgs {
   string pbctopo_temporal{"greedy"};
   int pbctopo_temporal_k{4};
   double pbctopo_temporal_penalty{2.0};
+  bool pbctopo_evidence_export{false};
   double pbctopo_vdw_clash_scale{0.55};
   double pbctopo_bond_cutoff{0.0};
   bool pbctopo_bond_cutoff_set{false};
@@ -125,6 +127,14 @@ struct GistArgs {
   int gist_min_count{10};
   double gist_cutoff{9.0};
 };
+
+// The only analytic SES engine whose vertices are certified on the analytic
+// patches.  `current` signs the field from a 26-direction sampling of the
+// probe ball that does not refine with the grid, so its surface never
+// converges to the SES; it is kept to reproduce earlier runs and warns when
+// it is selected.  See docs/TITAN_SES_ENGINE_FIX_2026-09-15.md.
+inline constexpr const char *kTabiDefaultAnalyticSesEngine =
+    "patch-ray-experimental";
 
 struct PbeArgs {
   bool flag_pbe{false};
@@ -226,11 +236,15 @@ struct PbeArgs {
   std::string tabi_calderon_aux_surface{"off"};
   double tabi_calderon_aux_grid_spacing{1.25};
   std::string tabi_primary_surface{"sphere-patch"};
-  std::string tabi_analytic_ses_engine{"current"};
+  std::string tabi_analytic_ses_engine{kTabiDefaultAnalyticSesEngine};
   double tabi_ses_grid_spacing{0.75};
   std::size_t tabi_ses_max_grid_vertices{4000000};
   std::string tabi_sphere_mesh{"auto"};
   int tabi_tree_leaf_size{32};
+  // Budget for the curved node-patch pair cache.  256 MiB holds the dense
+  // all-pairs table up to about 2896 nodes; past that a bounded sparse
+  // cache is used and uncached pairs are recomputed each matvec.
+  int tabi_curved_pair_cache_mb{256};
   bool tabi_tree_leaf_size_explicit{false};
   double tabi_tree_opening_theta{0.45};
   bool tabi_tree_opening_theta_explicit{false};
@@ -446,6 +460,33 @@ struct DeArgs {
   bool user_set_de_archive_scale{false};
   bool user_set_de_min_pop_num{false};
   bool flag_de_auto_term{false};
+  std::string pathway_file{};
+  std::string pathway_route_id{};
+  std::string path_previous_status{};
+  double path_continuity_window{0.0};
+  bool user_set_pathway_group{false};
+  double path_graph_edge_cutoff{4.0};
+  double path_recovery_enter_radius{4.0};
+  double path_recovery_exit_radius{3.0};
+  double path_recovery_max_turn_angle{60.0};
+  double path_corridor_spacing{0.5};
+  size_t path_corridor_radial_samples{16};
+  double path_registration_max_rmsd{2.0};
+  double path_completion_tolerance{1.0};
+  double path_completion_min_separation{0.0};
+  double path_max_turn_angle{20.0};
+  double path_energy_key_epsilon{0.05};
+  double path_min_clearance{1.5};
+  double path_probe_length{0.0};
+  vector<double> path_probe_lengths{};
+  bool path_navigation_enabled{false};
+  double path_navigation_tube_weight{1.0};
+  double path_navigation_backtrack_weight{1.0};
+  double path_navigation_cost_epsilon{0.0};
+  size_t path_navigation_seed_radial_samples{8};
+  double path_navigation_seed_amplitude{0.35};
+  std::string path_clearance_mode{"endpoint-center"};
+  bool path_geometry_only{false};
   double dis_along_path{4.};
   bool flag_pathway{false};
   size_t group_pathway{};
@@ -467,6 +508,10 @@ struct LlpsArgs {
   double llps_msd_fit_start_ns{-1.0};
   double llps_msd_fit_end_ns{-1.0};
   std::string llps_density{"auto"};
+  std::string llps_phase_geometry{"none"};
+  bool llps_dbscan{true};
+  int llps_phase_axis{2};
+  double llps_phase_dense{0}, llps_phase_dilute_inner{0}, llps_phase_dilute_outer{0};
   std::string llps_kernel{"auto"};
   std::string llps_rna_compaction{"auto"};
   std::string llps_rna_information{"auto"};
@@ -512,6 +557,7 @@ struct AwhArgs {
   std::string output_prefix{};
 };
 struct DhamArgs {
+  std::string segment_map_file{};  // audited segment/exchange input; counts audit only
   bool flag_dham{false};
   std::string temps_file{};         // file with replica temperatures (K)
   std::string ener_list_file{};     // file listing paths to .xvg energy files
@@ -975,6 +1021,8 @@ public:
 
   // Core flags
   bool flag_gbsa, flag_alpb;
+  double qha_temperature{300.0};
+  bool ml_predict_experimental{false};
   bool cal_dis_sc_contact, opdb, file_par, new_al_1pdb, entropy, entropy_quasi,
       flag_index, flag_topo_1, flag_topo_2, flag_1_pdb, flag_listfile,
       flag_use_common_topo, flag_nocal, flag_pattern_input, flag_range_input,
@@ -993,6 +1041,7 @@ public:
       mol_1_type_explicit, mol_2_type_explicit, flag_cat_result_multi_infile,
       opdb_name_explicit, flag_groups_explicit;
   int igb;
+  double gbnsr6_spacing{0.5};
   int flag_pqr, flag_all_side_chain_ct, begin_mol_2, force_map, argc, group_1,
       group_2, flag_h_bond, group_entropy_com, group_entropy_rec,
       group_entropy_lg, k_neighbor, dt, b_input, e_input, step_input,
@@ -1014,6 +1063,14 @@ public:
   bool low_memory{false};
   std::string gbsa_perf{"summary"};
   int gbsa_sasa_points{96};
+  // Cutoff (Angstrom) on the HCT pairwise descreening integral used for the
+  // effective Born radii. Amber's egb default is 25.0; TITAN defaults to
+  // "no cutoff" so existing results stay reproducible, and -gbsa-rgbmax 25
+  // selects Amber parity. Any finite value changes DeltaG_polar.
+  double gbsa_rgbmax{std::numeric_limits<double>::infinity()};
+  // Nonpolar surface tension in kcal/mol/A^2 applied to the buried SASA.
+  // 0.0072 is MMPBSA.py's GB default; sander's gbsa=1 default is 0.005.
+  double gbsa_surften{0.0072};
   double gbsa_temperature{298.15};
   std::string gbsa_ie_block{"auto"};
   int gbsa_ie_min_samples{10};

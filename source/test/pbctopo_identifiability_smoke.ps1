@@ -50,6 +50,38 @@ PbctopoPairShiftCandidateSet make_pair(std::size_t a, std::size_t b,
   return set;
 }
 
+bool same_identifiability(const PbctopoIdentifiability &a,
+                          const PbctopoIdentifiability &b) {
+  return a.evidence_component_count == b.evidence_component_count &&
+         a.evidence_edge_count == b.evidence_edge_count &&
+         a.explicit_contact_evidence_edges ==
+             b.explicit_contact_evidence_edges &&
+         a.scored_contact_evidence_edges == b.scored_contact_evidence_edges &&
+         a.evidence_connected_component_count ==
+             b.evidence_connected_component_count &&
+         a.unconstrained_relative_components ==
+             b.unconstrained_relative_components &&
+         a.relative_lattice_degrees_of_freedom ==
+             b.relative_lattice_degrees_of_freedom &&
+         a.equivalent_best_assignments_within_domain ==
+             b.equivalent_best_assignments_within_domain &&
+         a.feasible_assignments_within_domain ==
+             b.feasible_assignments_within_domain &&
+         a.evidence_graph_connected == b.evidence_graph_connected &&
+         a.identified == b.identified &&
+         a.objective_uniqueness_known == b.objective_uniqueness_known &&
+         a.objective_unique_within_search_domain ==
+             b.objective_unique_within_search_domain &&
+         a.feasible_assignment_set_enumerated ==
+             b.feasible_assignment_set_enumerated &&
+         a.evidence_uniqueness_known == b.evidence_uniqueness_known &&
+         a.evidence_unique_within_search_domain ==
+             b.evidence_unique_within_search_domain &&
+         a.unique_within_search_domain == b.unique_within_search_domain &&
+         a.uniqueness_search_exhaustive ==
+             b.uniqueness_search_exhaustive;
+}
+
 int main() {
   const std::vector<std::size_t> atom_components{0, 1, 2};
   const auto disconnected = evaluate_pbctopo_identifiability(
@@ -113,6 +145,51 @@ int main() {
              fully_unique.evidence_unique_within_search_domain &&
              fully_unique.feasible_assignment_set_enumerated,
          "fully enumerated singleton evidence was not reported as unique");
+
+  auto final_disconnected = fully_unique;
+  apply_pbctopo_final_selected_evidence(final_disconnected, true, false, 3, 0,
+                                         0, 0, 3);
+  expect(!final_disconnected.identified &&
+             !final_disconnected.evidence_graph_connected &&
+             !final_disconnected.objective_unique_within_search_domain &&
+             !final_disconnected.evidence_unique_within_search_domain &&
+             !final_disconnected.unique_within_search_domain &&
+             final_disconnected.objective_uniqueness_known &&
+             final_disconnected.evidence_uniqueness_known &&
+             final_disconnected.uniqueness_search_exhaustive &&
+             final_disconnected.equivalent_best_assignments_within_domain ==
+                 1 &&
+             final_disconnected.feasible_assignments_within_domain == 1,
+         "final disconnected evidence did not restore uniqueness invariants");
+
+  auto final_connected = final_disconnected;
+  apply_pbctopo_final_selected_evidence(final_connected, true, true, 3, 2, 1,
+                                         1, 1);
+  expect(final_connected.identified &&
+             final_connected.evidence_graph_connected &&
+             final_connected.objective_unique_within_search_domain &&
+             final_connected.evidence_unique_within_search_domain &&
+             final_connected.unique_within_search_domain,
+         "final connected singleton evidence was not reported as unique");
+
+  auto connected_non_singleton = ambiguous;
+  apply_pbctopo_final_selected_evidence(connected_non_singleton, true, true, 3,
+                                         2, 1, 1, 1);
+  expect(connected_non_singleton.identified &&
+             !connected_non_singleton.objective_unique_within_search_domain &&
+             !connected_non_singleton.evidence_unique_within_search_domain &&
+             !connected_non_singleton.unique_within_search_domain &&
+             connected_non_singleton.equivalent_best_assignments_within_domain ==
+                 2 &&
+             connected_non_singleton.feasible_assignments_within_domain == 2,
+         "final connected evidence overrode non-singleton counts");
+
+  auto unevaluated = fully_unique;
+  const auto before_unevaluated = unevaluated;
+  apply_pbctopo_final_selected_evidence(unevaluated, false, false, 0, 0, 0, 0,
+                                         0);
+  expect(same_identifiability(unevaluated, before_unevaluated),
+         "unevaluated final evidence mutated identifiability");
 
   std::cout << "PASS pbctopo_identifiability_smoke\n";
 }

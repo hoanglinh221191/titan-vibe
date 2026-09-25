@@ -1,3 +1,5 @@
+#include "titan_topology_energy.h"
+#include "gromos_nonbonded.h"
 #include "functions.h"
 #include "titan_electrostatics.h"
 #include "titan_simd_dispatch.h"
@@ -45,6 +47,11 @@ int cal_energy_amber_intrin_nofilter(
     size_t begin, size_t end, cache_energy &Energy, size_t num_snap,
     const arguments &Arguments, const Multi_MOL_parameters &rec_parameters,
     const Multi_MOL_parameters &lg_parameters) {
+  if (titan_nb::topology_energy_required(CachedData, Arguments)) {
+    titan_nb::calculate(rec, lg, info_rec, info_lg, CachedData, begin, end,
+                        Energy, nullptr, Arguments);
+    return 0;
+  }
   (void)info_rec;
   (void)info_lg;
   (void)num_snap;
@@ -146,6 +153,11 @@ int cal_energy_amber_screening_intrin_nofilter(
     size_t begin, size_t end, cache_energy &Energy, size_t num_snap,
     const arguments &Arguments, const Multi_MOL_parameters &rec_parameters,
     const Multi_MOL_parameters &lg_parameters) {
+  if (titan_nb::topology_energy_required(CachedData, Arguments)) {
+    titan_nb::calculate(rec, lg, info_rec, info_lg, CachedData, begin, end,
+                        Energy, nullptr, Arguments);
+    return 0;
+  }
   (void)info_rec;
   (void)info_lg;
   (void)num_snap;
@@ -269,6 +281,11 @@ int cal_energy_gromos_intrin_nofilter(
     size_t begin, size_t end, cache_energy &Energy, size_t num_snap,
     const arguments &Arguments, const Multi_MOL_parameters &rec_parameters,
     const Multi_MOL_parameters &lg_parameters) {
+  if (titan_nb::topology_energy_required(CachedData, Arguments)) {
+    titan_nb::calculate(rec, lg, info_rec, info_lg, CachedData, begin, end,
+                        Energy, nullptr, Arguments);
+    return 0;
+  }
   (void)info_rec;
   (void)info_lg;
   (void)num_snap;
@@ -319,10 +336,16 @@ int cal_energy_gromos_intrin_nofilter(
       elec = _mm256_mul_pd(elec, inv_d);
       elec = _mm256_div_pd(elec, avx_epsilon_in);
 
-      const __m256d epsilon = _mm256_sqrt_pd(
+      __m256d epsilon = _mm256_sqrt_pd(
           _mm256_mul_pd(avx_temp_epsilon_lg, _mm256_loadu_pd(rec_epsilon + i)));
-      const __m256d sigma = _mm256_sqrt_pd(
+      __m256d sigma = _mm256_sqrt_pd(
           _mm256_mul_pd(avx_temp_sigma_lg, _mm256_loadu_pd(rec_sigma + i)));
+      if (CachedData.has_charmm_pair_overrides()) {
+        alignas(32) double c6_values[4],c12_values[4];
+        for(std::size_t lane=0;lane<4;++lane)
+          gromos::pair_params(CachedData,rec_parameters,lg_parameters,i+lane,j,c6_values[lane],c12_values[lane]);
+        sigma=_mm256_load_pd(c6_values);epsilon=_mm256_load_pd(c12_values);
+      }
       const __m256d vdw = _mm256_sub_pd(_mm256_mul_pd(epsilon, inv_d12),
                                         _mm256_mul_pd(sigma, inv_d6));
 
@@ -341,10 +364,9 @@ int cal_energy_gromos_intrin_nofilter(
           138.935457839 * lg_parameters.charge[j] * rec_parameters.charge[i] /
           (d * Arguments.epsilon_in);
       const double c_6 = c6(d);
-      const double vdw_val =
-          sqrt(lg_parameters.epsilon[j] * rec_parameters.epsilon[i]) /
-              square(c_6) -
-          sqrt(lg_parameters.sigma[j] * rec_parameters.sigma[i]) / c_6;
+      double pair_c6{},pair_c12{};
+      gromos::pair_params(CachedData,rec_parameters,lg_parameters,i,j,pair_c6,pair_c12);
+      const double vdw_val=pair_c12/square(c_6)-pair_c6/c_6;
       const size_t pos = rec_size * j + i;
 
       Energy.elec_ener += elec_val;
@@ -365,6 +387,11 @@ void cal_energy_opls_intrin_nofilter(
     size_t begin, size_t end, cache_energy &Energy, size_t num_snap,
     const arguments &Arguments, const Multi_MOL_parameters &rec_parameters,
     const Multi_MOL_parameters &lg_parameters) {
+  if (titan_nb::topology_energy_required(CachedData, Arguments)) {
+    titan_nb::calculate(rec, lg, info_rec, info_lg, CachedData, begin, end,
+                        Energy, nullptr, Arguments);
+    return;
+  }
   (void)info_rec;
   (void)info_lg;
   (void)num_snap;

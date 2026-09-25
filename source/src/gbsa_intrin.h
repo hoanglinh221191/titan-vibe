@@ -6,6 +6,7 @@
 #include "cache_sigma_epsilon.h"
 #include "info.h"
 #include <iosfwd>
+#include <limits>
 #include <string>
 #include <unordered_map>
 
@@ -56,6 +57,7 @@ struct GBSA_decomposition {
 };
 
 struct GBSASasaCache {
+  bool gbnsr6_sizes{false};
   std::vector<double> sasa_rec_free;
   std::vector<double> sasa_lig_free;
   std::vector<double> sasa_complex;
@@ -112,6 +114,18 @@ public:
 
 #ifdef __AVX__
 
+void set_gbnsr6_electrostatic_sizes(const MOL &rec, const MOL &lg,
+    const Multi_MOL_parameters &rp, const Multi_MOL_parameters &lp,
+    const std::vector<mol_info> &ri, const std::vector<mol_info> &li,
+    GBSASasaCache &cache);
+
+void calculate_gbnsr6_binding_radii(const MOL &rec, const MOL &lg,
+    const AlignedDoubleVector &rvdw, const AlignedDoubleVector &lvdw,
+    const std::vector<mol_info> &ri, const std::vector<mol_info> &li,
+    AlignedDoubleVector &rf, AlignedDoubleVector &lf,
+    AlignedDoubleVector &rc, AlignedDoubleVector &lc,
+    double spacing, TitanExecutor *executor = nullptr);
+
 void build_gbsa_sasa_cache(const MOL &rec, const MOL &lg,
                            const Multi_MOL_parameters &rec_parameters,
                            const Multi_MOL_parameters &lg_parameters,
@@ -119,21 +133,27 @@ void build_gbsa_sasa_cache(const MOL &rec, const MOL &lg,
                            bool compute_alpb_sizes,
                            TitanExecutor *executor = nullptr);
 
-// Calculate Effective Born Radii AVX2 Kernel
+// Calculate Effective Born Radii AVX2 Kernel.
+// rgbmax_angstrom truncates the HCT descreening integral (Amber egb rgbmax).
+// The default +inf keeps the uncut sum, which is TITAN's historical behaviour.
 void cal_effective_born_radii_avx2(
     const MOL &mol, const AlignedDoubleVector &vdw_radii,
     const std::vector<mol_info> &atom_info, AlignedDoubleVector &radii,
     int igb, size_t begin, size_t end,
     const MOL *env_mol = nullptr,
     const AlignedDoubleVector *env_vdw_radii = nullptr,
-    const std::vector<mol_info> *env_atom_info = nullptr);
+    const std::vector<mol_info> *env_atom_info = nullptr,
+    double rgbmax_angstrom = std::numeric_limits<double>::infinity(),
+    double nsr6_spacing = 0.5);
 
 void cal_effective_born_radii_parallel_avx2(
     const MOL &mol, const AlignedDoubleVector &vdw_radii,
     const std::vector<mol_info> &atom_info, AlignedDoubleVector &radii,
     int igb, TitanExecutor &executor, const MOL *env_mol = nullptr,
     const AlignedDoubleVector *env_vdw_radii = nullptr,
-    const std::vector<mol_info> *env_atom_info = nullptr);
+    const std::vector<mol_info> *env_atom_info = nullptr,
+    double rgbmax_angstrom = std::numeric_limits<double>::infinity(),
+    double nsr6_spacing = 0.5);
 
 int cal_energy_gbsa_avx2(
     const MOL &rec, const MOL &lg, const std::vector<mol_info> &info_rec,

@@ -351,23 +351,26 @@ void CASAnalyzer::process_frame(Multi_MOL &pro_in, Multi_MOL &lig,
                 std::fill(scratch.mut_complex_radii.begin(),
                           scratch.mut_complex_radii.end(), 0.0);
 
+                // Mutant endpoints use the same rgbmax as the wild-type run,
+                // otherwise the alanine-scan difference mixes conventions.
                 cal_effective_born_radii_avx2(
                     worker_frame, scratch.parameters.radius,
                     mol.info, scratch.mut_free_radii, Arguments.igb, 0, m_size,
-                    nullptr, nullptr);
+                    nullptr, nullptr, nullptr, Arguments.gbsa_rgbmax, Arguments.gbnsr6_spacing);
 
                 if (mutate_receptor && active_lg_size_ > 0) {
                   cal_effective_born_radii_avx2(
                       worker_frame, scratch.parameters.radius,
                       mol.info, scratch.mut_complex_radii, Arguments.igb, 0,
                       m_size, &active_lg_mol, &lig.parameters.radius,
-                      &lig.info);
+                      &lig.info, Arguments.gbsa_rgbmax, Arguments.gbnsr6_spacing);
                 } else if (!mutate_receptor && rec_size_ > 0) {
                   cal_effective_born_radii_avx2(
                       worker_frame, scratch.parameters.radius,
                       mol.info, scratch.mut_complex_radii, Arguments.igb, 0,
                       m_size, &pro_in.m_mol[num_snap],
-                      &pro_in.parameters.radius, &pro_in.info);
+                      &pro_in.parameters.radius, &pro_in.info,
+                      Arguments.gbsa_rgbmax, Arguments.gbnsr6_spacing);
                 }
 
                 GBSA_energy_snap mut_gbsa_total;

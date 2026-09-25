@@ -38,6 +38,9 @@
 #include "titan_dssp.h"
 #include "titan_energy_decomp_engine.h"
 #include "titan_energy_validation.h"
+#include "titan_topology_energy.h"
+#include "titan_fflib_charge_policy.h"
+#include "titan_parameter_audit.h"
 #include "titan_hbond_kinetics.h"
 #include "titan_hotspot_report.h"
 #include "titan_lj.h"
@@ -1487,6 +1490,10 @@ int engine(arguments &Arguments) {
           Groups_from_index_file, parameter, amine, info_output);
 
       if (!init_result) {
+        if (Arguments.gist.flag_gist) {
+          TitanUI::print_error("GIST initialization failed: " + init_result.error());
+          return 1;
+        }
         if (Arguments.flag_nocal) {
           TitanUI::print_info("Nocal mode is turned on!");
           return 0; // nocal: init parsed what it could, done
@@ -1604,7 +1611,8 @@ int engine(arguments &Arguments) {
         Arguments.flag_use_CI ||
         Arguments.flag_cal_dipole_moment ||
         Arguments.flag_charged_atom_distance_dis || Arguments.flag_cas ||
-        Arguments.ifp.flag_ifp || Arguments.flag_pqr == 1;
+        Arguments.ifp.flag_ifp || Arguments.flag_pqr == 1 ||
+        TitanFfLib::parameter_audit_path() != nullptr;
     if (!charge_initialized && !needs_charge_init) {
       TitanUI::log_kv(log, "Charge Init",
                       "Skipped (no charge-dependent module active)");
@@ -1613,38 +1621,34 @@ int engine(arguments &Arguments) {
     if (!charge_initialized) {
       const bool initialize_mol2_parameters =
           Arguments.needs_mol2_coordinates() && !lig.m_mol.empty();
-      if (Arguments.flag_use_common_topo) {
-        // Khi dùng common topo cho protein-protein, cả 2 phải dùng cờ 1
-        // (chuẩn topology)
-        pro_in.take_charge(amine, parameter, pro_in.m_mol[0].size(), 0ull,
-                           force_f, 1, &Arguments, &executor, "mol1");
-        if (initialize_mol2_parameters)
-          lig.take_charge(amine, parameter, lig.m_mol[0].size(), 0ull,
-                          force_f, 1, &Arguments, &executor, "mol2");
-      } else if (topo_is_open && topo_2_is_open) {
-        pro_in.take_charge(amine, parameter, pro_in.m_mol[0].size(), 0ull,
-                           force_f, 1, &Arguments, &executor, "mol1");
-        if (initialize_mol2_parameters)
-          lig.take_charge(amine, parameter, lig.m_mol[0].size(), 0ull,
-                          force_f, 1, &Arguments, &executor, "mol2");
-      } else if (topo_is_open && Arguments.flag_topo_1 && !topo_2_is_open) {
-        pro_in.take_charge(amine, parameter, pro_in.m_mol[0].size(), 0ull,
-                           force_f, 0, &Arguments, &executor, "mol1");
-        if (initialize_mol2_parameters)
-          lig.take_charge(amine, parameter, lig.m_mol[0].size(), 0ull,
-                          force_f, 1, &Arguments, &executor, "mol2");
-      } else if (!topo_is_open && topo_2_is_open) {
-        pro_in.take_charge(amine, parameter, pro_in.m_mol[0].size(), 0ull,
-                           force_f, 1, &Arguments, &executor, "mol1");
-        if (initialize_mol2_parameters)
-          lig.take_charge(amine, parameter, lig.m_mol[0].size(), 0ull,
-                          force_f, 0, &Arguments, &executor, "mol2");
-      } else {
-        pro_in.take_charge(amine, parameter, pro_in.m_mol[0].size(), 0ull,
-                           force_f, 0, &Arguments, &executor, "mol1");
-        if (initialize_mol2_parameters)
-          lig.take_charge(amine, parameter, lig.m_mol[0].size(), 0ull,
-                          force_f, 0, &Arguments, &executor, "mol2");
+      const auto charge_policy = TitanFfLib::resolve_charge_source_policy(
+          Arguments.flag_use_common_topo, topo_is_open, topo_2_is_open);
+      TitanUI::log_kv(log, "Charge Source Mol1",
+                      charge_policy.molecule1_uses_topology ? "topology"
+                                                            : "lib_ff");
+      if (initialize_mol2_parameters)
+        TitanUI::log_kv(log, "Charge Source Mol2",
+                        charge_policy.molecule2_uses_topology ? "topology"
+                                                              : "lib_ff");
+      pro_in.take_charge(
+          amine, parameter, pro_in.m_mol[0].size(), 0ull, force_f,
+          charge_policy.molecule1_uses_topology ? 1 : 0, &Arguments, &executor,
+          "mol1");
+      if (initialize_mol2_parameters)
+        lig.take_charge(
+            amine, parameter, lig.m_mol[0].size(), 0ull, force_f,
+            charge_policy.molecule2_uses_topology ? 1 : 0, &Arguments,
+            &executor, "mol2");
+      if (const char *audit_path = TitanFfLib::parameter_audit_path()) {
+        const auto audit = TitanFfLib::write_parameter_audit(
+            audit_path, pro_in, initialize_mol2_parameters ? &lig : nullptr,
+            charge_policy);
+        if (!audit) {
+          TitanUI::print_error(audit.error());
+          TitanUI::log_kv(log, "Parameter Audit Error", audit.error());
+          return 1;
+        }
+        TitanUI::log_kv(log, "Parameter Audit", audit_path);
       }
       charge_initialized = true;
     }
@@ -1671,6 +1675,20 @@ int engine(arguments &Arguments) {
 
     cache_sigma_epsilon CachedData{Arguments.distance_energy_cutoff};
     CachedData.force_field_name = force_f;
+    if (Arguments.flag_use_common_topo && !Arguments.flag_gbsa && !Arguments.flag_nocal) {
+      try {
+        CachedData.nonbonded_topology = titan_nb::read_topology(Arguments.topo_name);
+        titan_nb::validate_selection(*CachedData.nonbonded_topology, pro_in.info);
+        titan_nb::validate_selection(*CachedData.nonbonded_topology, lig.info);
+        TitanUI::log_kv(log, "Nonbonded topology",
+                        "source-bound exclusions and listed pairs; " +
+                        std::to_string(CachedData.nonbonded_topology->listed_pairs.size()) + " listed pair(s)");
+      } catch (const std::exception &error) {
+        TitanUI::print_error(error.what());
+        TitanUI::log_message(log, error.what());
+        return 1;
+      }
+    }
     // Martini CG systems are too large for O(N×M) pair cache (~GB).
     // Energy functions handle empty cache via elec_ener.empty() checks.
     // Downstream emap/force_map are guarded to skip when cache is empty.
@@ -1695,6 +1713,7 @@ int engine(arguments &Arguments) {
       CachedData.set_size(pro_atom_count * lig_atom_count, Arguments,
                           pro_atom_count, lig_atom_count);
     }
+    TitanUI::log_kv(log, "Pair Cache Entries", std::to_string(CachedData.elec_ener.size()));
 
     if (lig.m_mol.empty())
       lig.m_mol.resize(1);
@@ -1706,7 +1725,8 @@ int engine(arguments &Arguments) {
       lig.parse_martini_topology(Arguments, log, &CachedData);
     }
 
-    if (force_f.find("CHARMM") != string::npos &&
+    if ((force_f.find("CHARMM") != string::npos ||
+         force_f.find("GROMOS") != string::npos) &&
         !parameter.nonbond_overrides.empty()) {
       size_t ntypes = 0;
       for (const auto &[atom_type, type_id] : parameter.atom_type_to_id) {
@@ -1760,7 +1780,7 @@ int engine(arguments &Arguments) {
                                          std::move(epsilon_table),
                                          static_cast<int>(ntypes));
         TitanUI::log_kv(
-            log, "CHARMM LJ Overrides",
+            log, "Pair LJ Overrides",
             std::to_string(parameter.nonbond_overrides.size()) +
                 " pair(s) loaded from [ nonbond_params ] (dense table, " +
                 std::to_string(ntypes) + " type-id span)");
@@ -1810,7 +1830,7 @@ int engine(arguments &Arguments) {
                                           std::move(sparse_sigma),
                                           std::move(sparse_epsilon));
         TitanUI::log_kv(
-            log, "CHARMM LJ Overrides",
+            log, "Pair LJ Overrides",
             std::to_string(parameter.nonbond_overrides.size()) +
                 " pair(s) loaded from [ nonbond_params ] (sparse table, " +
                 std::to_string(ntypes) + " type-id span)");
@@ -2393,21 +2413,9 @@ int engine(arguments &Arguments) {
                       tica_backend_to_string(requested_backend));
       TitanUI::log_kv(log, "TICA Backend Selected",
                       tica_backend_to_string(selected_backend));
-      if (backend_decision.explicit_exact_dual_overridden) {
-        TitanUI::log_kv(log, "TICA Hard-Cap Override",
-                        "exact_dual -> randomized");
-        TitanUI::print_warning(
-            "TICA: explicit exact_dual request exceeds the hard memory cap; "
-            "using randomized instead.");
-      }
       if (backend_decision.large_matrix_limit_exceeded) {
-        TitanUI::log_kv(
-            log, "TICA Large-Matrix Policy",
-            backend_decision.selected_by_large_matrix_limit
-                ? "auto -> randomized"
-                : (backend_decision.explicit_exact_dual_overridden
-                       ? "limit exceeded; hard memory cap override"
-                       : "limit exceeded; explicit backend honored"));
+        TitanUI::log_kv(log, "TICA Large-Matrix Policy",
+                        "exact covariance/replay selected by memory budget; approximation requires explicit opt-in");
       }
       TitanUI::log_kv(log, "TICA Rank",
                       std::to_string(Arguments.msm.tica_rank));
@@ -2501,6 +2509,9 @@ int engine(arguments &Arguments) {
           Arguments.llps.llps_dynamics_detailed,
           Arguments.llps.llps_prna_rcut, Arguments.llps.llps_kernel,
           Arguments.llps.llps_density);
+      llps_analyzer->configure_phase({Arguments.llps.llps_phase_geometry,
+          Arguments.llps.llps_phase_axis, Arguments.llps.llps_phase_dense,
+          Arguments.llps.llps_phase_dilute_inner, Arguments.llps.llps_phase_dilute_outer});
       llps_analyzer->set_sticker_beads(mol_info_vec,
                                        Arguments.llps.llps_sticker_beads);
       if ((Arguments.mol_2_type.find("rna") != std::string::npos ||
@@ -2536,7 +2547,7 @@ int engine(arguments &Arguments) {
     }
 
     // --- LLPS DBSCAN (bead-level morphology) ---
-    if (Arguments.llps.flag_llps && !dbscan_llps) {
+    if (Arguments.llps.flag_llps && Arguments.llps.llps_dbscan && !dbscan_llps) {
       dbscan_llps = std::make_unique<TitanLLPSCluster>();
       const std::string pdb_out =
           info_output.get_llps_dbscan_droplets_filename();
@@ -2646,7 +2657,7 @@ int engine(arguments &Arguments) {
            Arguments.llps.llps_paper_profile_bin_nm,
            Arguments.llps.llps_paper_blocks,
            Arguments.llps.llps_paper_geometry,
-           llps_fractal_enabled});
+           llps_fractal_enabled, Arguments.llps.llps_phase_axis});
       dbscan_llps->configure_trace_outputs(info_output);
       if (Arguments.llps.llps_fuzzy) {
         dbscan_llps->enable_fuzzy(true);
@@ -2717,11 +2728,19 @@ int engine(arguments &Arguments) {
 
     // --- GIST Water Thermodynamics Initialization ---
     if (Arguments.gist.flag_gist) {
-      // Auto-enable water tracking if not explicitly set
-      if (Arguments.n_wat < 0) {
-        Arguments.n_wat = 0;
-        TitanUI::print_info("[GIST] Auto-enabling water tracking (-n_wat 0) "
-                            "for GIST analysis.");
+      // The group index must be resolved before topology/coordinate loading.
+      if (Arguments.n_wat < 0 || water_traj.info.empty() || water_traj.info.size()%3) {
+        TitanUI::print_error("GIST has no complete water topology; select a full O,H,H water group with -n_wat.");
+        return 1;
+      }
+      for (size_t i=0;i<water_traj.info.size();++i) {
+        const auto name=water_traj.info[i].get_atom();
+        const bool oxygen=(name=="O" || name=="OW" || name=="OH2");
+        const bool hydrogen=!name.empty() && name[0]=='H';
+        if ((i%3==0 && !oxygen) || (i%3!=0 && !hydrogen)) {
+          TitanUI::print_error("GIST water group must be ordered oxygen, hydrogen, hydrogen for each molecule.");
+          return 1;
+        }
       }
 
       if (!gist_analyzer && !lig.m_mol.empty() &&
@@ -2990,13 +3009,68 @@ int engine(arguments &Arguments) {
         need_com_distance;
 
     // ========================================================================
+    // CHUNK PREFETCH (XDR only)
+    // ========================================================================
+    // XTC/TRR decode (decompress + float->double scatter) used to run on the
+    // main thread with the worker pool idle, then analysis ran with the reader
+    // idle. The reader now fills back buffers for chunk N+1 while chunk N is
+    // analysed, and only the frame vectors are swapped, so the shared topology
+    // in pro_in/lig/water_traj/membrane_traj is never touched or duplicated.
+    //
+    // Safety: read_next_chunk() is the sole streamer entry point inside the
+    // loop, start_chunk_prefetch() only runs after the previous read has been
+    // consumed by take_next_chunk(), and take_next_chunk() joins before any
+    // further read, so exactly one thread uses the streamer at a time. The
+    // worker is declared after the buffers it writes, so its destructor joins
+    // before those buffers die on any early return.
+    //
+    // The PDB path keeps the synchronous read because its loader also
+    // populates topology, not just frames.
+    Multi_MOL pro_next(force_f), lig_next(force_f), water_next(force_f),
+        membrane_next(force_f);
+    std::optional<std::expected<size_t, std::string>> prefetched_chunk;
+    // TITAN_DISABLE_CHUNK_PREFETCH forces the previous serial reader. It exists
+    // so the overlapped and serial paths can be diffed on the same binary, and
+    // as an operator kill switch if a host ever misbehaves under the extra
+    // reader thread. Both paths must produce identical output.
+    const bool chunk_prefetch_enabled =
+        Arguments.flag_xdr && CHUNK_SIZE != std::numeric_limits<size_t>::max() &&
+        std::getenv("TITAN_DISABLE_CHUNK_PREFETCH") == nullptr;
+    std::optional<titan::jthread> chunk_prefetch_worker;
+
+    auto start_chunk_prefetch = [&]() {
+      if (!chunk_prefetch_enabled || chunk_prefetch_worker)
+        return;
+      chunk_prefetch_worker.emplace([&]() {
+        prefetched_chunk = streamer.read_next_chunk(
+            CHUNK_SIZE, pro_next, lig_next, water_next, membrane_next);
+      });
+    };
+
+    auto take_next_chunk = [&]() {
+      if (!chunk_prefetch_worker)
+        return streamer.read_next_chunk(CHUNK_SIZE, pro_in, lig, water_traj,
+                                        membrane_traj);
+      chunk_prefetch_worker->join();
+      chunk_prefetch_worker.reset();
+      auto result = std::move(*prefetched_chunk);
+      prefetched_chunk.reset();
+      // read_next_chunk() clears its destination frame vectors on entry, so the
+      // back buffers hold exactly what a synchronous read would have produced.
+      std::swap(pro_in.m_mol, pro_next.m_mol);
+      std::swap(lig.m_mol, lig_next.m_mol);
+      std::swap(water_traj.m_mol, water_next.m_mol);
+      std::swap(membrane_traj.m_mol, membrane_next.m_mol);
+      return result;
+    };
+
+    // ========================================================================
     // MAIN STREAMING LOOP
     // ========================================================================
     while (is_streaming) {
       const auto start_input_stream = std::chrono::steady_clock::now();
-      auto expected_frames =
-          streamer.read_next_chunk(CHUNK_SIZE, pro_in, lig, water_traj,
-                                   membrane_traj);
+      // With prefetch active this measures the reader stall, not the decode.
+      auto expected_frames = take_next_chunk();
       time_input_stream += std::chrono::duration_cast<milliseconds>(
           std::chrono::steady_clock::now() - start_input_stream);
       if (!expected_frames) {
@@ -3011,6 +3085,9 @@ int engine(arguments &Arguments) {
       }
 
       NUM = chunk_num_snaps;
+
+      // Decode chunk N+1 while chunk N is analysed below.
+      start_chunk_prefetch();
 
       // --- PBC & WATER SHIFT LOGIC (Applied Per-Chunk) ---
       struct shift_vector {
@@ -3695,6 +3772,17 @@ int engine(arguments &Arguments) {
           TitanUI::log_message(log, "[Validation] " + message);
           return 1;
         }
+        if (Arguments.self_int && !CachedData.nonbonded_topology) {
+          const std::string message =
+              "unsupported_topology_self_energy: intramolecular energy/force "
+              "requires topology exclusions and explicit 1-4 parameters; the "
+              "legacy distance-based exclusion heuristic is not a valid "
+              "substitute. Self-interaction energy output is disabled until "
+              "those parameters are available to every energy/decomposition kernel.";
+          TitanUI::print_error(message);
+          TitanUI::log_message(log, "[Validation] " + message);
+          return 1;
+        }
         const auto invalid_coordinate =
             titan_energy_validation::find_nonfinite_coordinate(
                 pro_in.m_mol[chunk_snap_idx], energy_lig_frame);
@@ -3883,20 +3971,31 @@ int engine(arguments &Arguments) {
           rec_complex_radii.resize(pro_in.m_mol[chunk_snap_idx].size());
           lg_complex_radii.resize(active_lg_mol.size());
 
+          // All four endpoints must share one rgbmax, otherwise the binding
+          // cycle mixes cut and uncut descreening integrals.
+          if (Arguments.igb == 66) {
+            calculate_gbnsr6_binding_radii(pro_in.m_mol[chunk_snap_idx],active_lg_mol,
+                rec_vdw_radii,lg_vdw_radii,pro_in.info,active_lg_info,
+                rec_free_radii,lg_free_radii,rec_complex_radii,lg_complex_radii,
+                Arguments.gbnsr6_spacing,&executor);
+          } else {
           cal_effective_born_radii_parallel_avx2(
               pro_in.m_mol[chunk_snap_idx], rec_vdw_radii, pro_in.info,
-              rec_free_radii, Arguments.igb, executor);
+              rec_free_radii, Arguments.igb, executor, nullptr, nullptr,
+              nullptr, Arguments.gbsa_rgbmax, Arguments.gbnsr6_spacing);
           cal_effective_born_radii_parallel_avx2(
               active_lg_mol, lg_vdw_radii, active_lg_info, lg_free_radii,
-              Arguments.igb, executor);
+              Arguments.igb, executor, nullptr, nullptr, nullptr,
+              Arguments.gbsa_rgbmax, Arguments.gbnsr6_spacing);
           cal_effective_born_radii_parallel_avx2(
               pro_in.m_mol[chunk_snap_idx], rec_vdw_radii, pro_in.info,
               rec_complex_radii, Arguments.igb, executor, &active_lg_mol,
-              &lg_vdw_radii, &active_lg_info);
+              &lg_vdw_radii, &active_lg_info, Arguments.gbsa_rgbmax, Arguments.gbnsr6_spacing);
           cal_effective_born_radii_parallel_avx2(
               active_lg_mol, lg_vdw_radii, active_lg_info, lg_complex_radii,
               Arguments.igb, executor, &pro_in.m_mol[chunk_snap_idx],
-              &rec_vdw_radii, &pro_in.info);
+              &rec_vdw_radii, &pro_in.info, Arguments.gbsa_rgbmax, Arguments.gbnsr6_spacing);
+          }
 
           const auto validate_born_radii = [&](const AlignedDoubleVector &values,
                                                 const char *endpoint) {
@@ -3926,6 +4025,9 @@ int engine(arguments &Arguments) {
                                 frame_sasa_cache,
                                 Arguments.gbsa_sasa_points,
                                 Arguments.flag_alpb, &executor);
+          if (Arguments.igb == 66)
+            set_gbnsr6_electrostatic_sizes(pro_in.m_mol[chunk_snap_idx],active_lg_mol,
+                pro_in.parameters,lig.parameters,pro_in.info,active_lg_info,frame_sasa_cache);
           if (Arguments.flag_alpb &&
               (!(frame_sasa_cache.alpb_rec_electrostatic_size_nm > 0.0) ||
                !std::isfinite(
@@ -6248,6 +6350,10 @@ int engine(arguments &Arguments) {
       std::chrono::steady_clock::now() - start_pp_water);
 
   auto start_pp_gist = std::chrono::steady_clock::now();
+  if (Arguments.gist.flag_gist && (!gist_analyzer || gist_analyzer->processed_frames()==0)) {
+    TitanUI::print_error("GIST processed no water frames; refusing a successful empty result.");
+    return 1;
+  }
   if (Arguments.gist.flag_gist && gist_analyzer) {
     TitanUI::print_module_header("GIST Water Thermodynamics");
     gist_analyzer->export_dx_maps(info_output.get_gist_prefix(),

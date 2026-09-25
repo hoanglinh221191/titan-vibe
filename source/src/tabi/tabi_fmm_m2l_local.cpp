@@ -515,7 +515,7 @@ CartesianJcpM2lOperatorP4 build_cartesian_jcp_m2l_operator_p4(
     result.jets[2 + static_cast<std::size_t>(component)] =
         compact_jet(subtract(scale(sourcek, safe_eps), source0));
     result.jets[5 + static_cast<std::size_t>(component)] =
-        compact_jet(subtract(source0, sourcek));
+        compact_jet(subtract(sourcek, source0));
   }
   for (const auto &jet : result.jets) {
     for (const double value : jet)
@@ -681,8 +681,9 @@ bool accumulate_cartesian_jcp_compressed_green_operator_p4_order(
         const double moment = phi_normal[component][a];
         k2[component] +=
             moment * stencil.factor * (safe_eps * sourcek - source0);
+        // L2P differentiates in the target normal: K4 = d_x(d_y Gk-d_y G0).
         k4[component] +=
-            moment * stencil.factor * (source0 - sourcek);
+            moment * stencil.factor * (sourcek - source0);
       }
     }
     destination[static_cast<std::size_t>(JcpLocalField::K1)][b] += k1;

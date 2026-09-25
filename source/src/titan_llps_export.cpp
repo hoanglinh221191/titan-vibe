@@ -106,7 +106,7 @@ void TitanLLPS::export_results(const info &info_output, std::fstream &log) const
     policy = "avx2";
   const double density_mib =
       static_cast<double>((vox_pro_.size() + vox_rna_.size()) *
-                          sizeof(uint64_t)) /
+                          sizeof(double)) /
       (1024.0 * 1024.0);
 
   TitanUI::log_section(log, "LLPS Macro Summary");
@@ -157,7 +157,7 @@ void TitanLLPS::export_results(const info &info_output, std::fstream &log) const
                   "Reason\n";
       }
       const std::size_t density_bytes =
-          (vox_pro_.size() + vox_rna_.size()) * sizeof(uint64_t);
+          (vox_pro_.size() + vox_rna_.size()) * sizeof(double);
       const long double gib = 1024.0L * 1024.0L * 1024.0L;
       report << "LLPS/density,"
              << (density_disabled_by_budget_ ? "skipped" : density_mode_)
@@ -204,13 +204,15 @@ void TitanLLPS::export_results(const info &info_output, std::fstream &log) const
     std::ofstream out(info_output.get_llps_timeseries_filename());
     if (out.is_open()) {
       out << "# frame  time_ns  gcc_fraction  gcc_size  gcc_rg_nm  mean_degree  "
-             "rho_dense  rho_dilute\n";
+             "rho_dense  rho_dilute  dense_count  dilute_count  dense_volume_nm3  dilute_volume_nm3  phase_status\n";
+      out << "# rho_dense/rho_dilute: counts of macro-node representative beads in declared observation windows / physical window volume; not automatic coexistence inference.\n";
       out << std::fixed << std::setprecision(6);
+      out << "# phase_geometry=" << phase_config_.geometry << " axis_abc=" << phase_config_.axis << " dense_nm=" << phase_config_.dense << " dilute_inner_nm=" << phase_config_.dilute_inner << " dilute_outer_nm=" << phase_config_.dilute_outer << "\n";
       for (const auto &frame : result_.frames) {
         out << frame.frame_idx << "  " << frame.time_ns << "  "
             << frame.gcc_fraction << "  " << frame.gcc_size << "  "
             << frame.gcc_rg_nm << "  " << frame.mean_degree << "  "
-            << frame.density_dense << "  " << frame.density_dilute << "\n";
+            << frame.density_dense << "  " << frame.density_dilute << "  " << frame.phase.dense_count << "  " << frame.phase.dilute_count << "  " << frame.phase.dense_volume << "  " << frame.phase.dilute_volume << "  " << frame.phase.status << "\n";
       }
       TitanUI::print_info("  Written: " +
                           info_output.get_llps_timeseries_filename());
@@ -373,22 +375,22 @@ void TitanLLPS::export_results(const info &info_output, std::fstream &log) const
   }
 
   if (density_frame_count_ > 0 && grid_nx_ > 0) {
-    const double voxel_vol =
-        static_cast<double>(voxel_size_nm_) * voxel_size_nm_ * voxel_size_nm_;
+
     const std::size_t total = static_cast<std::size_t>(grid_nx_) * grid_ny_ *
                               static_cast<std::size_t>(grid_nz_);
     auto write_dx = [&](const std::string &filename,
-                        const std::vector<uint64_t> &vox,
+                        const std::vector<double> &vox,
                         const std::string &label) {
       std::ofstream out(filename);
       if (!out.is_open())
         return;
       out << "object 1 class gridpositions counts " << grid_nx_ << " "
           << grid_ny_ << " " << grid_nz_ << "\n";
-      out << "origin 0 0 0\n";
-      out << "delta " << voxel_size_nm_ << " 0 0\n";
-      out << "delta 0 " << voxel_size_nm_ << " 0\n";
-      out << "delta 0 0 " << voxel_size_nm_ << "\n";
+      out << "# Mean per-frame number density (nm^-3) on fixed fractional bins, displayed in first accepted cell; variable cells are not a fixed Cartesian density map.\n";
+      int dims[3]={grid_nx_,grid_ny_,grid_nz_};
+      const auto& b=density_reference_cell_;
+      out << "origin " << .5*(b[0]/dims[0]+b[1]/dims[1]+b[2]/dims[2]) << " " << .5*(b[3]/dims[0]+b[4]/dims[1]+b[5]/dims[2]) << " " << .5*(b[6]/dims[0]+b[7]/dims[1]+b[8]/dims[2]) << "\n";
+      for(int k=0;k<3;++k) out << "delta " << b[k]/dims[k] << " " << b[3+k]/dims[k] << " " << b[6+k]/dims[k] << "\n";
       out << "object 2 class gridconnections counts " << grid_nx_ << " "
           << grid_ny_ << " " << grid_nz_ << "\n";
       out << "object 3 class array type double rank 0 items " << total
@@ -398,7 +400,7 @@ void TitanLLPS::export_results(const info &info_output, std::fstream &log) const
       for (std::size_t i = 0; i < total; ++i) {
         const double density =
             static_cast<double>(vox[i]) /
-            (static_cast<double>(density_frame_count_) * voxel_vol);
+            static_cast<double>(density_frame_count_);
         if (col > 0)
           out << ' ';
         out << density;

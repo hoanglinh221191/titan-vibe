@@ -161,11 +161,11 @@ if ([string]$legacyProfile.preconditioner_ilu_regularization -ne 'off' -or
 
 $badMode = @($accepted) + '-pbe-tabi-precond-ilu-regularization=aggressive'
 Invoke-C5D1rParserCase 'bad_mode' $badMode $false `
-    'pbe-tabi-precond-ilu-regularization.*off.*adaptive'
+    'pbe-(tabi|bie)-precond-ilu-regularization.*off.*adaptive'
 
 $badMax = @($accepted) + '-pbe-tabi-precond-ilu-regularization-max=0.02'
 Invoke-C5D1rParserCase 'bad_max' $badMax $false `
-    'pbe-tabi-precond-ilu-regularization-max.*0.*1e-2'
+    'pbe-(tabi|bie)-precond-ilu-regularization-max.*0.*1e-2'
 
 $bareOptions = @($accepted | Where-Object { $_ -match '^-[A-Za-z0-9-]+$' })
 if ($bareOptions.Count -ne 0) {

@@ -194,6 +194,13 @@ int pre_proc_pdb(string force_field, Multi_MOL &protein_1, Multi_MOL &protein_2,
       type = "OPLSAA";
   }
 
+  // Receptor-only -topo2: preserve its topology atom naming, while mol2
+  // still follows the force-field library preprocessing used without -topo.
+  if (flag == 4) {
+    type = type_2;
+    type_2 = "lig";
+  }
+
   if (Arguments.flag_set_type_1 == true)
     type_2 = Arguments.mol_1_type;
   if (Arguments.flag_set_type_2 == true) {

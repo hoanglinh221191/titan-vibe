@@ -170,14 +170,23 @@ foreach ($column in $requiredColumns) {
 if ($rows[0].status -ne 'certified') {
     throw "Expected certified frame, got $($rows[0].status)"
 }
-if ([int]$rows[0].anchor_contact_map_lost -ne 0) {
-    throw "Expected intact owner contact map, got lost=$($rows[0].anchor_contact_map_lost)"
+# Since R2B3 (2654075a) optional contacts do not rank candidates, so the anchor
+# score's contact-map fields stay neutral ('na'). The owner contact map is
+# audited on the selected assignment instead, in the soft_observed_* columns.
+if ([int]$rows[0].anchor_contact_map_lost -ne 0 -or
+    $rows[0].anchor_contact_map_lost_fraction -ne 'na' -or
+    $rows[0].anchor_contact_map_max_d2 -ne 'na') {
+    throw "Expected neutral anchor contact-map score, got lost=$($rows[0].anchor_contact_map_lost), lost_fraction=$($rows[0].anchor_contact_map_lost_fraction), max_d2=$($rows[0].anchor_contact_map_max_d2)"
 }
-if ([double]$rows[0].anchor_contact_map_max_d2 -le 0.0) {
-    throw "Expected positive contact-map distance metric"
+if ($rows[0].best_score_vector -notmatch 'anchor_contact_lost=0;anchor_contact_max=na') {
+    throw "best_score_vector does not expose the neutral anchor contact-map score"
 }
-if ($rows[0].best_score_vector -notmatch 'anchor_contact_lost=0') {
-    throw "best_score_vector does not expose anchor contact-map score"
+if ([int]$rows[0].soft_observed_contacts_checked -le 0) {
+    throw "Expected the selected assignment to audit observed owner contacts"
+}
+if ([int]$rows[0].soft_observed_contacts_lost -ne 0 -or
+    $rows[0].evidence_state -ne 'supported_connected') {
+    throw "Expected intact owner contact map, got lost=$($rows[0].soft_observed_contacts_lost), evidence_state=$($rows[0].evidence_state)"
 }
 
 Write-Host 'PASS pbctopo_anchor_graph_upgrade_smoke'

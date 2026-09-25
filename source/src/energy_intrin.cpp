@@ -1,3 +1,5 @@
+#include "titan_topology_energy.h"
+#include "gromos_nonbonded.h"
 #include "cache_sigma_epsilon.h"
 #include "charmm_nonbonded.h"
 #include "force.h"
@@ -76,6 +78,11 @@ int cal_energy_amber_intrin(const MOL &rec, const MOL &lg,
                             const arguments &Arguments,
                             const Multi_MOL_parameters &rec_parameters,
                             const Multi_MOL_parameters &lg_parameters) {
+  if (titan_nb::topology_energy_required(CachedData, Arguments)) {
+    titan_nb::calculate(rec, lg, info_rec, info_lg, CachedData, begin, end,
+                        Energy, nullptr, Arguments);
+    return 0;
+  }
   Energy.set_energy(0., 0.);
   const bool is_charmm =
       Arguments.force_f.find("CHARMM") != std::string::npos;
@@ -311,6 +318,11 @@ int cal_energy_amber_screening_intrin(
     size_t begin, size_t end, cache_energy &Energy, size_t num_snap,
     const arguments &Arguments, const Multi_MOL_parameters &rec_parameters,
     const Multi_MOL_parameters &lg_parameters) {
+  if (titan_nb::topology_energy_required(CachedData, Arguments)) {
+    titan_nb::calculate(rec, lg, info_rec, info_lg, CachedData, begin, end,
+                        Energy, nullptr, Arguments);
+    return 0;
+  }
   Energy.set_energy(0., 0.);
   constexpr double kScreeningMinDistance =
       titan_energy_validation::kMinimumPairDistanceNm;
@@ -507,6 +519,11 @@ int cal_energy_gromos_intrin(const MOL &rec, const MOL &lg,
                              const arguments &Arguments,
                              const Multi_MOL_parameters &rec_parameters,
                              const Multi_MOL_parameters &lg_parameters) {
+  if (titan_nb::topology_energy_required(CachedData, Arguments)) {
+    titan_nb::calculate(rec, lg, info_rec, info_lg, CachedData, begin, end,
+                        Energy, nullptr, Arguments);
+    return 0;
+  }
   Energy.set_energy(0., 0.);
   const __m256d avx_epsilon_in = _mm256_set1_pd(Arguments.epsilon_in);
   const __m256d avx_one = _mm256_set1_pd(1.0);
@@ -562,11 +579,17 @@ int cal_energy_gromos_intrin(const MOL &rec, const MOL &lg,
           _mm256_loadu_pd(&rec_parameters.epsilon[i]);
       const __m256d avx_rec_sigma = _mm256_loadu_pd(&rec_parameters.sigma[i]);
 
-      const __m256d term_eps =
+      __m256d term_eps =
           _mm256_sqrt_pd(_mm256_mul_pd(avx_temp_epsilon_lg, avx_rec_epsilon));
-      const __m256d term_sig =
+      __m256d term_sig =
           _mm256_sqrt_pd(_mm256_mul_pd(avx_temp_sigma_lg, avx_rec_sigma));
 
+      if (CachedData.has_charmm_pair_overrides()) {
+        alignas(32) double c6_values[4], c12_values[4];
+        for (std::size_t lane=0;lane<4;++lane)
+          gromos::pair_params(CachedData,rec_parameters,lg_parameters,i+lane,j,c6_values[lane],c12_values[lane]);
+        term_sig=_mm256_load_pd(c6_values);term_eps=_mm256_load_pd(c12_values);
+      }
       __m256d r2_vdw = _mm256_mul_pd(avx_array_d_rec, avx_array_d_rec);
       __m256d r6 = _mm256_mul_pd(r2_vdw, r2_vdw);
       r6 = _mm256_mul_pd(r6, r2_vdw);
@@ -632,10 +655,8 @@ int cal_energy_gromos_intrin(const MOL &rec, const MOL &lg,
                          rec_parameters[i].get_charge() /
                          (d * Arguments.epsilon_in);
         double c_6 = c6(d); // c6(d) = d^6
-        double eps_term = sqrt(lg_parameters[j].get_epsilon() *
-                               rec_parameters[i].get_epsilon());
-        double sig_term =
-            sqrt(lg_parameters[j].get_sigma() * rec_parameters[i].get_sigma());
+        double sig_term{}, eps_term{};
+        gromos::pair_params(CachedData,rec_parameters,lg_parameters,i,j,sig_term,eps_term);
         double vdw_val = eps_term / square(c_6) - sig_term / c_6;
 
         if (write_cache) {
@@ -659,6 +680,11 @@ void cal_energy_opls_intrin(const MOL &rec, const MOL &lg,
                             const arguments &Arguments,
                             const Multi_MOL_parameters &rec_parameters,
                             const Multi_MOL_parameters &lg_parameters) {
+  if (titan_nb::topology_energy_required(CachedData, Arguments)) {
+    titan_nb::calculate(rec, lg, info_rec, info_lg, CachedData, begin, end,
+                        Energy, nullptr, Arguments);
+    return;
+  }
   Energy.set_energy(0., 0.);
   const __m256d avx_one = _mm256_set1_pd(1.0);
   const bool write_cache = !CachedData.elec_ener.empty();
@@ -811,6 +837,11 @@ int cal_energy_martini_intrin(const MOL &rec, const MOL &lg,
                               const arguments &Arguments,
                               const Multi_MOL_parameters &rec_parameters,
                               const Multi_MOL_parameters &lg_parameters) {
+  if (titan_nb::topology_energy_required(CachedData, Arguments)) {
+    titan_nb::calculate(rec, lg, info_rec, info_lg, CachedData, begin, end,
+                        Energy, nullptr, Arguments);
+    return 0;
+  }
   Energy.set_energy(0., 0.);
   const auto elec_cfg = martini::electrostatic_config(Arguments);
   const __m256d v_scale = _mm256_set1_pd(0.01);

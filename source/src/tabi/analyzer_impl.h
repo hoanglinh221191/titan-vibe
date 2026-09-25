@@ -458,6 +458,7 @@ private:
     int tabi_surface_point_count_requested{0};
     double tabi_panel_density_per_a2{0.0};
     std::string tabi_panel_budget_status{"off"};
+    ChargeResolutionDiagnostic tabi_charge_resolution;
     std::size_t tabi_surface_exposed_points{0};
     std::size_t tabi_surface_buried_points{0};
     double tabi_tree_build_ms{0.0};
@@ -1065,6 +1066,7 @@ private:
     double tabi_avg_valence{0.0};
     std::size_t tabi_nonmanifold_edges{0};
     std::size_t tabi_solid_angle_fallbacks{0};
+    std::size_t tabi_solid_angle_clamps{0};
     double tabi_diag_min{1.0};
     double tabi_diag_max{1.0};
     int tabi_taylor_order{0};
@@ -1140,6 +1142,7 @@ private:
     double tabi_preconditioner_coarse_verify_rel_error_max{0.0};
     std::string tabi_surface_generator{"off"};
     std::string tabi_discretization{"off"};
+    std::string tabi_node_patch_representation{"n/a"};
     double tabi_rhs_scale{1.0};
     double tabi_dielectric_contrast{0.0};
     double tabi_operator_contrast{0.0};

@@ -234,7 +234,7 @@ int main() {
   write_pbctopo_assignment_set_rows(
       assignment_out, 3, 1.5, candidates, &candidates[0], identifiability,
       {1.0, 0.0, 0.0, 1.0, 0.0, 1.0}, better,
-      layout.topology_epoch_id, 1);
+      layout.topology_epoch_id, 1, 0, 0, PbctopoFrameStatus::Certified);
   const auto assignment_lines = split_lines(assignment_out.str());
   expect(assignment_lines.size() == 2 &&
              split_csv(assignment_lines[0]).size() ==

@@ -1,5 +1,4 @@
 #include "identifiability.h"
-#include "component_graph_math.h"
 
 #include <algorithm>
 #include <cmath>
@@ -36,23 +35,6 @@ void unite(std::vector<std::size_t> &parent, std::vector<unsigned char> &rank,
   parent[b] = a;
   if (rank[a] == rank[b])
     ++rank[a];
-}
-
-bool pair_set_has_scored_contact_evidence(
-    const PbctopoPairShiftCandidateSet &pair_set) {
-  if (pair_set.candidates.empty())
-    return false;
-  const auto &best = pair_set.candidates.front();
-  const double confidence =
-      pair_set.candidates.size() > 1
-          ? pbctopo_pair_shift_confidence(
-                best.score, pair_set.candidates[1].score)
-          : 0.0;
-  return best.score.valid && best.score.complete && !best.score.ultra_clash &&
-         best.score.contact_pairs > 0 &&
-         best.score.contact_fraction > 0.0 &&
-         (confidence >= kPbctopoEvidenceMinConfidence ||
-          best.score.contact_fraction >= kPbctopoEvidenceMinConfidence);
 }
 
 } // namespace
@@ -171,9 +153,10 @@ PbctopoIdentifiability evaluate_pbctopo_identifiability(
   }
 
   for (const auto &pair_set : pair_candidates) {
+    const auto support =
+        evaluate_pbctopo_scored_pair_evidence_support(pair_set);
     if (pair_set.a >= component_count || pair_set.b >= component_count ||
-        pair_set.a == pair_set.b ||
-        !pair_set_has_scored_contact_evidence(pair_set)) {
+        pair_set.a == pair_set.b || !support.active_at_threshold) {
       continue;
     }
     const std::uint64_t key = component_pair_key(pair_set.a, pair_set.b);

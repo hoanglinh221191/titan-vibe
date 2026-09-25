@@ -1,10 +1,13 @@
 #include "tabi_near.h"
+#include "tabi_node_patch_curved.h"
 
 #include <algorithm>
 #include <array>
 #include <cmath>
 #include <limits>
+#include <cstdlib>
 #include <stdexcept>
+#include <unordered_set>
 
 namespace TitanPBE::Tabi {
 namespace {
@@ -139,7 +142,9 @@ double mixed_normal_green(const Panel &target, double sx, double sy, double sz,
       expkr *
       (kk * kk * inv_r + 2.0 * kk * inv_r2 + 2.0 * inv_r2 * inv_r) /
       (4.0 * kPi);
-  return fsecond * nxu * nyu + (fprime * inv_r) * (nxny - nxu * nyu);
+  // grad_y G(x-y) = -grad_x G(x-y): the mixed normal derivative
+  // is minus the radial Hessian contracted with the two outward normals.
+  return -fsecond * nxu * nyu - (fprime * inv_r) * (nxny - nxu * nyu);
 }
 
 KernelValues point_kernel(const Panel &target, const Panel &source, double sx,
@@ -495,24 +500,78 @@ double self_green_disk_integral(double area, double kappa) noexcept {
   return (1.0 - std::exp(-kk * radius)) / (2.0 * kk);
 }
 
+bool is_node_patch_panel(const Panel &panel) noexcept;
+
+// Discrete mean curvature at a node patch, from its one-ring.  On a sphere of
+// radius R, -2*n.(x_j-x_i)/|x_j-x_i|^2 equals 1/R exactly for every neighbour
+// and any mesh, so the average is unbiased there.  Returns 0 when no one-ring
+// is available, which restores the previous flat behaviour exactly.
+double node_patch_mean_curvature(const Panel &panel) noexcept {
+  if (!is_node_patch_panel(panel))
+    return 0.0;
+  const NodePatchGeometry &geometry = *panel.node_patch_geometry;
+  const std::size_t node = panel.node_patch_index;
+  if (node + 1 >= geometry.adjacent_offsets.size() ||
+      node >= geometry.vertex_xyz.size())
+    return 0.0;
+  const auto &xyz = geometry.vertex_xyz[node];
+  const Vec3 origin{xyz[0], xyz[1], xyz[2]};
+  const Vec3 normal{panel.nx, panel.ny, panel.nz};
+  double sum = 0.0;
+  std::size_t count = 0;
+  for (std::size_t pos = geometry.adjacent_offsets[node];
+       pos < geometry.adjacent_offsets[node + 1]; ++pos) {
+    const std::size_t other = geometry.adjacent_nodes[pos];
+    if (other >= geometry.vertex_xyz.size())
+      continue;
+    const auto &other_xyz = geometry.vertex_xyz[other];
+    const Vec3 edge =
+        Vec3{other_xyz[0], other_xyz[1], other_xyz[2]} - origin;
+    const double length2 = dot(edge, edge);
+    if (!(length2 > 1.0e-24))
+      continue;
+    sum += -2.0 * dot(normal, edge) / length2;
+    ++count;
+  }
+  if (count == 0)
+    return 0.0;
+  const double curvature = sum / static_cast<double>(count);
+  return std::isfinite(curvature) ? curvature : 0.0;
+}
+
 [[maybe_unused]] KernelValues self_singular_integral(const Panel &source,
+                                                     double eps_ratio,
                                                      double kappa) noexcept {
   // The jump terms remain on the analytic JCP LHS.  For the collocation
   // source triangle itself, integrate only the single-layer singular part
-  // with an equal-area disk surrogate and use flat-panel principal values for
-  // the derivative kernels.
+  // with an equal-area disk surrogate.
   const double g0 = self_green_disk_integral(source.area, 0.0);
   const double gk = self_green_disk_integral(source.area, kappa);
-  return {g0 - gk, 0.0, 0.0, 0.0};
+  // The derivative kernels' principal value is zero only for a FLAT patch,
+  // where n_y.(x-y) vanishes identically on the patch itself.  Expanding the
+  // surface about the collocation point gives, for principal curvatures k1,k2,
+  //   integral dG0/dn_y dS = -(k1+k2)/2 * sqrt(A/pi)/4 + O(A),
+  // and dG/dn_x agrees with dG/dn_y at this order.  On a sphere the mean
+  // curvature is 1/R and this reproduces the closed form.  The screened minus
+  // unscreened difference is O(kappa^2 * A^(3/2)) and is dropped with it.
+  // k4 keeps its flat finite part; no curvature term is claimed for it.
+  // Leading order only.  A scale sweep on the sphere puts the best-fit
+  // coefficient near 2.2 and drifting with resolution, so the mechanism is
+  // right but the magnitude for a barycentric dual cell is not settled; a
+  // fitted constant would not be physics.  See the 2026-09-15 report.
+  const double layer = -node_patch_mean_curvature(source) *
+                       std::sqrt(std::max(0.0, source.area) / kPi) / 4.0;
+  return {g0 - gk, (eps_ratio - 1.0) * layer,
+          (1.0 - 1.0 / std::max(1.0e-12, eps_ratio)) * layer, 0.0};
 }
 
 AcceptedKernelValues self_singular_decision(const Panel &source,
-                                            double kappa) noexcept {
+                                            double eps_ratio, double kappa) noexcept {
   AcceptedKernelValues out;
-  out.kernel = self_singular_integral(source, kappa);
+  out.kernel = self_singular_integral(source, eps_ratio, kappa);
   out.block = {KernelBlockDecision{true, "self_asi", "centroid_guarded"},
-               KernelBlockDecision{true, "self_flat_pv", "centroid_guarded"},
-               KernelBlockDecision{true, "self_flat_pv", "centroid_guarded"},
+               KernelBlockDecision{true, "self_curved_pv", "centroid_guarded"},
+               KernelBlockDecision{true, "self_curved_pv", "centroid_guarded"},
                KernelBlockDecision{true, "self_flat_pv", "centroid_guarded"}};
   return out;
 }
@@ -1119,7 +1178,7 @@ bool has_all_triangle_geometry(const std::vector<Panel> &panels) noexcept {
   return true;
 }
 
-std::string kernel_policy_for_mode(const std::string &near_integration) {
+const char *kernel_policy_for_mode(const std::string &near_integration) noexcept {
   if (near_integration == "analytic_singular")
     return "self_asi";
   if (near_integration == "duffy_adaptive")
@@ -1266,7 +1325,334 @@ AcceptedKernelValues guarded_one_ring_cpv_integral_decision(
   return out;
 }
 
+// Gauss-Legendre on [0,1]. Immutable rules are shared between surface builds.
+std::vector<Quad1D> sphere_gauss_rule(int order) {
+  std::vector<Quad1D> rule;
+  for (int i = 0; i < order; ++i) {
+    double z = std::cos(kPi * (i + 0.75) / (order + 0.5));
+    double derivative = 0.0;
+    for (int iteration = 0; iteration < 64; ++iteration) {
+      double p = 1.0, previous = 0.0;
+      for (int k = 1; k <= order; ++k) {
+        const double old = p;
+        p = ((2 * k - 1) * z * p - (k - 1) * previous) / k;
+        previous = old;
+      }
+      derivative = order * (z * p - previous) / (z * z - 1.0);
+      const double step = p / derivative;
+      z -= step;
+      if (std::abs(step) < 2.0e-15)
+        break;
+    }
+    rule.push_back({0.5 * (1.0 + z),
+                    1.0 / ((1.0 - z * z) * derivative * derivative)});
+  }
+  return rule;
+}
+
+const std::vector<Quad1D> &sphere_rule(std::size_t level) {
+  static const std::array<std::vector<Quad1D>, 7> rules = {
+      sphere_gauss_rule(8), sphere_gauss_rule(16), sphere_gauss_rule(32),
+      sphere_gauss_rule(64), sphere_gauss_rule(128), sphere_gauss_rule(256),
+      sphere_gauss_rule(512)};
+  return rules.at(level);
+}
+
+double sphere_self_rule(const std::array<Vec3, 3> &vertices,
+                        const std::vector<Quad1D> &rule,
+                        SpherePatchQuadrature *prepared = nullptr,
+                        const Vec3 *target_point = nullptr) {
+  const Vec3 center = (1.0 / 3.0) * (vertices[0] + vertices[1] + vertices[2]);
+  const Vec3 target = target_point ? *target_point : (1.0 / norm(center)) * center;
+  double integral = 0.0;
+  for (int edge = 0; edge < 3; ++edge) {
+    const Vec3 a = vertices[edge], b = vertices[(edge + 1) % 3];
+    for (const auto &u : rule) {
+      for (const auto &v : rule) {
+        const Vec3 radial = (1.0 - v.x) * a + v.x * b - center;
+        const Vec3 p = center + u.x * radial;
+        const double length = norm(p);
+        const Vec3 y = (1.0 / length) * p;
+        const double weight = u.weight * v.weight * u.x *
+            std::abs(dot(p, cross(radial, b - a))) /
+            (length * length * length);
+        // On a unit sphere n_y.(x-y)=-|x-y|^2/2. Use this cancellation-free
+        // form for the weakly singular curved self term, separate from jump.
+        const Vec3 delta = target - y;
+        const double distance = norm(delta);
+        if (!(distance > 1.0e-14))
+          return std::numeric_limits<double>::quiet_NaN();
+        integral += target_point
+            ? weight * dot(y, delta) / (4.0 * kPi * distance * distance * distance)
+            : -weight / (8.0 * kPi * distance);
+        if (prepared)
+          prepared->nodes.push_back({y.x, y.y, y.z, weight});
+      }
+    }
+  }
+  return integral;
+}
+
+// For a self target t inside a spherical triangle, polar integration gives
+// integral_S 1/|y-t| dS = integral_boundary |y-t| d(azimuth).
+// This removes the radial singularity analytically. Adaptive 1D integration
+// resolves the narrow angular peaks of clipped slivers without an N^2 rule.
+double sphere_self_boundary(const std::array<Vec3, 3> &vertices) {
+  using L = std::array<long double, 3>;
+  auto dotl = [](L a, L b) { return a[0] * b[0] + a[1] * b[1] + a[2] * b[2]; };
+  auto crossl = [](L a, L b) {
+    return L{a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2],
+             a[0] * b[1] - a[1] * b[0]};
+  };
+  L target{0, 0, 0};
+  for (const auto &v : vertices) {
+    target[0] += v.x;
+    target[1] += v.y;
+    target[2] += v.z;
+  }
+  const long double target_length = std::sqrt(dotl(target, target));
+  for (auto &x : target)
+    x /= target_length;
+  double integral = 0;
+  for (int edge = 0; edge < 3; ++edge) {
+    const auto &av = vertices[edge], &bv = vertices[(edge + 1) % 3];
+    const L a{av.x, av.y, av.z}, e{static_cast<long double>(bv.x) - av.x,
+                                   static_cast<long double>(bv.y) - av.y,
+                                   static_cast<long double>(bv.z) - av.z};
+    const long double numerator = std::abs(dotl(target, crossl(a, e)));
+    auto rule = [&](double lo, double hi, std::size_t level) {
+      long double sum = 0;
+      for (const auto &v : sphere_rule(level)) {
+        const long double f = lo + (static_cast<long double>(hi) - lo) * v.x;
+        const L p{a[0] + f * e[0], a[1] + f * e[1], a[2] + f * e[2]};
+        const long double length = std::sqrt(dotl(p, p));
+        const L delta{p[0] / length - target[0], p[1] / length - target[1],
+                      p[2] / length - target[2]};
+        const L transverse = crossl(target, p);
+        const long double denominator = dotl(transverse, transverse);
+        if (!(denominator > 0))
+          return std::numeric_limits<double>::quiet_NaN();
+        sum +=
+            v.weight * std::sqrt(dotl(delta, delta)) * numerator / denominator;
+      }
+      return static_cast<double>((hi - lo) * sum);
+    };
+    auto adaptive = [&](auto &&self, double lo, double hi,
+                        int depth) -> double {
+      const double coarse = rule(lo, hi, 0), fine = rule(lo, hi, 1);
+      if (std::isfinite(fine) &&
+          std::abs(fine - coarse) <= 1e-8 * std::abs(fine) + 2e-13 * (hi - lo))
+        return fine;
+      if (depth == 18)
+        throw std::runtime_error("sphere_patch_self_boundary_nonconverged");
+      const double mid = (lo + hi) * .5;
+      return self(self, lo, mid, depth + 1) + self(self, mid, hi, depth + 1);
+    };
+    integral += adaptive(adaptive, 0, 1, 0);
+  }
+  return -integral / (8 * kPi);
+}
+
+bool sphere_poisson_near(const Panel &target, const Panel &source,
+                         double eps_ratio, bool self, double &value) {
+  const auto &prepared = *source.sphere_patch_quadrature;
+  if (self) {
+    value = (eps_ratio - 1.0) * prepared.self_double_layer;
+    return std::isfinite(value);
+  }
+  const auto &sphere = sphere_patch_sphere(source);
+  const Vec3 t = {(target.x - sphere[0]) / sphere[3],
+                  (target.y - sphere[1]) / sphere[3],
+                  (target.z - sphere[2]) / sphere[3]};
+  const bool same_sphere = target.sphere_patch_quadrature &&
+      sphere_patch_sphere(target) == sphere;
+  if (!same_sphere) {
+    // Rare but reachable at a globally merged vertex of touching spheres.
+    // Refine this near integral instead of applying the same-sphere identity.
+    const Vec3 origin = {sphere[0],sphere[1],sphere[2]};
+    const std::array<Vec3,3> vertices = {
+        (1.0/sphere[3])*(panel_vertex(source,0)-origin),
+        (1.0/sphere[3])*(panel_vertex(source,1)-origin),
+        (1.0/sphere[3])*(panel_vertex(source,2)-origin)};
+    double previous = sphere_self_rule(vertices,sphere_rule(0),nullptr,&t);
+    if (!std::isfinite(previous)) return false;
+    for (std::size_t level=1;level<=4;++level) {
+      const double current = sphere_self_rule(vertices,sphere_rule(level),nullptr,&t);
+      if (!std::isfinite(current)) return false;
+      const double tolerance = 1e-7*std::max(std::abs(current),std::abs(previous)) +
+          64*std::numeric_limits<double>::epsilon();
+      if (std::abs(current-previous)<=tolerance) {
+        value=(eps_ratio-1)*current;
+        return std::isfinite(value);
+      }
+      previous=current;
+    }
+    return false;
+  }
+  double integral = 0.0;
+  for (const auto &node : prepared.nodes) {
+    const Vec3 y = {node[0], node[1], node[2]};
+    const Vec3 delta = t - y;
+    const double distance = norm(delta);
+    if (!(distance > 1.0e-14))
+      return false;
+    integral += same_sphere ? -node[3] / (8.0 * kPi * distance)
+        : node[3] * dot(y, delta) /
+              (4.0 * kPi * distance * distance * distance);
+  }
+  value = (eps_ratio - 1.0) * integral;
+  return std::isfinite(value);
+}
+
+// Screened-minus-unscreened radial factors, written so that no digits are
+// lost near the singular point.  With s = kappa*r and
+// g(r) = (exp(-s)-1)/(4*pi*r) the difference of the two Green functions,
+//   E1(s) = 1-(1+s)exp(-s) = integral_0^s t exp(-t) dt,  g'(r) = E1(s)/(4 pi r^2)
+//   Q(s)  = exp(-s)/s + 2exp(-s)/s^2 + 2(exp(-s)-1)/s^3,  g''(r) = kappa^3 Q(s)/(4 pi)
+// Evaluating g' and g'' by subtracting the two kernels instead would cancel
+// twelve digits at small r, because each carries a 1/r^3 term that the
+// difference does not.  Both series below are the exact Taylor expansions.
+double screened_e1(double s) noexcept {
+  if (s < 0.5) {
+    const double s2 = s * s;
+    return s2 * (1.0 / 2.0 +
+                 s * (-1.0 / 3.0 +
+                      s * (1.0 / 8.0 +
+                           s * (-1.0 / 30.0 + s * (1.0 / 144.0)))));
+  }
+  return 1.0 - (1.0 + s) * std::exp(-s);
+}
+
+double screened_q(double s) noexcept {
+  if (s < 0.5)
+    return -1.0 / 3.0 +
+           s * (1.0 / 4.0 + s * (-1.0 / 10.0 + s * (1.0 / 36.0)));
+  const double e = std::exp(-s);
+  return e / s + 2.0 * e / (s * s) + 2.0 * std::expm1(-s) / (s * s * s);
+}
+
+// Curved self and one-ring integration for the coupled (salt > 0) kernels on a
+// sphere-patch surface.  The unscreened double layer is taken from the cached,
+// adaptively converged self value where it applies; only the screened
+// correction is re-integrated on the stored nodes, and that correction is
+// strictly less singular than either kernel alone.
+bool sphere_coupled_near(const Panel &target, const Panel &source,
+                         double eps_ratio, double kappa, bool self,
+                         KernelValues &out) {
+  const auto &prepared = *source.sphere_patch_quadrature;
+  const auto &sphere = sphere_patch_sphere(source);
+  const double radius = sphere[3];
+  if (!(radius > 0.0) || !(eps_ratio > 0.0))
+    return false;
+  if (!self && !(target.sphere_patch_quadrature &&
+                 sphere_patch_sphere(target) == sphere))
+    return false; // cross-sphere coupled pairs keep the centroid rule
+  const Vec3 t = {(target.x - sphere[0]) / radius,
+                  (target.y - sphere[1]) / radius,
+                  (target.z - sphere[2]) / radius};
+  const double kappa_hat = kappa * radius;
+  double single = 0.0;   // integral of (G0 - Gk), in unit-sphere measure
+  double layer0 = 0.0;   // integral of dG0/dn_y
+  double layer_k = 0.0;  // integral of (dGk/dn_y - dG0/dn_y)
+  double mixed = 0.0;    // integral of (d2Gk - d2G0), in unit-sphere measure
+  for (const auto &node : prepared.nodes) {
+    const Vec3 y = {node[0], node[1], node[2]};
+    const double distance = norm(t - y);
+    if (!(distance > 1.0e-14))
+      return false;
+    const double s = kappa_hat * distance;
+    const double e1 = screened_e1(s);
+    const double weight = node[3];
+    single += weight * (-std::expm1(-s)) / distance;
+    layer0 += weight * (-1.0) / distance;
+    layer_k += weight * e1 / distance;
+    // n_x.n_y = 1 - d^2/2 and (n_x.u)(n_y.u)/r^2 = -d^2/4 on one sphere.
+    mixed += weight * (kappa_hat * kappa_hat * kappa_hat * screened_q(s) *
+                           distance * distance / 4.0 -
+                       e1 * (1.0 - distance * distance / 4.0) /
+                           (distance * distance * distance));
+  }
+  const double layer_unscreened =
+      self ? prepared.self_double_layer : layer0 / (8.0 * kPi);
+  const double layer_screened = layer_k / (8.0 * kPi);
+  out.k1 = radius * single / (4.0 * kPi);
+  out.k2 = (eps_ratio - 1.0) * layer_unscreened + eps_ratio * layer_screened;
+  out.k3 = (1.0 - 1.0 / eps_ratio) * layer_unscreened -
+           layer_screened / eps_ratio;
+  out.k4 = mixed / (4.0 * kPi * radius);
+  return std::isfinite(out.k1) && std::isfinite(out.k2) &&
+         std::isfinite(out.k3) && std::isfinite(out.k4);
+}
+
+const char *poisson_policy(const Panel &panel, const std::string &requested) noexcept {
+  if (panel.sphere_patch_quadrature && requested != "centroid")
+    return "sphere_poisson_curved";
+  if (is_node_patch_panel(panel))
+    return "poisson_node_patch";
+  return "poisson_centroid";
+}
+
 } // namespace
+
+std::shared_ptr<const SpherePatchQuadrature> prepare_sphere_patch_quadrature(
+    const std::array<double, 3> &a, const std::array<double, 3> &b,
+    const std::array<double, 3> &c,
+    std::shared_ptr<const std::vector<std::array<double, 4>>> spheres,
+    bool clipped) {
+  const std::array<Vec3, 3> vertices = {
+      {{a[0], a[1], a[2]}, {b[0], b[1], b[2]}, {c[0], c[1], c[2]}}};
+  const std::array<double, 3> edges = {norm(vertices[1] - vertices[0]),
+                                       norm(vertices[2] - vertices[1]),
+                                       norm(vertices[0] - vertices[2])};
+  if (*std::min_element(edges.begin(), edges.end()) <= 1.0e-14)
+    throw std::runtime_error("sphere_patch_degenerate_triangle");
+  auto prepared = std::make_shared<SpherePatchQuadrature>();
+  prepared->spheres = std::move(spheres);
+  const double largest = *std::max_element(edges.begin(), edges.end());
+  const bool sliver =
+      largest > 4.0 * *std::min_element(edges.begin(), edges.end()) ||
+      norm(cross(vertices[1] - vertices[0], vertices[2] - vertices[0])) <
+          .1 * largest * largest;
+  const std::size_t near_level = sliver ? 1 : 0;
+  const auto &rule = sphere_rule(near_level);
+  prepared->nodes.reserve(3 * rule.size() * rule.size());
+  double previous = sphere_self_rule(vertices, rule, prepared.get());
+  if (!std::isfinite(previous) ||
+      prepared->nodes.size() != 3 * rule.size() * rule.size())
+    throw std::runtime_error("sphere_patch_quadrature_nodes_invalid");
+  if (clipped || near_level > 0) {
+    prepared->self_double_layer = sphere_self_boundary(vertices);
+    return prepared;
+  }
+  for (std::size_t level = near_level + 1; level < 7; ++level) {
+    const double current = sphere_self_rule(vertices, sphere_rule(level));
+    const double tolerance = 1.0e-8 * std::max(std::abs(current), std::abs(previous)) +
+        64.0 * std::numeric_limits<double>::epsilon();
+    if (std::isfinite(current) && std::abs(current - previous) <= tolerance) {
+      prepared->self_double_layer = current;
+      return prepared;
+    }
+    previous = current;
+  }
+  throw std::runtime_error("sphere_patch_self_quadrature_nonconverged");
+}
+
+std::size_t sphere_patch_quadrature_storage_bytes(const std::vector<Panel> &panels) {
+  std::unordered_set<const SpherePatchQuadrature *> seen;
+  std::unordered_set<const void *> seen_spheres;
+  std::size_t bytes = 0;
+  for (const auto &panel : panels) {
+    const auto *quadrature = panel.sphere_patch_quadrature.get();
+    if (quadrature && seen.insert(quadrature).second) {
+      bytes += sizeof(*quadrature) + quadrature->nodes.capacity() *
+          sizeof(std::array<double, 4>);
+      if (quadrature->spheres && seen_spheres.insert(quadrature->spheres.get()).second)
+        bytes += sizeof(*quadrature->spheres) + quadrature->spheres->capacity() *
+            sizeof(std::array<double, 4>);
+    }
+  }
+  return bytes;
+}
 
 std::string resolve_near_integration_mode(const std::string &requested,
                                           const std::vector<Panel> &panels) {
@@ -1277,7 +1663,9 @@ std::string resolve_near_integration_mode(const std::string &requested,
   const bool triangle_ready =
       has_all_triangle_geometry(panels) || node_patch_ready;
   if (mode == "auto")
-    return "centroid";
+    return std::any_of(panels.begin(), panels.end(), [](const Panel &panel) {
+      return static_cast<bool>(panel.sphere_patch_quadrature);
+    }) ? "analytic_singular" : "centroid";
   if (mode == "centroid")
     return mode;
   if ((mode == "analytic_singular" || mode == "duffy_adaptive") &&
@@ -1378,7 +1766,14 @@ JcpNearPairKernel evaluate_jcp_near_pair_kernel(
   AcceptedKernelValues block_decision;
   bool has_block_decision = false;
 
-  if (node_patch_pair && !coupled) {
+  if (node_patch_pair && curved_dual_cell(source)) {
+    const auto block = curved_node_pair(target, target_index, source,
+                                        source_index, eps_ratio, kappa);
+    kernel = {coupled ? block[0] : 0.0, block[1],
+              coupled ? block[2] : 0.0, coupled ? block[3] : 0.0};
+    used_duffy = true;
+    subdivisions = selected.self_pair || selected.one_ring ? 16 : 4;
+  } else if (node_patch_pair && !coupled) {
     if (selected.self_pair)
       return selected;
     kernel = selected.one_ring
@@ -1389,9 +1784,46 @@ JcpNearPairKernel evaluate_jcp_near_pair_kernel(
     used_centroid = !selected.one_ring;
     subdivisions = selected.one_ring ? 32 : 0;
   } else if (node_patch_pair && selected.self_pair) {
-    kernel = self_singular_integral(source, kappa);
+    kernel = self_singular_integral(source, eps_ratio, kappa);
     used_duffy = true;
     subdivisions = 1;
+  } else if (!coupled && source.sphere_patch_quadrature &&
+             near_integration != "centroid" &&
+             (selected.self_pair || selected.one_ring)) {
+    if (sphere_poisson_near(target, source, eps_ratio, selected.self_pair, kernel.k2)) {
+      used_duffy = true;
+      subdivisions = 3;
+    } else {
+      kernel = centroid_integral(target, source, eps_ratio, 0.0);
+      used_centroid = true;
+      fallback = true;
+    }
+  } else if (node_patch_pair && selected.one_ring) {
+    // Coupled one-ring pairs used to fall through to a centroid monopole,
+    // so the patch integration above applied only at zero salt.  Which near
+    // rule is used must not depend on ionic strength.
+    kernel = node_patch_near_integral(target, source, eps_ratio, kappa, false);
+    used_duffy = true;
+    subdivisions = 32;
+  } else if (coupled && source.sphere_patch_quadrature &&
+             near_integration != "centroid" &&
+             (selected.self_pair || selected.one_ring)) {
+    // Same correction as the scalar branch above, for salted runs.  Without
+    // it every ionic-strength calculation keeps the flat-panel self term.
+    if (sphere_coupled_near(target, source, eps_ratio, kappa,
+                            selected.self_pair, kernel)) {
+      used_duffy = true;
+      subdivisions = 3;
+    } else if (selected.self_pair) {
+      kernel = self_singular_integral(source, eps_ratio, kappa);
+      used_duffy = true;
+      subdivisions = 1;
+      fallback = true;
+    } else {
+      kernel = centroid_integral(target, source, eps_ratio, kappa);
+      used_centroid = true;
+      fallback = true;
+    }
   } else if (!coupled) {
     if (selected.self_pair)
       return selected;
@@ -1407,7 +1839,7 @@ JcpNearPairKernel evaluate_jcp_near_pair_kernel(
       throw std::runtime_error(
           "PBE BIE: analytic near integration requires triangle geometry "
           "for self panels.");
-    block_decision = self_singular_decision(source, kappa);
+    block_decision = self_singular_decision(source, eps_ratio, kappa);
     kernel = block_decision.kernel;
     has_block_decision = true;
     used_duffy = true;
@@ -1476,7 +1908,10 @@ JcpNearPairKernel evaluate_jcp_near_pair_kernel(
   if (stats != nullptr) {
     stats->near_integration = near_integration;
     stats->quad_buffer = quad_buffer;
-    stats->near_kernel_policy = kernel_policy_for_mode(near_integration);
+    const char *policy = curved_dual_cell(target) ? "curved_dual" : coupled ? kernel_policy_for_mode(near_integration)
+                                 : poisson_policy(target, near_integration);
+    if (stats->near_kernel_policy != policy)
+      stats->near_kernel_policy = policy;
   }
   return selected;
 }
@@ -1510,6 +1945,25 @@ JcpNearAccum accumulate_jcp_near_ordered(
   JcpNearAccum acc;
   const std::size_t n = panels.size();
   const std::size_t end = begin + count;
+  if(curved_dual_cell(target)) {
+    const auto&cache=*target.node_patch_geometry->curved;
+    if(!cache.pair_blocks.empty() && n==cache.cells.size() &&
+       target.node_patch_index==target_index) {
+      if(cache.eps_ratio!=eps_ratio||cache.kappa!=kappa)
+        throw std::runtime_error("curved_dual_kernel_cache_parameter_mismatch");
+      const auto*row=cache.pair_blocks.data()+target_index*n;
+      for(std::size_t pos=begin;pos<end;++pos){const auto j=order[pos];
+        if(panels[j].node_patch_geometry.get()!=target.node_patch_geometry.get() || panels[j].node_patch_index>=n)
+          throw std::runtime_error("curved_dual_mixed_cache_geometry");
+        const auto&k=row[panels[j].node_patch_index];
+        acc.phi+=k[1]*unknowns[j];
+        if(coupled){acc.phi+=k[0]*unknowns[n+j];acc.phin+=k[2]*unknowns[n+j]+k[3]*unknowns[j];}
+        if(stats)add_stats(stats,j==target_index,j!=target_index&&node_patch_adjacent(target,panels[j]),true,false,false,1);
+      }
+      if(stats){stats->near_integration=near_integration;stats->quad_buffer=quad_buffer;stats->near_kernel_policy="curved_dual";}
+      return acc;
+    }
+  }
   for (std::size_t pos = begin; pos < end; ++pos) {
     const std::size_t j = order[pos];
     const Panel &source = panels[j];
@@ -1528,7 +1982,10 @@ JcpNearAccum accumulate_jcp_near_ordered(
   if (stats != nullptr) {
     stats->near_integration = near_integration;
     stats->quad_buffer = quad_buffer;
-    stats->near_kernel_policy = kernel_policy_for_mode(near_integration);
+    const char *policy = curved_dual_cell(target) ? "curved_dual" : coupled ? kernel_policy_for_mode(near_integration)
+                                 : poisson_policy(target, near_integration);
+    if (stats->near_kernel_policy != policy)
+      stats->near_kernel_policy = policy;
   }
   return acc;
 }

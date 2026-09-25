@@ -102,15 +102,11 @@ void assert_randomized_timing_and_sink() {
 }
 
 void assert_exact_dual_runtime_hard_cap_promotes() {
-  TitanKinetics tica(5, 1, 2, 0.1, TicaBackend::ExactDual, 3,
-                     64 * 1024, true);
-  add_frames(tica);
-  require_true(tica.backend() == TicaBackend::Randomized,
-               "runtime hard cap did not promote exact_dual");
-  require_true(tica.timing_stats().promoted_cache_frames >= 0,
-               "runtime promotion counter is invalid");
-  tica.solve_tica();
-  require_true(tica.is_solved(), "promoted randomized backend did not solve");
+  TitanKinetics tica(5,1,2,0.1,TicaBackend::ExactDual,3,64*1024,true);
+  bool rejected=false;
+  try { add_frames(tica); } catch(const std::runtime_error &) { rejected=true; }
+  require_true(rejected, "runtime memory cap must reject instead of silently approximating");
+  require_true(tica.backend()==TicaBackend::ExactDual, "exact backend identity changed");
 }
 
 } // namespace

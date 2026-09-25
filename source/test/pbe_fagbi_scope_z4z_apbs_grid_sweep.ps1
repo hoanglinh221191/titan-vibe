@@ -11,6 +11,13 @@ param(
     [int]$ApbsTimeoutSeconds = 900,
     [int]$FmmTimeoutSeconds = 1800,
     [int]$Threads = 4,
+    [ValidateSet('sphere-patch','grid-ses','analytic-ses')]
+    [string]$TitanPrimarySurface = 'sphere-patch',
+    [ValidateSet('centroid','node-patch')]
+    [string]$TitanDiscretization = 'centroid',
+    [ValidateRange(0.25,4.0)]
+    [double]$TitanSesGridSpacing = 0.75,
+    [string]$TitanProtocolTag = '',
     [double]$ApbsStabilityRelativeThreshold = 0.05,
     [switch]$SkipTitan,
     [switch]$Quick,
@@ -369,6 +376,10 @@ function New-Z4zRow([object]$Case, [string]$RunDir) {
         dime = $Case.dime
         fine_scale = $Case.fine_scale
         surface_points = $Case.surface_points
+        primary_surface = if ($Case.backend -eq 'titan_guarded_p4') { $TitanPrimarySurface } else { '' }
+        discretization = if ($Case.backend -eq 'titan_guarded_p4') { $TitanDiscretization } else { '' }
+        ses_grid_spacing = if ($Case.backend -eq 'titan_guarded_p4') { $TitanSesGridSpacing } else { '' }
+        titan_protocol_tag = if ($Case.backend -eq 'titan_guarded_p4') { $TitanProtocolTag } else { '' }
         timeout_seconds = $Case.timeout_seconds
         status = 'planned'
         failure_class = 'planned'
@@ -397,8 +408,13 @@ function New-Z4zRow([object]$Case, [string]$RunDir) {
 }
 
 function New-Z4zTitanCase([object]$Fixture) {
+    $tag = if ([string]::IsNullOrWhiteSpace($TitanProtocolTag)) {
+        ''
+    } else {
+        '_' + (($TitanProtocolTag.Trim().ToLowerInvariant()) -replace '[^a-z0-9_-]','_')
+    }
     return [pscustomobject]@{
-        case_id = 'titan_guarded_p4_{0}' -f $Fixture.fixture
+        case_id = 'titan_guarded_p4{0}_{1}' -f $tag,$Fixture.fixture
         fixture = $Fixture.fixture
         protein_name = $Fixture.protein_name
         pdb_id = $Fixture.pdb_id
@@ -498,6 +514,8 @@ function Read-Z4zTitanOutputs([string]$RunDir, [object]$Row) {
             $Row.iterations = Get-Z4zProfileValue $profile 'iterations' ''
             $Row.sampled_audit_rms = Get-Z4zProfileValue $profile 'tree_vs_direct_matvec_rel' ''
             $Row.sampled_direct_true_residual = Get-Z4zProfileValue $profile 'fmm_local_sampled_direct_true_residual' (Get-Z4zProfileValue $profile 'sampled_direct_true_residual' '')
+            $Row.primary_surface = Get-Z4zProfileValue $profile 'surface_generator' $Row.primary_surface
+            $Row.discretization = Get-Z4zProfileValue $profile 'discretization' $Row.discretization
         }
     }
     if ($Row.status -eq 'ok') {
@@ -544,7 +562,11 @@ function Invoke-Z4zTitanCase([object]$Case, [System.Collections.Generic.List[obj
         -FmmLocalFallback 'packed-avx2' `
         -FmmLocalPlanBuilder 'metric-cache' `
         -FmmLocalGeometryGuard 'strict-geometry-mac' `
-        -FmmLocalGeometryTheta 0.5
+        -FmmLocalGeometryTheta 0.5 `
+        -PrimarySurface $TitanPrimarySurface `
+        -SesGridSpacing $TitanSesGridSpacing `
+        -DgSolv $true
+    Add-Content -LiteralPath $arg -Value "-pbe-tabi-discretization=$TitanDiscretization" -Encoding ASCII
     $result = Invoke-FmmCliTitanCase -TitanExe $TitanExe -RunDir $runDir -ArgPath $arg -CaseTimeoutSeconds $Case.timeout_seconds
     $row.exit_code = $result.exit_code
     $row.timed_out = [string]$result.timed_out
@@ -560,7 +582,18 @@ function Invoke-Z4zTitanCase([object]$Case, [System.Collections.Generic.List[obj
         $row = Read-Z4zTitanOutputs -RunDir $runDir -Row $row
         $energyValue = Get-Z4zDouble $row.energy_kj_mol
         $auditValue = Get-Z4zDouble $row.sampled_audit_rms
-        if ($row.status -eq 'ok' -and (Test-FmmCliFinite $energyValue) -and ((-not (Test-FmmCliFinite $auditValue)) -or $auditValue -le 8.0e-3)) {
+        $expectedSurface = switch ($TitanPrimarySurface) {
+            'analytic-ses' { 'titan_analytic_patch_ray_ses' }
+            'grid-ses' { 'titan_grid_watertight_ses' }
+            default { 'titan_sphere_patch' }
+        }
+        $actualSurface = ([string]$row.primary_surface).Replace('-','_')
+        $expectedDiscretization = $TitanDiscretization.Replace('-','_')
+        $actualDiscretization = ([string]$row.discretization).Replace('-','_')
+        if ($actualSurface -ne $expectedSurface -or $actualDiscretization -ne $expectedDiscretization) {
+            $row.status = 'protocol_mismatch'
+            $row.failure_class = 'titan_surface_or_discretization_mismatch'
+        } elseif ($row.status -eq 'ok' -and (Test-FmmCliFinite $energyValue) -and ((-not (Test-FmmCliFinite $auditValue)) -or $auditValue -le 8.0e-3)) {
             $row.status = 'ok'
             $row.failure_class = 'pass'
         } elseif ($row.failure_class -eq 'pass') {

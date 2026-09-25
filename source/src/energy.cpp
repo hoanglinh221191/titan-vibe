@@ -1,3 +1,5 @@
+#include "titan_topology_energy.h"
+#include "gromos_nonbonded.h"
 #include "cache_sigma_epsilon.h"
 #include "charmm_nonbonded.h"
 #include "force.h"
@@ -52,6 +54,17 @@ inline int add_energy(const cache_sigma_epsilon &CachedData, size_t i,
                       const vector<mol_info> &info_rec,
                       const vector<mol_info> &info_lg, size_t rec_pos = 0,
                       size_t lg_pos = 0) {
+  const bool topology_bound = titan_nb::topology_energy_required(CachedData, Arguments);
+  if (topology_bound && i >= CachedData.elec_ener.size()) {
+    const double dx=0.1*(rec.pos.x[rec_pos]-lg.pos.x[lg_pos]);
+    const double dy=0.1*(rec.pos.y[rec_pos]-lg.pos.y[lg_pos]);
+    const double dz=0.1*(rec.pos.z[rec_pos]-lg.pos.z[lg_pos]);
+    const auto pair=titan_nb::evaluate_pair(CachedData,Arguments,info_rec.at(rec_pos),info_lg.at(lg_pos),
+                                           std::sqrt(dx*dx+dy*dy+dz*dz),CachedData.cutoff_dis);
+    const double factor=Arguments.self_int?0.5:1.0;
+    electro_energy+=factor*pair.elec;van_der_waals_energy+=factor*pair.vdw;
+    return 0;
+  }
   if (i < CachedData.elec_ener.size()) {
     electro_energy += CachedData.elec_ener[i];
     van_der_waals_energy += CachedData.vdw_ener[i];
@@ -152,11 +165,9 @@ inline int add_energy(const cache_sigma_epsilon &CachedData, size_t i,
     } else {
       double sd{1. / square(d)}, temp_elec{sd * charge / Arguments.epsilon_in},
           c_6{c6(d)}, c_12{square(c_6)};
-      double epsilon{sqrt(rec_parameters[rec_pos].get_epsilon() *
-                          lg_parameters[lg_pos].get_epsilon())},
-          sigma{sqrt(rec_parameters[rec_pos].get_sigma() *
-                     lg_parameters[lg_pos].get_sigma())},
-          temp_vdw{12. * sd * epsilon / c_12 - 6. * sd * sigma / c_6};
+      double sigma{}, epsilon{};
+      gromos::pair_params(CachedData, rec_parameters, lg_parameters, rec_pos, lg_pos, sigma, epsilon);
+      double temp_vdw{12. * sd * epsilon / c_12 - 6. * sd * sigma / c_6};
 
       van_der_waals_energy += epsilon / c_12 - sigma / c_6;
     }
@@ -178,6 +189,11 @@ int cal_energy_amber_screening(const MOL &rec, const MOL &lg,
                                size_t num_snap, const arguments &Arguments,
                                const Multi_MOL_parameters &rec_parameters,
                                const Multi_MOL_parameters &lg_parameters) {
+  if (titan_nb::topology_energy_required(CachedData, Arguments)) {
+    titan_nb::calculate(rec, lg, info_rec, info_lg, CachedData, begin, end,
+                        Energy, nullptr, Arguments);
+    return 0;
+  }
   constexpr double kScreeningMinDistance =
       titan_energy_validation::kMinimumPairDistanceNm;
   const double epsilon_in{Arguments.epsilon_in};
@@ -260,6 +276,11 @@ void cal_energy_amber(const MOL &rec, const MOL &lg,
                       const arguments &Arguments,
                       const Multi_MOL_parameters &rec_parameters,
                       const Multi_MOL_parameters &lg_parameters) {
+  if (titan_nb::topology_energy_required(CachedData, Arguments)) {
+    titan_nb::calculate(rec, lg, info_rec, info_lg, CachedData, begin, end,
+                        Energy, nullptr, Arguments);
+    return;
+  }
   Energy.set_energy(0., 0.);
   const bool is_charmm =
       Arguments.force_f.find("CHARMM") != string::npos;
@@ -337,6 +358,11 @@ void cal_energy_opls(const MOL &rec, const MOL &lg,
                      const arguments &Arguments,
                      const Multi_MOL_parameters &rec_parameters,
                      const Multi_MOL_parameters &lg_parameters) {
+  if (titan_nb::topology_energy_required(CachedData, Arguments)) {
+    titan_nb::calculate(rec, lg, info_rec, info_lg, CachedData, begin, end,
+                        Energy, nullptr, Arguments);
+    return;
+  }
   Energy.set_energy(0., 0.);
   for (size_t j{begin}; j < end; ++j) {
     double temp_epsilon_lg{16. * lg_parameters[j].get_epsilon()},
@@ -400,6 +426,11 @@ void cal_energy_gromos(const MOL &rec, const MOL &lg,
                        const arguments &Arguments,
                        const Multi_MOL_parameters &rec_parameters,
                        const Multi_MOL_parameters &lg_parameters) {
+  if (titan_nb::topology_energy_required(CachedData, Arguments)) {
+    titan_nb::calculate(rec, lg, info_rec, info_lg, CachedData, begin, end,
+                        Energy, nullptr, Arguments);
+    return;
+  }
   Energy.set_energy(0., 0.);
   for (size_t j{begin}; j < end; ++j) {
     double temp_charge{138.935457839 * lg_parameters[j].get_charge() /
@@ -432,17 +463,19 @@ void cal_energy_gromos(const MOL &rec, const MOL &lg,
         continue;
       }
 
+      double pair_c6{}, pair_c12{};
+      gromos::pair_params(CachedData, rec_parameters, lg_parameters, i, j, pair_c6, pair_c12);
       if (CachedData.elec_ener.empty()) {
         Energy.elec_ener += temp_charge * rec_parameters[i].get_charge() / d;
         Energy.vdw_ener +=
-            sqrt(rec_parameters[i].get_epsilon() * temp_epsilon) / square(c_6) -
-            sqrt(rec_parameters[i].get_sigma() * temp_sigma) / c_6;
+            pair_c12 / square(c_6) -
+            pair_c6 / c_6;
       } else {
         size_t pos{rec.size() * j + i};
         CachedData.set_elec_vdw(
             pos, temp_charge * rec_parameters[i].get_charge() / d,
-            sqrt(rec_parameters[i].get_epsilon() * temp_epsilon) / square(c_6) -
-                sqrt(rec_parameters[i].get_sigma() * temp_sigma) / c_6);
+            pair_c12 / square(c_6) -
+                pair_c6 / c_6);
         Energy += CachedData.get_energy(pos);
       }
     }
@@ -460,6 +493,11 @@ void cal_energy_martini(const MOL &rec, const MOL &lg,
                         const arguments &Arguments,
                         const Multi_MOL_parameters &rec_parameters,
                         const Multi_MOL_parameters &lg_parameters) {
+  if (titan_nb::topology_energy_required(CachedData, Arguments)) {
+    titan_nb::calculate(rec, lg, info_rec, info_lg, CachedData, begin, end,
+                        Energy, nullptr, Arguments);
+    return;
+  }
   Energy.set_energy(0., 0.);
   const auto elec_cfg = martini::electrostatic_config(Arguments);
   for (size_t j{begin}; j < end; ++j) {

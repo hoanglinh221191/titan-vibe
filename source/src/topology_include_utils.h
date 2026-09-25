@@ -2,6 +2,7 @@
 #define TOPOLOGY_INCLUDE_UTILS_H
 
 #include <algorithm>
+#include <cstdlib>
 #include <filesystem>
 #include <optional>
 #include <string>
@@ -44,6 +45,39 @@ inline std::optional<std::string> extract_include_target(std::string_view line) 
   return std::nullopt;
 }
 
+inline std::vector<std::filesystem::path> gromacs_library_include_roots() {
+  namespace fs = std::filesystem;
+
+  std::vector<fs::path> roots;
+  const char *raw_gmxlib = std::getenv("GMXLIB");
+  if (raw_gmxlib == nullptr || raw_gmxlib[0] == '\0')
+    return roots;
+
+#if defined(_WIN32)
+  constexpr char path_list_separator = ';';
+#else
+  constexpr char path_list_separator = ':';
+#endif
+
+  const std::string_view value(raw_gmxlib);
+  std::size_t begin = 0;
+  while (begin <= value.size()) {
+    const std::size_t end = value.find(path_list_separator, begin);
+    const std::string root = trim_copy(value.substr(
+        begin,
+        end == std::string_view::npos ? std::string_view::npos : end - begin));
+    if (!root.empty()) {
+      const fs::path normalized = fs::path(root).lexically_normal();
+      if (std::find(roots.begin(), roots.end(), normalized) == roots.end())
+        roots.emplace_back(normalized);
+    }
+    if (end == std::string_view::npos)
+      break;
+    begin = end + 1;
+  }
+  return roots;
+}
+
 inline std::vector<std::filesystem::path>
 build_include_candidates(std::string_view current_file,
                          std::string_view include_target) {
@@ -74,6 +108,8 @@ build_include_candidates(std::string_view current_file,
   if (!current_path.empty() && current_path.has_parent_path()) {
     append_unique(current_path.parent_path() / include_path);
   }
+  for (const fs::path &library_root : gromacs_library_include_roots())
+    append_unique(library_root / include_path);
   append_unique(include_path);
   return candidates;
 }

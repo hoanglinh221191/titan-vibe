@@ -1,28 +1,21 @@
-# Reproducibility record for 1.0.2
+# Reproducibility record for 1.0.3
 
-Version 1.0.2 adds the executable distribution and complete buildable host with
-HoloLift omitted. See the root README for exact commands. The focused VIBE source
-remains identical to 1.0.1; the host snapshot is based on TITAN commit
-`6a8385cf1c63c42046b8a38053f003311e85e633`. Source normalization, adapted host
-headers, executable hash, and imported DLLs are recorded in SOURCE_AUDIT.json.
+The executable, the host source under `source/`, and the focused library under
+`src/` all come from TITAN commit `50ed41edecfe7b9cc5b72fec1ed5d38827d4c6ac`.
+Source normalization, adapted host headers, the executable hash, and imported
+DLLs are recorded in `SOURCE_AUDIT.json`.
 
-The embedded host version is `0.2.0-dev.242+g6a8385cf1c63.dirty`. The suffix records
-the HoloLift-excluded build and pinned metadata. TITAN-VIBE distribution version
-1.0.2 does not relabel the underlying research-source identity.
+The embedded host version is `0.2.0-dev.304+g50ed41edecfe.dirty`. The suffix
+records the HoloLift-excluded export and pinned metadata. The TITAN-VIBE
+distribution version 1.0.3 does not relabel that identity.
 
-Validation already completed for this exact executable: 480/480 held-out fixed
-input PDB hashes and 18 scientific report fields match archived outputs; the
-first frame of each of the five representative systems matches coordinates at
-PDB precision and all 18 report fields. Two additional Figure 1 frames match.
-A longer replay was stopped at the user's request to avoid rerunning every test;
-its partial results are retained and are not described as full completion.
+Every VIBE calculation of the methods article was run with this executable.
+`validation/` records the checks shipped with the package. Replay of the 480
+held-out inputs and of the five molecular frame sets compares outputs with the
+reference outputs of this release. The original held-out endpoint table is kept
+in `examples/heldout480/ARCHIVED_CASE_ENDPOINTS.csv`.
 
-No VIBE algorithm was changed, no new MD simulation or timing campaign was run,
-and the full library test suite was not rerun just to change the distribution
-version. Existing tests remain available. The release commit intentionally skips
-automatic CI for this packaging-only change; validation records are local checks,
-not a claim of a fresh remote CI run.
-
-The original designed-case oracle and the original MDVWhole/GROMACS and timing
-protocols remain in data DOI 10.5281/zenodo.22710653. A replay establishes output
-agreement, not independent physical truth or a new held-out study.
+The designed-case oracle, the MDVWhole and GROMACS comparisons, and the timing
+protocol are archived in the data deposit (DOI 10.5281/zenodo.22710653 and its
+later versions). A replay establishes output agreement; it is not independent
+physical truth or a new held-out study.

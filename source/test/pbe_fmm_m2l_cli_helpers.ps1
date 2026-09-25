@@ -266,6 +266,8 @@ function Write-FmmCliArgFile(
     [string]$PqrPath,
     [string]$ForceFieldRoot = '',
     [ValidateSet('tabi','grid')][string]$Backend = 'tabi',
+    [ValidateSet('jcp2013-treecode','tabi2-nodepatch','calibrated-debug')]
+    [string]$Formulation = 'jcp2013-treecode',
     [ValidateSet('direct','treecode')][string]$Mode,
     [ValidateSet('off','single-matvec-analytic')][string]$FmmMode,
     [int]$SurfacePoints,
@@ -395,7 +397,7 @@ function Write-FmmCliArgFile(
     if ($Backend -eq 'tabi') {
         $argLines += @(
         "-pbe-tabi-sum=$Mode",
-        '-pbe-tabi-formulation=jcp2013-treecode',
+        "-pbe-tabi-formulation=$Formulation",
         "-pbe-tabi-fmm-m2l=$FmmMode",
         "-pbe-tabi-fmm-cartesian-audit=$FmmCartesianAudit",
         "-pbe-tabi-fmm-local=$FmmLocal",

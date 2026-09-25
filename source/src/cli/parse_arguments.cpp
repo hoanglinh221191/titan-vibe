@@ -308,6 +308,42 @@ int arguments::parse_arguments(int argc, char **argv) {
     }
     return false;
   };
+  auto parse_path_probe_lengths = [&](const std::string &raw_list) {
+    de.path_probe_lengths.clear();
+    std::string normalized = raw_list;
+    std::replace(normalized.begin(), normalized.end(), ';', ',');
+    std::istringstream iss(normalized);
+    for (std::string token; std::getline(iss, token, ',');) {
+      token.erase(
+          std::remove_if(token.begin(), token.end(),
+                         [](unsigned char c) { return std::isspace(c) != 0; }),
+          token.end());
+      if (token.empty())
+        continue;
+      std::size_t parsed_chars = 0;
+      double value = 0.0;
+      try {
+        value = std::stod(token, &parsed_chars);
+      } catch (const std::exception &) {
+        TitanUI::print_error(
+            "-pathway-probe-lengths expects positive finite distances.");
+        exit(EXIT_FAILURE);
+      }
+      if (parsed_chars != token.size() || !std::isfinite(value) ||
+          value <= 0.0) {
+        TitanUI::print_error(
+            "-pathway-probe-lengths expects positive finite distances.");
+        exit(EXIT_FAILURE);
+      }
+      de.path_probe_lengths.push_back(value);
+    }
+    if (de.path_probe_lengths.empty()) {
+      TitanUI::print_error(
+          "-pathway-probe-lengths expects a comma-separated distance list.");
+      exit(EXIT_FAILURE);
+    }
+    de.path_probe_length = de.path_probe_lengths.front();
+  };
   auto consume_compound_option_value =
       [&](const std::string &arg, std::initializer_list<const char *> flags,
           std::string &value_out, int &arg_index) {
@@ -599,6 +635,9 @@ int arguments::parse_arguments(int argc, char **argv) {
     }
   };
   for (int i = 1; i < argc; ++i) {
+    // Remember what is being parsed so a std::sto* failure can name the option
+    // instead of surfacing a bare "stoi"/"stod".
+    titan_cli::active_option_token() = argv[i];
     const std::string arg = normalize_pbe_cli_alias(string(argv[i]));
     std::string common_value;
 
@@ -1558,7 +1597,8 @@ int arguments::parse_arguments(int argc, char **argv) {
                               "--pbe-bie-analytic-ses-engine"},
                              common_value, i)) {
       pbe.tabi_analytic_ses_engine = require_choice(
-          common_value, {"current", "patch-ray-experimental"},
+          common_value,
+          {"current", "current-dense", "patch-ray-experimental"},
           "-pbe-bie-analytic-ses-engine");
       continue;
     }
@@ -1581,6 +1621,20 @@ int arguments::parse_arguments(int argc, char **argv) {
       pbe.tabi_sphere_mesh =
           require_choice(common_value, {"auto", "latlong", "icosphere"},
                          "-pbe-bie-sphere-mesh");
+      continue;
+    }
+    if (consume_option_value(
+            arg, {"-pbe-bie-curved-pair-cache-mb",
+                  "--pbe-bie-curved-pair-cache-mb"},
+            common_value, i)) {
+      pbe.tabi_curved_pair_cache_mb = parse_integer_option(
+          common_value, "-pbe-bie-curved-pair-cache-mb");
+      if (pbe.tabi_curved_pair_cache_mb < 0 ||
+          pbe.tabi_curved_pair_cache_mb > 262144) {
+        TitanUI::print_error("-pbe-bie-curved-pair-cache-mb must be between "
+                             "0 and 262144 MiB.");
+        exit(EXIT_FAILURE);
+      }
       continue;
     }
     if (consume_option_value(
@@ -3348,6 +3402,38 @@ int arguments::parse_arguments(int argc, char **argv) {
       gbsa_sasa_points = stoi(common_value);
       continue;
     }
+    if (consume_option_value(arg, {"-gbsa-surften", "--gbsa-surften"},
+                             common_value, i)) {
+      gbsa_surften = parse_numeric_option(common_value, "-gbsa-surften");
+      if (gbsa_surften < 0.0) {
+        TitanUI::print_error(
+            "-gbsa-surften must be a non-negative surface tension in "
+            "kcal/mol/A^2.");
+        exit(EXIT_FAILURE);
+      }
+      continue;
+    }
+    if (consume_option_value(arg, {"-gbsa-rgbmax", "--gbsa-rgbmax"},
+                             common_value, i)) {
+      // Cutoff on the HCT descreening integral for the effective Born radii.
+      // "off" keeps the uncut sum (TITAN default, reproduces earlier results);
+      // 25 is Amber's egb default. Any finite value changes DeltaG_polar, so
+      // the chosen value is recorded in gbsa_summary.dat.
+      const std::string choice = lowercase_copy(common_value);
+      if (choice == "off" || choice == "none" || choice == "inf" ||
+          choice == "infinite") {
+        gbsa_rgbmax = std::numeric_limits<double>::infinity();
+      } else {
+        gbsa_rgbmax = parse_numeric_option(common_value, "-gbsa-rgbmax");
+        if (!(gbsa_rgbmax > 0.0)) {
+          TitanUI::print_error(
+              "-gbsa-rgbmax must be a positive distance in Angstrom, or "
+              "'off' for no cutoff.");
+          exit(EXIT_FAILURE);
+        }
+      }
+      continue;
+    }
     if (consume_option_value(arg, {"-gbsa-ie-block", "--gbsa-ie-block"},
                              common_value, i)) {
       gbsa_ie_block = lowercase_copy(common_value);
@@ -4295,6 +4381,16 @@ int arguments::parse_arguments(int argc, char **argv) {
       llps.llps_density = require_choice(
           llps_value, {"auto", "full", "projection", "off"}, "-llps-density");
     }
+    if (consume_bool_option(arg, {"-llps-dbscan"}, llps.llps_dbscan, i)) {}
+    if (consume_option_value(arg, {"-llps-phase-geometry"}, llps_value, i))
+      llps.llps_phase_geometry=require_choice(llps_value,{"none","droplet","slab"},"-llps-phase-geometry");
+    if (consume_option_value(arg, {"-llps-phase-axis"}, llps_value, i)) {
+      auto axis=require_choice(llps_value,{"a","b","c"},"-llps-phase-axis");
+      llps.llps_phase_axis=axis=="a"?0:axis=="b"?1:2;
+    }
+    if (consume_option_value(arg, {"-llps-phase-dense-nm"}, llps_value, i)) llps.llps_phase_dense=stod(llps_value);
+    if (consume_option_value(arg, {"-llps-phase-dilute-inner-nm"}, llps_value, i)) llps.llps_phase_dilute_inner=stod(llps_value);
+    if (consume_option_value(arg, {"-llps-phase-dilute-outer-nm"}, llps_value, i)) llps.llps_phase_dilute_outer=stod(llps_value);
     if (consume_option_value(arg, {"-llps-kernel", "--llps-kernel"}, llps_value,
                              i)) {
       llps.llps_kernel = require_choice(llps_value, {"auto", "scalar", "avx2"},
@@ -4501,39 +4597,39 @@ int arguments::parse_arguments(int argc, char **argv) {
     }
     if (consume_bool_option(arg, {"-llps-fuzzy"}, llps.llps_fuzzy, i)) {
     }
-    // --- GIST Water Thermodynamics flags ---
-    if (string(argv[i]) == "-gist") {
-      gist.flag_gist = true;
+    // --- GIST: use the same normalized split-value parser as other modules ---
+    if (consume_bool_option(arg, {"-gist", "--gist"}, gist.flag_gist, i)) {
+      continue;
     }
-    if (string(argv[i]).find("--gist-resolution=") == 0 ||
-        string(argv[i]).find("-gist-resolution=") == 0) {
-      gist.gist_resolution =
-          stod(string(argv[i]).substr(string(argv[i]).find('=') + 1));
+    std::string gist_value;
+    if (consume_required_option_value(arg, {"-gist-resolution", "--gist-resolution"}, gist_value, i)) {
+      gist.gist_resolution=parse_numeric_option(gist_value, "-gist-resolution");
+      if (gist.gist_resolution<=0) { TitanUI::print_error("-gist-resolution must be positive."); exit(EXIT_FAILURE); }
+      continue;
     }
-    if (string(argv[i]).find("--gist-padding=") == 0 ||
-        string(argv[i]).find("-gist-padding=") == 0) {
-      gist.gist_padding =
-          stod(string(argv[i]).substr(string(argv[i]).find('=') + 1));
+    if (consume_required_option_value(arg, {"-gist-padding", "--gist-padding"}, gist_value, i)) {
+      gist.gist_padding=parse_numeric_option(gist_value, "-gist-padding");
+      if (gist.gist_padding<=0) { TitanUI::print_error("-gist-padding must be positive."); exit(EXIT_FAILURE); }
+      continue;
     }
-    if (string(argv[i]).find("--gist-temperature=") == 0 ||
-        string(argv[i]).find("-gist-temperature=") == 0) {
-      gist.gist_temperature =
-          stod(string(argv[i]).substr(string(argv[i]).find('=') + 1));
+    if (consume_required_option_value(arg, {"-gist-temperature", "--gist-temperature"}, gist_value, i)) {
+      gist.gist_temperature=parse_numeric_option(gist_value, "-gist-temperature");
+      if (gist.gist_temperature<=0) { TitanUI::print_error("-gist-temperature must be positive."); exit(EXIT_FAILURE); }
+      continue;
     }
-    if (string(argv[i]).find("--gist-water-model=") == 0 ||
-        string(argv[i]).find("-gist-water-model=") == 0) {
-      gist.gist_water_model =
-          string(argv[i]).substr(string(argv[i]).find('=') + 1);
+    if (consume_required_option_value(arg, {"-gist-cutoff", "--gist-cutoff"}, gist_value, i)) {
+      gist.gist_cutoff=parse_numeric_option(gist_value, "-gist-cutoff");
+      if (gist.gist_cutoff<=0) { TitanUI::print_error("-gist-cutoff must be positive."); exit(EXIT_FAILURE); }
+      continue;
     }
-    if (string(argv[i]).find("--gist-min-count=") == 0 ||
-        string(argv[i]).find("-gist-min-count=") == 0) {
-      gist.gist_min_count =
-          stoi(string(argv[i]).substr(string(argv[i]).find('=') + 1));
+    if (consume_required_option_value(arg, {"-gist-min-count", "--gist-min-count"}, gist_value, i)) {
+      gist.gist_min_count=parse_integer_option(gist_value, "-gist-min-count");
+      if (gist.gist_min_count<1) { TitanUI::print_error("-gist-min-count must be positive."); exit(EXIT_FAILURE); }
+      continue;
     }
-    if (string(argv[i]).find("--gist-cutoff=") == 0 ||
-        string(argv[i]).find("-gist-cutoff=") == 0) {
-      gist.gist_cutoff =
-          stod(string(argv[i]).substr(string(argv[i]).find('=') + 1));
+    if (consume_required_option_value(arg, {"-gist-water-model", "--gist-water-model"}, gist_value, i)) {
+      gist.gist_water_model=gist_value;
+      continue;
     }
     // --- IFP (Interaction Fingerprint) flags ---
     if (string(argv[i]) == "-ifp") {
@@ -4621,6 +4717,15 @@ int arguments::parse_arguments(int argc, char **argv) {
       }
       ++i;
     }
+    if (arg == "-gbnsr6" || arg == "--gbnsr6") {
+      flag_gbsa = true;
+      igb = 66;
+      continue;
+    }
+    if (consume_required_option_value(arg, {"-gbnsr6-spacing"}, common_value, i)) {
+      gbnsr6_spacing = parse_numeric_option(common_value, "-gbnsr6-spacing");
+      continue;
+    }
     if (string(argv[i]) == "-igb" && i + 1 < argc) {
       igb = stoi(argv[i + 1]);
       ++i;
@@ -4643,11 +4748,10 @@ int arguments::parse_arguments(int argc, char **argv) {
                              common_value, i)) {
       gbsa_temperature = stod(common_value);
     }
-    if (string(argv[i]) == "-n_wat" && i + 1 < argc) {
-      n_wat = stoi(argv[i + 1]);
-      ++i;
-    } else if (string(argv[i]).find("-n_wat=") == 0) {
-      n_wat = stoi(string(argv[i]).substr(7));
+    if (consume_required_option_value(arg, {"-n_wat"}, common_value, i)) {
+      n_wat = parse_integer_option(common_value, "-n_wat");
+      if(n_wat < -1){TitanUI::print_error("-n_wat must be -1 or a zero-based water group index.");exit(EXIT_FAILURE);}
+      continue;
     }
     if (string(argv[i]) == "-cscd") {
       cal_dis_sc_contact = true;
@@ -4723,7 +4827,7 @@ int arguments::parse_arguments(int argc, char **argv) {
       pbc.solv_pbc = 1;
       if (i + 1 < argc && isdigit(argv[i + 1][0])) {
         pbc.solv_pbc = 0;
-        pbc.chain_ref = atoi(argv[i + 1]);
+        pbc.chain_ref = parse_integer_option(argv[i + 1], "-pbci");
       } else {
         cout << "WARNING!! The option -pbci lacks reference chain!\n";
         pbc.solv_pbc_int = 0;
@@ -4803,6 +4907,11 @@ int arguments::parse_arguments(int argc, char **argv) {
       pbc.pbctopo_temporal_penalty =
           parse_numeric_option(common_value, "-pbctopo-temporal-penalty");
     }
+    if (consume_bool_option(
+            arg, {"-pbctopo-evidence-export", "--pbctopo-evidence-export"},
+            pbc.pbctopo_evidence_export, i)) {
+      pbc.solv_pbctopo = true;
+    }
     if (consume_required_option_value(
             arg, {"-pbctopo-vdw-clash-scale", "--pbctopo-vdw-clash-scale"},
             common_value, i)) {
@@ -4879,7 +4988,7 @@ int arguments::parse_arguments(int argc, char **argv) {
       pbc.solv_pbc = 1;
       if (i + 1 < argc && isdigit(argv[i + 1][0])) {
         pbc.solv_pbc = 0;
-        pbc.chain_ref = atoi(argv[i + 1]);
+        pbc.chain_ref = parse_integer_option(argv[i + 1], "-pbci2");
       } else {
         cout << "WARNING!! The option -pbci2 lacks reference chain!\n";
         pbc.solv_pbc_int = 0;
@@ -4894,7 +5003,7 @@ int arguments::parse_arguments(int argc, char **argv) {
       pbc.solv_pbc_int3 = 1;
       if (i + 1 < argc && isdigit(argv[i + 1][0])) {
         pbc.solv_pbc = 0;
-        pbc.chain_ref = atoi(argv[i + 1]);
+        pbc.chain_ref = parse_integer_option(argv[i + 1], "-pbci3");
       } else {
         cout << "WARNING!! The option -pbci3 lacks reference chain!\n";
         pbc.solv_pbc_int = 0;
@@ -4909,7 +5018,7 @@ int arguments::parse_arguments(int argc, char **argv) {
       pbc.pbc_aggressive = true;
       if (i + 1 < argc && isdigit(argv[i + 1][0])) {
         pbc.solv_pbc = 0;
-        pbc.chain_ref = atoi(argv[i + 1]);
+        pbc.chain_ref = parse_integer_option(argv[i + 1], "-pbca");
         if (pbc.chain_ref < 0)
           pbc.chain_ref = 0;
       } else {
@@ -4964,11 +5073,10 @@ int arguments::parse_arguments(int argc, char **argv) {
     if (string(argv[i]) == "-cal-volume") {
       flag_cal_vol = true;
     }
-    if (string(argv[i]) == "-cache") {
-      flag_cache = 1;
-      if (i + 1 < argc &&
-          (string(argv[i + 1]) == "-no" || string(argv[i + 1]) == "no"))
-        flag_cache = 2;
+    bool cache_enabled = true;
+    if (consume_bool_option(arg, {"-cache", "--cache"}, cache_enabled, i)) {
+      flag_cache = cache_enabled ? 1 : 2;
+      continue;
     }
     if (string(argv[i]) == "-max-force") {
       flag_maxforce = true;
@@ -4986,17 +5094,17 @@ int arguments::parse_arguments(int argc, char **argv) {
     if (string(argv[i]) == "-charged_atom_dis") {
       flag_charged_atom_distance_dis = true;
       if (i + 1 < argc && argv[i + 1][0] != '-' && isdigit(argv[i + 1][0]) != 0)
-        number_charged_distances_bin = atoi(argv[i + 1]);
+        number_charged_distances_bin = parse_integer_option(argv[i + 1], "-charged_atom_dis");
     }
     if (string(argv[i]) == "-charged_distances_min") {
       flag_charged_atom_distance_dis = true;
       if (i + 1 < argc && argv[i + 1][0] != '-' && isdigit(argv[i + 1][0]) != 0)
-        charged_distances_min = atof(argv[i + 1]);
+        charged_distances_min = parse_numeric_option(argv[i + 1], "-charged_distances_min");
     }
     if (string(argv[i]) == "-charged_distances_max") {
       flag_charged_atom_distance_dis = true;
       if (i + 1 < argc && argv[i + 1][0] != '-' && isdigit(argv[i + 1][0]) != 0)
-        charged_distances_max = atof(argv[i + 1]);
+        charged_distances_max = parse_numeric_option(argv[i + 1], "-charged_distances_max");
     }
     if (string(argv[i]) == "-resdis2com") {
       flag_cal_dis_res_2com = true;
@@ -5004,7 +5112,7 @@ int arguments::parse_arguments(int argc, char **argv) {
     if (string(argv[i]) == "-angle_dipole_efield") {
       flag_angle_dipole_efield = true;
       if (i + 1 < argc && argv[i + 1][0] != '-' && isdigit(argv[i + 1][0]) != 0)
-        number_bin_angle_dipole_efield = atoi(argv[i + 1]);
+        number_bin_angle_dipole_efield = parse_integer_option(argv[i + 1], "-angle_dipole_efield");
     }
     if (string(argv[i]) == "-side_chain_contact" && i + 1 < argc) {
       if (string(argv[i + 1]) == "full-res")
@@ -5034,18 +5142,18 @@ int arguments::parse_arguments(int argc, char **argv) {
         com_dis_energy_2mol = 4;
     }
     if (string(argv[i]) == "-b" && i + 1 < argc) {
-      begin_time = atof(argv[i + 1]);
+      begin_time = parse_numeric_option(argv[i + 1], "-b");
       flag_begin_set = true;
     }
     if (string(argv[i]) == "-e" && i + 1 < argc) {
-      end_time = atof(argv[i + 1]);
+      end_time = parse_numeric_option(argv[i + 1], "-e");
       flag_end_set = true;
     }
     if (string(argv[i]) == "-dt" && i + 1 < argc) {
-      dt = atoi(argv[i + 1]);
+      dt = parse_integer_option(argv[i + 1], "-dt");
     }
     if (string(argv[i]) == "-mol2" && i + 1 < argc) {
-      begin_mol_2 = atoi(argv[i + 1]);
+      begin_mol_2 = parse_integer_option(argv[i + 1], "-mol2");
     }
     if (string(argv[i]) == "-topo" && i + 1 < argc) {
       topo_name = argv[i + 1];
@@ -5085,7 +5193,7 @@ int arguments::parse_arguments(int argc, char **argv) {
       transform(force_f.begin(), force_f.end(), force_f.begin(), ::toupper);
     }
     if (string(argv[i]) == "-epsilon_in" && i + 1 < argc) {
-      epsilon_in = atof(argv[i + 1]);
+      epsilon_in = parse_numeric_option(argv[i + 1], "-epsilon_in");
       ++i;
     }
     if (string(argv[i]) == "-g" && i + 1 < argc) {
@@ -5144,10 +5252,10 @@ int arguments::parse_arguments(int argc, char **argv) {
         nt = stoi(string(argv[i + 1]));
     }
     if (string(argv[i]) == "-dsc" && i + 1 < argc) {
-      d_standard = atof(argv[i + 1]);
+      d_standard = parse_numeric_option(argv[i + 1], "-dsc");
     }
     if (string(argv[i]) == "-denfo" && i + 1 < argc) {
-      distance_energy_cutoff = atof(argv[i + 1]);
+      distance_energy_cutoff = parse_numeric_option(argv[i + 1], "-denfo");
       distance_energy_cutoff *= 0.1;
     }
     if ((string(argv[i]) == "-path-a" && i + 1 < argc) ||
@@ -5233,11 +5341,11 @@ int arguments::parse_arguments(int argc, char **argv) {
       if (string(argv[i + 1]).find("*") != string::npos) {
         input_pattern = string(argv[i + 1]);
         if (i + 2 < argc && argv[i + 2][0] != '-')
-          b_input = atoi(argv[i + 2]);
+          b_input = parse_integer_option(argv[i + 2], "-pattern-input");
         if (i + 3 < argc && argv[i + 3][0] != '-')
-          e_input = atoi(argv[i + 3]);
+          e_input = parse_integer_option(argv[i + 3], "-pattern-input");
         if (i + 4 < argc && argv[i + 4][0] != '-')
-          step_input = atoi(argv[i + 4]);
+          step_input = parse_integer_option(argv[i + 4], "-pattern-input");
         if (e_input != 10000000)
           flag_range_input = true;
       } else
@@ -5245,18 +5353,30 @@ int arguments::parse_arguments(int argc, char **argv) {
                 "character!\n";
     }
     if (string(argv[i]) == "-ahb" && i + 1 < argc) {
-      angle_h = atof(argv[i + 1]);
+      angle_h = parse_numeric_option(argv[i + 1], "-ahb");
     }
     if (string(argv[i]) == "-dhb" && i + 1 < argc) {
-      dis_h = atof(argv[i + 1]);
+      dis_h = parse_numeric_option(argv[i + 1], "-dhb");
+    }
+    if (consume_bool_option(arg, {"-ml-predict-experimental", "--ml-predict-experimental"},
+                               ml_predict_experimental, i)) {
+      if (ml_predict_experimental) flag_ml = true;
+      continue;
+    }
+    if (consume_option_value(arg, {"-qha-temp", "--qha-temp"}, common_value,
+                             i)) {
+      qha_temperature = parse_numeric_option(common_value, "-qha-temp");
+      if (!std::isfinite(qha_temperature) || qha_temperature <= 0.0)
+        throw std::invalid_argument("-qha-temp must be finite and positive");
+      continue;
     }
     if (string(argv[i]) == "-entropy-quasi" && i + 3 < argc) {
       entropy_quasi = true;
       if (isdigit(argv[i + 1][0]) && isdigit(argv[i + 2][0]) &&
           isdigit(argv[i + 3][0])) {
-        group_entropy_com = atoi(argv[i + 1]);
-        group_entropy_lg = atoi(argv[i + 2]);
-        group_entropy_rec = atoi(argv[i + 3]);
+        group_entropy_com = parse_integer_option(argv[i + 1], "-entropy-quasi");
+        group_entropy_lg = parse_integer_option(argv[i + 2], "-entropy-quasi");
+        group_entropy_rec = parse_integer_option(argv[i + 3], "-entropy-quasi");
       } else {
         cout << "-entropy-quasi option is invalid\n";
         entropy_quasi = false;
@@ -5290,7 +5410,7 @@ int arguments::parse_arguments(int argc, char **argv) {
       }
     }
     if (string(argv[i]) == "-dis-water" && i + 1 < argc) {
-      d_crit_water = atof(argv[i + 1]);
+      d_crit_water = parse_numeric_option(argv[i + 1], "-dis-water");
     }
     if (string(argv[i]) == "-all-respair" && i + 1 < argc) {
       flag_all_respair = true;
@@ -5320,37 +5440,37 @@ int arguments::parse_arguments(int argc, char **argv) {
       ++i;
     }
     if (arg.rfind("-de-diff-weight=", 0) == 0) {
-      de.de_diff_weight = atof(arg.substr(16).c_str());
+      de.de_diff_weight = parse_numeric_option(arg.substr(16), "-de-diff-weight");
       de.user_set_de_diff_weight = true;
     }
     if (string(argv[i]) == "-de-diff-weight" && i + 1 < argc) {
-      de.de_diff_weight = atof(argv[i + 1]);
+      de.de_diff_weight = parse_numeric_option(argv[i + 1], "-de-diff-weight");
       de.user_set_de_diff_weight = true;
     }
     if (arg.rfind("-de-cross-prob=", 0) == 0) {
-      de.de_cross_prob = atof(arg.substr(15).c_str());
+      de.de_cross_prob = parse_numeric_option(arg.substr(15), "-de-cross-prob");
       de.user_set_de_cross_prob = true;
     }
     if (string(argv[i]) == "-de-cross-prob" && i + 1 < argc) {
-      de.de_cross_prob = atof(argv[i + 1]);
+      de.de_cross_prob = parse_numeric_option(argv[i + 1], "-de-cross-prob");
       de.user_set_de_cross_prob = true;
     }
     if (arg.rfind("-de-F=", 0) == 0) {
-      de.de_F = atof(arg.substr(6).c_str());
+      de.de_F = parse_numeric_option(arg.substr(6), "-de-F");
       de.user_set_de_F = true;
     }
     if (string(argv[i]) == "-de-F" && i + 1 < argc) {
-      de.de_F = atof(argv[i + 1]);
+      de.de_F = parse_numeric_option(argv[i + 1], "-de-F");
       de.user_set_de_F = true;
     }
     if (string(argv[i]) == "-de-scan-radius" && i + 1 < argc) {
-      de.de_scan_radius = atof(argv[i + 1]);
+      de.de_scan_radius = parse_numeric_option(argv[i + 1], "-de-scan-radius");
     }
     if (string(argv[i]) == "-de-min-scan-radius" && i + 1 < argc) {
-      de.de_min_scan_radius = atof(argv[i + 1]);
+      de.de_min_scan_radius = parse_numeric_option(argv[i + 1], "-de-min-scan-radius");
     }
     if (string(argv[i]) == "-de-score-function" && i + 1 < argc) {
-      de.de_flag_score_function = atoi(argv[i + 1]);
+      de.de_flag_score_function = parse_integer_option(argv[i + 1], "-de-score-function");
     }
     if (string(argv[i]) == "-de-pop-num" && i + 1 < argc) {
       de.de_pop_num = stoi(string(argv[i + 1]));
@@ -5367,7 +5487,7 @@ int arguments::parse_arguments(int argc, char **argv) {
       de.user_set_de_algorithm = true;
     }
     if (string(argv[i]) == "-de-angle" && i + 1 < argc) {
-      de.de_restrain_angle = atof(argv[i + 1]);
+      de.de_restrain_angle = parse_numeric_option(argv[i + 1], "-de-angle");
     }
     if (string(argv[i]) == "-de-auto-term") {
       de.flag_de_auto_term = true;
@@ -5388,19 +5508,19 @@ int arguments::parse_arguments(int argc, char **argv) {
       de.user_set_de_memory_size = true;
     }
     if (arg.rfind("-de-p-best-rate=", 0) == 0) {
-      de.de_p_best_rate = atof(arg.substr(16).c_str());
+      de.de_p_best_rate = parse_numeric_option(arg.substr(16), "-de-p-best-rate");
       de.user_set_de_p_best_rate = true;
     }
     if (string(argv[i]) == "-de-p-best-rate" && i + 1 < argc) {
-      de.de_p_best_rate = atof(argv[i + 1]);
+      de.de_p_best_rate = parse_numeric_option(argv[i + 1], "-de-p-best-rate");
       de.user_set_de_p_best_rate = true;
     }
     if (arg.rfind("-de-archive-scale=", 0) == 0) {
-      de.de_archive_scale = atof(arg.substr(18).c_str());
+      de.de_archive_scale = parse_numeric_option(arg.substr(18), "-de-archive-scale");
       de.user_set_de_archive_scale = true;
     }
     if (string(argv[i]) == "-de-archive-scale" && i + 1 < argc) {
-      de.de_archive_scale = atof(argv[i + 1]);
+      de.de_archive_scale = parse_numeric_option(argv[i + 1], "-de-archive-scale");
       de.user_set_de_archive_scale = true;
     }
     if (arg.rfind("-de-min-pop-num=", 0) == 0) {
@@ -5414,9 +5534,147 @@ int arguments::parse_arguments(int argc, char **argv) {
     if (string(argv[i]) == "-de-pathway-group" && i + 1 < argc) {
       de.group_pathway = static_cast<size_t>(stoull(string(argv[i + 1])));
       de.flag_pathway = true;
+      de.user_set_pathway_group = true;
     }
     if (string(argv[i]) == "-de-pathway-radius" && i + 1 < argc) {
-      de.dis_along_path = atof(argv[i + 1]);
+      de.dis_along_path = parse_numeric_option(argv[i + 1], "-de-pathway-radius");
+      de.path_graph_edge_cutoff = de.dis_along_path;
+      de.path_recovery_enter_radius = de.dis_along_path;
+      de.path_recovery_exit_radius = de.dis_along_path;
+    }
+    if (string(argv[i]) == "-pathway-file" && i + 1 < argc) {
+      de.pathway_file = string(argv[i + 1]);
+      de.flag_pathway = true;
+    }
+    if (string(argv[i]) == "-pathway-route-id" && i + 1 < argc) {
+      de.pathway_route_id = string(argv[i + 1]);
+    }
+    if (string(argv[i]) == "-pathway-previous-status" && i + 1 < argc) {
+      de.path_previous_status = string(argv[i + 1]);
+      de.flag_pathway = true;
+    }
+    if (string(argv[i]) == "-pathway-continuity-window" && i + 1 < argc) {
+      de.path_continuity_window = parse_numeric_option(
+          string(argv[i + 1]), "-pathway-continuity-window");
+      de.flag_pathway = true;
+    }
+    if (string(argv[i]) == "-pathway-graph-edge-cutoff" && i + 1 < argc) {
+      de.path_graph_edge_cutoff = parse_numeric_option(argv[i + 1], "-pathway-graph-edge-cutoff");
+    }
+    if (string(argv[i]) == "-pathway-recovery-enter" && i + 1 < argc) {
+      de.path_recovery_enter_radius = parse_numeric_option(argv[i + 1], "-pathway-recovery-enter");
+    }
+    if (string(argv[i]) == "-pathway-recovery-exit" && i + 1 < argc) {
+      de.path_recovery_exit_radius = parse_numeric_option(argv[i + 1], "-pathway-recovery-exit");
+    }
+    if (string(argv[i]) == "-pathway-recovery-max-turn-angle" &&
+        i + 1 < argc) {
+      de.path_recovery_max_turn_angle = parse_numeric_option(argv[i + 1], "-pathway-recovery-max-turn-angle");
+    }
+    if (string(argv[i]) == "-pathway-corridor-spacing" && i + 1 < argc) {
+      de.path_corridor_spacing = parse_numeric_option(argv[i + 1], "-pathway-corridor-spacing");
+    }
+    if (string(argv[i]) == "-pathway-corridor-radial-samples" &&
+        i + 1 < argc) {
+      de.path_corridor_radial_samples =
+          static_cast<size_t>(stoull(string(argv[i + 1])));
+    }
+    if (string(argv[i]) == "-pathway-registration-max-rmsd" && i + 1 < argc) {
+      de.path_registration_max_rmsd = parse_numeric_option(argv[i + 1], "-pathway-registration-max-rmsd");
+    }
+    if (string(argv[i]) == "-pathway-completion-tolerance" && i + 1 < argc) {
+      de.path_completion_tolerance = parse_numeric_option(argv[i + 1], "-pathway-completion-tolerance");
+    }
+    if (string(argv[i]) == "-pathway-completion-min-separation" &&
+        i + 1 < argc) {
+      de.path_completion_min_separation = parse_numeric_option(argv[i + 1], "-pathway-completion-min-separation");
+    }
+    if (string(argv[i]) == "-pathway-max-turn-angle" && i + 1 < argc) {
+      de.path_max_turn_angle = parse_numeric_option(argv[i + 1], "-pathway-max-turn-angle");
+    }
+    if (string(argv[i]) == "-pathway-energy-key-epsilon" && i + 1 < argc) {
+      de.path_energy_key_epsilon = parse_numeric_option(argv[i + 1], "-pathway-energy-key-epsilon");
+    }
+    if (string(argv[i]) == "-pathway-min-clearance" && i + 1 < argc) {
+      de.path_min_clearance = parse_numeric_option(argv[i + 1], "-pathway-min-clearance");
+    }
+    if (string(argv[i]) == "-pathway-probe-length" && i + 1 < argc) {
+      de.path_probe_length = parse_numeric_option(argv[i + 1], "-pathway-probe-length");
+      if (de.path_probe_length > 0.0)
+        de.path_probe_lengths = {de.path_probe_length};
+      else
+        de.path_probe_lengths.clear();
+    }
+    if (arg.rfind("-pathway-probe-lengths=", 0) == 0) {
+      parse_path_probe_lengths(arg.substr(23));
+    }
+    if (string(argv[i]) == "-pathway-probe-lengths" && i + 1 < argc) {
+      parse_path_probe_lengths(string(argv[i + 1]));
+    }
+    if (string(argv[i]) == "-pathway-navigation") {
+      de.path_navigation_enabled = true;
+    }
+    if (arg.rfind("-pathway-navigation-tube-weight=", 0) == 0) {
+      de.path_navigation_tube_weight = parse_numeric_option(
+          arg.substr(32), "-pathway-navigation-tube-weight");
+    }
+    if (string(argv[i]) == "-pathway-navigation-tube-weight" &&
+        i + 1 < argc) {
+      de.path_navigation_tube_weight = parse_numeric_option(
+          string(argv[i + 1]), "-pathway-navigation-tube-weight");
+    }
+    if (arg.rfind("-pathway-navigation-backtrack-weight=", 0) == 0) {
+      de.path_navigation_backtrack_weight = parse_numeric_option(
+          arg.substr(37), "-pathway-navigation-backtrack-weight");
+    }
+    if (string(argv[i]) == "-pathway-navigation-backtrack-weight" &&
+        i + 1 < argc) {
+      de.path_navigation_backtrack_weight = parse_numeric_option(
+          string(argv[i + 1]), "-pathway-navigation-backtrack-weight");
+    }
+    if (arg.rfind("-pathway-navigation-cost-epsilon=", 0) == 0) {
+      de.path_navigation_cost_epsilon = parse_numeric_option(
+          arg.substr(33), "-pathway-navigation-cost-epsilon");
+    }
+    if (string(argv[i]) == "-pathway-navigation-cost-epsilon" &&
+        i + 1 < argc) {
+      de.path_navigation_cost_epsilon = parse_numeric_option(
+          string(argv[i + 1]), "-pathway-navigation-cost-epsilon");
+    }
+    if (arg.rfind("-pathway-navigation-seed-radial-samples=", 0) == 0) {
+      de.path_navigation_seed_radial_samples = static_cast<size_t>(
+          parse_integer_option(arg.substr(40),
+                               "-pathway-navigation-seed-radial-samples"));
+    }
+    if (string(argv[i]) == "-pathway-navigation-seed-radial-samples" &&
+        i + 1 < argc) {
+      de.path_navigation_seed_radial_samples = static_cast<size_t>(
+          parse_integer_option(
+              string(argv[i + 1]),
+              "-pathway-navigation-seed-radial-samples"));
+    }
+    if (arg.rfind("-pathway-navigation-seed-amplitude=", 0) == 0) {
+      de.path_navigation_seed_amplitude = parse_numeric_option(
+          arg.substr(35), "-pathway-navigation-seed-amplitude");
+    }
+    if (string(argv[i]) == "-pathway-navigation-seed-amplitude" &&
+        i + 1 < argc) {
+      de.path_navigation_seed_amplitude = parse_numeric_option(
+          string(argv[i + 1]), "-pathway-navigation-seed-amplitude");
+    }
+    if (arg.rfind("-pathway-clearance-mode=", 0) == 0) {
+      de.path_clearance_mode = require_choice(
+          arg.substr(24), {"endpoint-center", "swept-linear-center"},
+          "-pathway-clearance-mode");
+    }
+    if (string(argv[i]) == "-pathway-clearance-mode" && i + 1 < argc) {
+      de.path_clearance_mode = require_choice(
+          string(argv[i + 1]),
+          {"endpoint-center", "swept-linear-center"},
+          "-pathway-clearance-mode");
+    }
+    if (string(argv[i]) == "-pathway-geometry-only") {
+      de.path_geometry_only = true;
     }
     // --- Flags previously only in arg-file parser, now unified ---
     if (string(argv[i]) == "-new_al" || string(argv[i]) == "-new-al") {
@@ -5438,7 +5696,7 @@ int arguments::parse_arguments(int argc, char **argv) {
       pbc.pbc_mem = true;
       if (i + 1 < argc && isdigit(argv[i + 1][0])) {
         pbc.solv_pbc = 0;
-        pbc.chain_ref = atoi(argv[i + 1]);
+        pbc.chain_ref = parse_integer_option(argv[i + 1], "-pbcm");
         ++i;
       }
     }
@@ -5532,6 +5790,15 @@ int arguments::parse_arguments(int argc, char **argv) {
     }
     if (string(argv[i]) == "-dham-temps" && i + 1 < argc) {
       dham.temps_file = string(argv[i + 1]);
+      ++i;
+    }
+    if (string(argv[i]).find("-dham-segment-map=") == 0 ||
+        string(argv[i]).find("--dham-segment-map=") == 0) {
+      dham.segment_map_file = string(argv[i]).substr(string(argv[i]).find('=') + 1);
+    }
+    if ((string(argv[i]) == "-dham-segment-map" ||
+         string(argv[i]) == "--dham-segment-map") && i + 1 < argc) {
+      dham.segment_map_file = string(argv[i + 1]);
       ++i;
     }
     if (string(argv[i]).find("-dham-ener=") == 0 ||
@@ -5836,6 +6103,9 @@ int arguments::parse_arguments(int argc, char **argv) {
     command += argv[i];
     command += " ";
   }
+  // Parsing finished without throwing, so a later exception from the engine
+  // must not be attributed to the last option inspected.
+  titan_cli::active_option_token().clear();
 
   if (flag_topo_1 && flag_topo_2 && topo_name == topo_name_2) {
     flag_use_common_topo = true;

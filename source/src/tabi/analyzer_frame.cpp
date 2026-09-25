@@ -257,6 +257,7 @@ FrameResult AnalyzerImpl::consume_frame(
         tabi_solve.tabi_surface_point_count_requested;
     result.tabi_panel_density_per_a2 = tabi_solve.tabi_panel_density_per_a2;
     result.tabi_panel_budget_status = tabi_solve.tabi_panel_budget_status;
+    result.tabi_charge_resolution = tabi_solve.tabi_charge_resolution;
     result.tabi_surface_exposed_points = tabi_solve.tabi_surface_exposed_points;
     result.tabi_surface_buried_points = tabi_solve.tabi_surface_buried_points;
     result.tabi_tree_build_ms = tabi_solve.tabi_tree_build_ms;
@@ -1280,6 +1281,7 @@ FrameResult AnalyzerImpl::consume_frame(
     result.tabi_avg_valence = tabi_solve.tabi_avg_valence;
     result.tabi_nonmanifold_edges = tabi_solve.tabi_nonmanifold_edges;
     result.tabi_solid_angle_fallbacks = tabi_solve.tabi_solid_angle_fallbacks;
+    result.tabi_solid_angle_clamps = tabi_solve.tabi_solid_angle_clamps;
     result.tabi_diag_min = tabi_solve.tabi_diag_min;
     result.tabi_diag_max = tabi_solve.tabi_diag_max;
     result.tabi_taylor_order = tabi_solve.tabi_taylor_order;
@@ -1419,6 +1421,8 @@ FrameResult AnalyzerImpl::consume_frame(
         tabi_solve.tabi_preconditioner_coarse_verify_rel_error_max;
     result.tabi_surface_generator = tabi_solve.tabi_surface_generator;
     result.tabi_discretization = tabi_solve.tabi_discretization;
+    result.tabi_node_patch_representation =
+        tabi_solve.tabi_node_patch_representation;
     result.tabi_rhs_scale = tabi_solve.tabi_rhs_scale;
     result.tabi_dielectric_contrast = tabi_solve.tabi_dielectric_contrast;
     result.tabi_operator_contrast = tabi_solve.tabi_operator_contrast;

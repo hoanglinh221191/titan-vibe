@@ -198,9 +198,16 @@ struct AtomGrid {
   return best;
 }
 
+// `radius_offset` grows or shrinks every atom for this query only.  A caller
+// that wants a certificate rather than an answer passes a small negative
+// offset to prove containment and a small positive one to prove exclusion,
+// which leaves a thin shell around the boundary uncertified instead of
+// resolving it by whichever way the last bit of a squared distance happened
+// to fall.
 [[nodiscard]] bool point_inside_union(const AtomGrid &grid,
                                       std::span<const Atom> atoms,
-                                      const Vec3 &point) noexcept {
+                                      const Vec3 &point,
+                                      double radius_offset = 0.0) noexcept {
   const CellKey center = cell_for(grid, point);
   for (int dz = -1; dz <= 1; ++dz) {
     for (int dy = -1; dy <= 1; ++dy) {
@@ -211,10 +218,13 @@ struct AtomGrid {
           continue;
         for (const std::size_t index : found->second) {
           const Atom &atom = atoms[index];
+          const double radius = atom.radius + radius_offset;
+          if (!(radius > 0.0))
+            continue;
           const double rx = point.x - atom.x;
           const double ry = point.y - atom.y;
           const double rz = point.z - atom.z;
-          if (rx * rx + ry * ry + rz * rz < atom.radius * atom.radius)
+          if (rx * rx + ry * ry + rz * rz < radius * radius)
             return true;
         }
       }
@@ -245,6 +255,55 @@ struct AtomGrid {
     return result;
   }();
   return directions;
+}
+
+// The current-family engines take their inside/outside sign by sampling the
+// probe ball at these directions and asking whether every sample lands in the
+// dilated atom set.  Sampling the sphere instead of testing the ball admits a
+// vertex whose probe does not really fit, so the surface sits outside the SES
+// by an amount set by the angular resolution of this set and not by the grid
+// spacing -- which is why refining the grid does not reduce it.
+//
+// Half-width 1 is the 26 directions `current` has always used: the widest gap
+// between neighbouring directions is 27.6 degrees and the average is 15.5,
+// which at a 1.4 A probe is 0.16 A and 0.05 A of radial slack.  Half-width 2
+// is 98 directions at 17.6 and 8.2 degrees, which is `current-dense`.
+[[nodiscard]] std::vector<Vec3> build_closing_sample_directions(
+    int half_width) {
+  std::vector<Vec3> result;
+  result.push_back({}); // the unshifted probe centre
+  for (int dz = -half_width; dz <= half_width; ++dz)
+    for (int dy = -half_width; dy <= half_width; ++dy)
+      for (int dx = -half_width; dx <= half_width; ++dx) {
+        if (dx == 0 && dy == 0 && dz == 0)
+          continue;
+        const Vec3 direction =
+            normalized({static_cast<double>(dx), static_cast<double>(dy),
+                        static_cast<double>(dz)});
+        // A lattice box repeats the directions its inner shells already
+        // cover, so the cost is the direction count rather than the lattice
+        // size.  The test is an AND over every sample, so the order the
+        // survivors end up in cannot change the answer.
+        if (std::none_of(result.begin(), result.end(),
+                         [&](const Vec3 &seen) {
+                           return norm(seen - direction) < 1.0e-12;
+                         }))
+          result.push_back(direction);
+      }
+  return result;
+}
+
+[[nodiscard]] const std::vector<Vec3> &closing_sample_directions(
+    int half_width) {
+  static const std::vector<Vec3> narrow = build_closing_sample_directions(1);
+  static const std::vector<Vec3> dense = build_closing_sample_directions(2);
+  return half_width <= 1 ? narrow : dense;
+}
+
+// `current-dense` differs from `current` in that one number and nothing else,
+// so everything that asks "is this the sampled-closing engine" asks here.
+[[nodiscard]] bool is_current_family_engine(std::string_view engine) noexcept {
+  return engine == "current" || engine == "current-dense";
 }
 
 [[nodiscard]] VertexKey vertex_key(const Vec3 &point) noexcept {
@@ -340,12 +399,23 @@ void add_triangle(
   mesh.panels.push_back(panel);
 }
 
+// `edge_margin` rescales the crossing parameter into [m, 1-m], holding every
+// marching vertex that far from both endpoints of its edge as a fraction of
+// the edge.  A crossing that lands a hair from an endpoint is the classic
+// source of sliver triangles, and the rescale is continuous and monotone, so
+// a small change in the field still moves the vertex by a small amount.  It
+// never merges two vertices, so the combinatorics are exactly those of the
+// unrescaled mesh and the surface stays closed.  Zero disables it, which is
+// what the `current` engine passes: that engine's geometry is fixed by the
+// runs already published with it.
 [[nodiscard]] Vec3 interpolate(const Vec3 &a, const Vec3 &b, double fa,
-                               double fb) noexcept {
+                               double fb, double edge_margin) noexcept {
   const double denominator = fa - fb;
-  const double t = std::abs(denominator) > 1.0e-300
-                       ? std::clamp(fa / denominator, 0.0, 1.0)
-                       : 0.5;
+  double t = std::abs(denominator) > 1.0e-300
+                 ? std::clamp(fa / denominator, 0.0, 1.0)
+                 : 0.5;
+  if (edge_margin > 0.0 && edge_margin < 0.5)
+    t = edge_margin + (1.0 - 2.0 * edge_margin) * t;
   return a + t * (b - a);
 }
 
@@ -353,7 +423,8 @@ void polygonize_tetrahedron(
     SurfaceMesh &mesh,
     std::unordered_map<VertexKey, std::size_t, VertexKeyHash> &vertex_lookup,
     const AtomGrid &atom_grid, std::span<const Atom> atoms,
-    const std::array<Vec3, 4> &points, const std::array<double, 4> &values) {
+    const std::array<Vec3, 4> &points, const std::array<double, 4> &values,
+    double edge_margin) {
   std::array<int, 4> inside{};
   std::array<int, 4> outside{};
   int inside_count = 0;
@@ -372,7 +443,7 @@ void polygonize_tetrahedron(
     return interpolate(points[static_cast<std::size_t>(a)],
                        points[static_cast<std::size_t>(b)],
                        values[static_cast<std::size_t>(a)],
-                       values[static_cast<std::size_t>(b)]);
+                       values[static_cast<std::size_t>(b)], edge_margin);
   };
   if (inside_count == 1) {
     const int i = inside[0];
@@ -506,6 +577,35 @@ struct FaceMoveValidation {
   bool geometry_valid{false};
   bool orientation_preserved{false};
 };
+
+[[nodiscard]] double face_edge_ratio(const Vec3 &a, const Vec3 &b,
+                                     const Vec3 &c) noexcept {
+  const double ab = norm(b - a);
+  const double bc = norm(c - b);
+  const double ca = norm(a - c);
+  const double shortest = std::min({ab, bc, ca});
+  const double longest = std::max({ab, bc, ca});
+  if (!(shortest > 1.0e-14) || !std::isfinite(longest))
+    return std::numeric_limits<double>::infinity();
+  return longest / shortest;
+}
+
+// A refused vertex stays on its marching position, off the analytic surface
+// by the move it did not make.  That is certifiable only while the largest
+// outstanding move is small against the spacing the mesh is drawn at, and
+// this is the fraction of a cell the certificate grants.  Every refusal the
+// commit is allowed to invent for its own reasons is held to the same
+// number, so no refusal can be the thing that fails the certificate.
+constexpr double kRefusedVertexToleranceCells = 0.25;
+
+// The marching mesh reaches the projection with a worst edge ratio near 16
+// and no poor triangle; the projection alone takes it past 60.  A bound
+// above what marching produces refuses only what the projection newly
+// creates, and never blocks a move that improves a face already past it.
+// NanoShaper reports a worst ratio under 10, which this cannot reach: what
+// stands between is the marching mesh itself, not the projection.
+constexpr double kProjectionShapeRatioBound = 20.0;
+
 
 [[nodiscard]] FaceMoveValidation validate_face_move(
     const Vec3 &a, const Vec3 &b, const Vec3 &c,
@@ -1998,6 +2098,7 @@ struct LocalPatchRepairMetrics {
   double local_sliver_ms{0.0};
   double full_projection_ms{0.0};
   double seam_weld_ms{0.0};
+  double refused_sliver_repair_ms{0.0};
   double certificate_cleanup_ms{0.0};
   double orientation_repair_ms{0.0};
   double wide_repair_ms{0.0};
@@ -2034,6 +2135,19 @@ struct LocalPatchRepairMetrics {
   double sampled_hausdorff_proxy{0.0};
   std::size_t analytic_vertex_projection_misses{0};
   double analytic_vertex_residual_max{0.0};
+  // Vertices the last transactional projection could not move, with the
+  // distance each still needs.  Both are small by construction (1-3 on a
+  // protein surface of 10^4-10^5 vertices) and the targeted sliver repair
+  // reads them to find the faces that blocked the move.
+  std::vector<std::uint32_t> refused_vertex_indices;
+  std::vector<double> refused_vertex_distances;
+  std::vector<std::uint8_t> refused_vertex_shape_flags;
+  double analytic_vertex_refused_distance_max{0.0};
+  // The subset of those refusals the commit chose, to keep a one ring from
+  // being sheared by a move it would otherwise have accepted.
+  std::size_t analytic_vertex_refused_for_shape{0};
+  std::size_t refused_sliver_collapses{0};
+  std::size_t analytic_sheet_bridge_faces{0};
   std::size_t projection_orientation_reversals{0};
   std::size_t orientation_repair_rounds{0};
   std::size_t orientation_repair_faces{0};
@@ -2523,6 +2637,20 @@ struct ProjectionCommitResult {
   std::size_t vertices_rescued{0U};
   std::size_t max_component_size{0U};
   std::size_t retained_bytes{0U};
+  // Moves refused for the shape of the one ring rather than its orientation.
+  // Counted apart because the two failures want different repairs and only
+  // this one is a choice the commit made.
+  std::size_t shape_rejections{0U};
+  // Vertices left in the rejected state.  Kept in production, not only in
+  // test builds: the repair pipeline needs to know which one-rings blocked
+  // the move, and the list is empty or tiny on every surface that gets here.
+  std::vector<std::uint32_t> refused_vertices;
+  // Parallel to refused_vertices: 1 where the commit declined the move to
+  // keep the one ring's shape, 0 where a face would have reversed.  The
+  // targeted sliver repair unblocks the second kind and must leave the
+  // first alone, or it collapses an edge to enable the very move the gate
+  // declined and hands the shear back.
+  std::vector<std::uint8_t> refused_for_shape;
   bool all_faces_certified{false};
 #ifdef TITAN_TABI_SES_TEST_HOOKS
   std::vector<std::uint8_t> final_state;
@@ -2542,7 +2670,8 @@ struct ProjectionCommitResult {
     std::span<const Vertex> proposals,
     std::span<const std::uint8_t> proposal_valid,
     std::span<const Vec3> reference_normals,
-    std::vector<std::uint8_t> &affected_faces) {
+    std::vector<std::uint8_t> &affected_faces,
+    double shape_refusal_distance_limit = 0.0) {
   ProjectionCommitResult result;
   if (proposals.size() != mesh.vertices.size() ||
       proposal_valid.size() != mesh.vertices.size() ||
@@ -2552,7 +2681,8 @@ struct ProjectionCommitResult {
     return result;
 
   // 0 = no certified proposal, 1 = pending, 2 = committed,
-  // 3 = current coupled component, 4 = finally rejected.
+  // 3 = current coupled component, 4 = rejected because a face would
+  // have reversed, 5 = declined to keep the one ring's shape.
   std::vector<std::uint8_t> state(mesh.vertices.size(), 0U);
   for (std::size_t vertex = 0U; vertex < mesh.vertices.size(); ++vertex) {
     if (proposal_valid[vertex] != 0U)
@@ -2591,6 +2721,43 @@ struct ProjectionCommitResult {
     return true;
   };
 
+  // A move survives validate_faces whenever every incident face keeps its
+  // orientation, however much the move distorts it.  At a seam two
+  // neighbouring vertices take their closest point on different patches -- a
+  // contact sphere and a reentrant sphere -- and shear the triangle between
+  // them; that is where this mesh loses its worst aspect ratio, and nothing
+  // downstream recovers it.  Refusing such a move keeps the shape and leaves
+  // the vertex off the surface by the distance it did not travel, so it is
+  // offered only inside the tolerance the vertex certificate already grants
+  // refusals.  A vertex that must travel further is committed whatever it
+  // does to its one ring: position is the thing the certificate is about.
+  const auto move_degrades_shape = [&](std::size_t vertex,
+                                       std::span<const std::size_t> faces) {
+    if (!(shape_refusal_distance_limit > 0.0))
+      return false;
+    const Vertex &proposal = proposals[vertex];
+    const Vec3 target{proposal.x, proposal.y, proposal.z};
+    if (!(norm(target - mesh_vertex(mesh, vertex)) <=
+          shape_refusal_distance_limit))
+      return false;
+    for (const std::size_t triangle_index : faces) {
+      const Triangle &triangle = mesh.triangles[triangle_index];
+      const auto moved = [&](std::size_t index) {
+        return index == vertex ? target : mesh_vertex(mesh, index);
+      };
+      const double after = face_edge_ratio(
+          moved(triangle.v0), moved(triangle.v1), moved(triangle.v2));
+      if (!(after > kProjectionShapeRatioBound))
+        continue;
+      const double before = face_edge_ratio(mesh_vertex(mesh, triangle.v0),
+                                            mesh_vertex(mesh, triangle.v1),
+                                            mesh_vertex(mesh, triangle.v2));
+      if (after > before)
+        return true;
+    }
+    return false;
+  };
+
   std::vector<std::uint8_t> selected(mesh.vertices.size(), 0U);
   std::vector<std::size_t> incident_faces;
   for (std::size_t vertex = 0U; vertex < mesh.vertices.size(); ++vertex) {
@@ -2604,6 +2771,15 @@ struct ProjectionCommitResult {
          position < incidence.offsets[vertex + 1U]; ++position)
       incident_faces.push_back(incidence.triangles[position]);
     bool orientation_failed = false;
+    if (move_degrades_shape(vertex, incident_faces)) {
+      // Final, not deferred to the coupled pass: the coupled pass exists to
+      // rescue moves that only a neighbour's move makes safe, and this one
+      // is safe already.  It was declined.
+      state[vertex] = 5U;
+      ++result.shape_rejections;
+      selected[vertex] = 0U;
+      continue;
+    }
     if (validate_faces(incident_faces, selected, orientation_failed)) {
       mesh.vertices[vertex] = proposals[vertex];
       state[vertex] = 2U;
@@ -2683,9 +2859,13 @@ struct ProjectionCommitResult {
       face_selected[triangle_index] = 0U;
   }
 
-  result.rejected_vertices =
-      static_cast<std::size_t>(std::count(state.begin(), state.end(),
-                                          std::uint8_t{4U}));
+  for (std::size_t vertex = 0U; vertex < state.size(); ++vertex) {
+    if (state[vertex] != 4U && state[vertex] != 5U)
+      continue;
+    result.refused_vertices.push_back(static_cast<std::uint32_t>(vertex));
+    result.refused_for_shape.push_back(state[vertex] == 5U ? 1U : 0U);
+  }
+  result.rejected_vertices = result.refused_vertices.size();
   result.all_faces_certified = true;
   for (std::size_t triangle_index = 0U;
        triangle_index < mesh.triangles.size(); ++triangle_index) {
@@ -2705,11 +2885,82 @@ struct ProjectionCommitResult {
       incident_faces.capacity() * sizeof(std::size_t) +
       stack.capacity() * sizeof(std::size_t) +
       component.capacity() * sizeof(std::size_t) +
-      component_faces.capacity() * sizeof(std::size_t);
+      component_faces.capacity() * sizeof(std::size_t) +
+      result.refused_vertices.capacity() * sizeof(std::uint32_t) +
+      result.refused_for_shape.capacity() * sizeof(std::uint8_t);
 #ifdef TITAN_TABI_SES_TEST_HOOKS
   result.final_state = std::move(state);
 #endif
   return result;
+}
+
+// A vertex is refused by specific faces in its one ring: those whose smallest
+// altitude is below the move it still needs, so the move sweeps the vertex
+// past the opposite edge and reverses the face.  Every other incident face
+// would have survived.  Collapsing the shortest edge of exactly those faces
+// removes the obstruction and touches nothing else, which is what separates
+// this from lowering the global short-edge threshold until something gives.
+[[nodiscard]] std::vector<EdgeKey> collect_refused_vertex_sliver_edges(
+    const SurfaceMesh &mesh, const CompactVertexIncidence &incidence,
+    std::span<const std::uint32_t> refused,
+    std::span<const double> distances,
+    std::span<const std::uint8_t> shape_flags, double &maximum_length) {
+  std::vector<EdgeKey> edges;
+  maximum_length = 0.0;
+  for (std::size_t entry = 0U; entry < refused.size(); ++entry) {
+    const std::size_t vertex = refused[entry];
+    if (vertex + 1U >= incidence.offsets.size())
+      continue;
+    // A shape refusal is not an obstruction to clear.  The move was safe and
+    // was declined, so collapsing an edge to make room for it would spend a
+    // sliver to buy back the shear the refusal prevented.
+    if (entry < shape_flags.size() && shape_flags[entry] != 0U)
+      continue;
+    const double move = entry < distances.size()
+                            ? distances[entry]
+                            : std::numeric_limits<double>::quiet_NaN();
+    if (!std::isfinite(move) || !(move > 0.0))
+      continue;
+    for (std::size_t position = incidence.offsets[vertex];
+         position < incidence.offsets[vertex + 1U]; ++position) {
+      const std::size_t face = incidence.triangles[position];
+      if (face >= mesh.triangles.size())
+        continue;
+      const Triangle &triangle = mesh.triangles[face];
+      const Vec3 a = mesh_vertex(mesh, triangle.v0);
+      const Vec3 b = mesh_vertex(mesh, triangle.v1);
+      const Vec3 c = mesh_vertex(mesh, triangle.v2);
+      const double ab = norm(b - a);
+      const double bc = norm(c - b);
+      const double ca = norm(a - c);
+      const double longest = std::max({ab, bc, ca});
+      if (!(longest > 0.0) || !std::isfinite(longest))
+        continue;
+      if (!(norm(cross(b - a, c - a)) / longest < move))
+        continue;
+      EdgeKey shortest{triangle.v0, triangle.v1};
+      double shortest_length = ab;
+      if (bc < shortest_length) {
+        shortest = {triangle.v1, triangle.v2};
+        shortest_length = bc;
+      }
+      if (ca < shortest_length) {
+        shortest = {triangle.v2, triangle.v0};
+        shortest_length = ca;
+      }
+      if (shortest.lo > shortest.hi)
+        std::swap(shortest.lo, shortest.hi);
+      edges.push_back(shortest);
+      maximum_length = std::max(maximum_length, shortest_length);
+    }
+  }
+  std::sort(edges.begin(), edges.end(),
+            [](const EdgeKey &left, const EdgeKey &right) {
+              return std::tie(left.lo, left.hi) <
+                     std::tie(right.lo, right.hi);
+            });
+  edges.erase(std::unique(edges.begin(), edges.end()), edges.end());
+  return edges;
 }
 
 [[nodiscard]] bool project_all_vertices_to_analytic_patches(
@@ -2723,6 +2974,13 @@ struct ProjectionCommitResult {
 #ifdef TITAN_TABI_SES_TEST_HOOKS
   metrics.debug_last_projection_state.clear();
 #endif
+  // Refused vertices are indices into the current compact vertex set, so a
+  // list left over from a coarser mesh must never survive into a failed
+  // attempt on a newer one.
+  metrics.refused_vertex_indices.clear();
+  metrics.refused_vertex_distances.clear();
+  metrics.refused_vertex_shape_flags.clear();
+  metrics.analytic_vertex_refused_distance_max = 0.0;
   if (mesh.vertices.empty() || mesh.triangles.empty())
     return false;
 
@@ -2809,8 +3067,39 @@ struct ProjectionCommitResult {
   }
 
   std::vector<std::uint8_t> affected(mesh.triangles.size(), 0U);
-  const ProjectionCommitResult commit = commit_projection_proposals(
-      mesh, incidence, proposals, proposal_valid, reference_normals, affected);
+  // The shape gate is a local rule serving a global number, so it can pay
+  // its cost and buy nothing: on a lone sphere it declines three vertices of
+  // 1428 and the worst edge ratio comes out at 23.0556 either way, because
+  // the face that sets the maximum is made by moves the gate allows.  Paying
+  // 0.04 A of position on a surface known in closed form, for no change in
+  // the number the gate exists to hold down, is not a trade worth making.
+  // So commit both ways and keep the gated mesh only when it is measurably
+  // better shaped; ties go to the mesh that sits on the surface.  The
+  // proposals are already computed and a commit is linear in the mesh, so
+  // this costs one extra pass over what the projection itself cost.
+  std::vector<Vertex> before_commit = mesh.vertices;
+  ProjectionCommitResult commit = commit_projection_proposals(
+      mesh, incidence, proposals, proposal_valid, reference_normals, affected,
+      kRefusedVertexToleranceCells * grid_spacing);
+  if (commit.shape_rejections != 0U) {
+    const double gated_ratio = mesh_max_edge_ratio(mesh);
+    std::vector<Vertex> gated_vertices = mesh.vertices;
+    mesh.vertices = before_commit;
+    std::vector<std::uint8_t> plain_affected(mesh.triangles.size(), 0U);
+    ProjectionCommitResult plain = commit_projection_proposals(
+        mesh, incidence, proposals, proposal_valid, reference_normals,
+        plain_affected);
+    if (!(mesh_max_edge_ratio(mesh) > gated_ratio)) {
+      for (std::size_t face = 0U; face < affected.size(); ++face)
+        affected[face] = static_cast<std::uint8_t>(
+            affected[face] | plain_affected[face]);
+      commit = std::move(plain);
+    } else {
+      mesh.vertices = std::move(gated_vertices);
+    }
+  }
+  before_commit.clear();
+  before_commit.shrink_to_fit();
 #ifdef TITAN_TABI_SES_TEST_HOOKS
   metrics.debug_last_projection_state = commit.final_state;
 #endif
@@ -2846,12 +3135,54 @@ struct ProjectionCommitResult {
                    reference_normals.capacity() * sizeof(Vec3) +
                    affected.capacity() * sizeof(std::uint8_t) +
                    commit.retained_bytes);
+  // Record which vertices stayed behind and how far each still had to go.
+  // The distance is measured against the mesh as it stands now: an accepted
+  // vertex already sits on its target, and a refused one was not moved, so
+  // this is exactly the outstanding correction.
+  metrics.refused_vertex_indices = commit.refused_vertices;
+  metrics.refused_vertex_shape_flags = commit.refused_for_shape;
+  metrics.refused_vertex_distances.clear();
+  metrics.refused_vertex_distances.reserve(commit.refused_vertices.size());
+  double refused_distance_max = 0.0;
+  for (const std::uint32_t vertex : commit.refused_vertices) {
+    const double distance =
+        vertex < proposals.size()
+            ? norm(Vec3{proposals[vertex].x, proposals[vertex].y,
+                        proposals[vertex].z} -
+                   mesh_vertex(mesh, vertex))
+            : std::numeric_limits<double>::infinity();
+    metrics.refused_vertex_distances.push_back(distance);
+    refused_distance_max = std::max(refused_distance_max, distance);
+  }
+  metrics.analytic_vertex_refused_distance_max = refused_distance_max;
+  // A refused vertex is not an uncertified one: its target was proved to be
+  // the closest point on a bounded analytic patch, and the only reason it
+  // stayed put is that one incident face would have reversed.  Leaving it
+  // costs the surface that one outstanding move, which is meaningful only
+  // against the spacing the rest of the mesh is drawn at.  Certify while the
+  // largest outstanding move is a quarter cell or less, and report the count
+  // and the distance either way rather than hiding them behind a bit.
+  metrics.analytic_vertex_refused_for_shape += commit.shape_rejections;
   metrics.analytic_vertex_certificate =
       metrics.analytic_vertex_projection_misses == 0U &&
-      commit.rejected_vertices == 0U &&
-      commit.accepted_vertices == mesh.vertices.size() &&
-      commit.all_faces_certified;
+      commit.accepted_vertices + commit.rejected_vertices ==
+          mesh.vertices.size() &&
+      commit.all_faces_certified &&
+      refused_distance_max <= kRefusedVertexToleranceCells * grid_spacing;
   return commit.accepted_vertices != 0U;
+}
+
+// Name the audit status after what actually failed.  One string used to cover
+// three unrelated outcomes, and on a molecular surface the one that fires is
+// almost never a projection that missed: every query is answered and
+// certified, and what fails is the commit of a handful of those answers.
+[[nodiscard]] std::string
+analytic_vertex_failure_status(const LocalPatchRepairMetrics &metrics) {
+  if (metrics.analytic_vertex_projection_misses != 0U)
+    return "vertex_projection_missed";
+  if (!metrics.refused_vertex_indices.empty())
+    return "vertex_commit_refused";
+  return "vertex_commit_uncertified";
 }
 
 void certify_all_face_orientations(
@@ -2865,6 +3196,7 @@ void certify_all_face_orientations(
   metrics.analytic_orientation_centroid_queries = 0U;
   metrics.analytic_orientation_uncertified_faces = 0U;
   metrics.analytic_inverted_faces = 0U;
+  metrics.analytic_sheet_bridge_faces = 0U;
   metrics.analytic_orientation_min_cosine = 1.0;
   metrics.analytic_normal_quality_status = "not_run";
   metrics.analytic_orientation_smooth_faces = 0U;
@@ -2984,6 +3316,12 @@ void certify_all_face_orientations(
     }
     if (!(cosine > kOrientationTolerance)) {
       ++metrics.analytic_inverted_faces;
+      // Two of this face's own certified vertex normals point against each
+      // other, so its corners are on facing sheets of the surface and the
+      // triangle spans the gap between them.  Refining or reconnecting the
+      // mesh cannot fix that: at this spacing one cell holds both sheets.
+      if (coherence < 0.0)
+        ++metrics.analytic_sheet_bridge_faces;
       continue;
     }
     ++metrics.analytic_orientation_certified_faces;
@@ -3036,7 +3374,10 @@ void certify_all_face_orientations(
         normal_quality_pass ? "pass" : "warning";
   }
   if (metrics.analytic_inverted_faces != 0U)
-    metrics.analytic_orientation_status = "inverted_face";
+    metrics.analytic_orientation_status =
+        metrics.analytic_sheet_bridge_faces == metrics.analytic_inverted_faces
+            ? "sheet_bridge_below_spacing"
+            : "inverted_face";
   else if (metrics.analytic_orientation_uncertified_faces != 0U)
     metrics.analytic_orientation_status = "orientation_uncertified";
   else if (collect_normal_quality &&
@@ -3139,6 +3480,54 @@ void emit_projection_failure_diagnostics(
               << ",hit_point=" << hit.point.x << ';' << hit.point.y << ';'
               << hit.point.z << ",hit_normal=" << hit.normal.x << ';'
               << hit.normal.y << ';' << hit.normal.z << '\n';
+    // Which incident face refuses the move: report each one-ring face's
+    // shape and the cosine between its normal before and after moving this
+    // vertex to the certified hit.  A negative cosine on a face whose
+    // smallest altitude is below the move distance is a sliver flip.
+    if (!certified_finite_projection_hit(hit) ||
+        vertex_index + 1U >= diagnostic_incidence.offsets.size())
+      continue;
+    const Vec3 target{hit.point.x, hit.point.y, hit.point.z};
+    for (std::size_t position = diagnostic_incidence.offsets[vertex_index];
+         position < diagnostic_incidence.offsets[vertex_index + 1U];
+         ++position) {
+      const std::size_t face = diagnostic_incidence.triangles[position];
+      if (face >= mesh.triangles.size())
+        continue;
+      const Triangle &triangle = mesh.triangles[face];
+      const Vec3 a = mesh_vertex(mesh, triangle.v0);
+      const Vec3 b = mesh_vertex(mesh, triangle.v1);
+      const Vec3 c = mesh_vertex(mesh, triangle.v2);
+      const auto moved = [&](std::size_t index, const Vec3 &p) {
+        return index == vertex_index ? target : p;
+      };
+      const Vec3 old_normal = cross(b - a, c - a);
+      const Vec3 a2 = moved(triangle.v0, a);
+      const Vec3 b2 = moved(triangle.v1, b);
+      const Vec3 c2 = moved(triangle.v2, c);
+      const Vec3 new_normal = cross(b2 - a2, c2 - a2);
+      const double ab = norm(b - a);
+      const double bc = norm(c - b);
+      const double ca = norm(a - c);
+      const double longest = std::max({ab, bc, ca});
+      const double shortest = std::min({ab, bc, ca});
+      const double area = 0.5 * norm(old_normal);
+      const double old_length = norm(old_normal);
+      const double new_length = norm(new_normal);
+      std::cerr << "ses_projection_diag,unresolved_incident_face,vertex="
+                << vertex_index << ",face=" << face << ",area=" << area
+                << ",min_altitude=" << (longest > 0.0 ? 2.0 * area / longest : 0.0)
+                << ",quality=" << normalized_triangle_quality(a, b, c)
+                << ",edge_ratio="
+                << (shortest > 1.0e-14
+                        ? longest / shortest
+                        : std::numeric_limits<double>::infinity())
+                << ",cos_old_new="
+                << (old_length > 0.0 && new_length > 0.0
+                        ? dot(old_normal, new_normal) / (old_length * new_length)
+                        : std::numeric_limits<double>::quiet_NaN())
+                << ",new_area=" << 0.5 * new_length << '\n';
+    }
   }
 
   constexpr double kOrientationTolerance = 1.0e-8;
@@ -4821,6 +5210,21 @@ void repair_patch_ray_surface_local(
   metrics.poor_triangles_before = shape_before.poor_triangles;
   metrics.triangle_quality_min_before = shape_before.minimum_quality;
   metrics.max_edge_ratio_before = shape_before.maximum_edge_ratio;
+  // Per-stage mesh shape, so the stage that spends it can be named rather
+  // than guessed.  Diagnostic only; production compiles none of this.
+  const auto stage_shape = [&](const char *stage) {
+#ifdef TITAN_TABI_SES_TEST_HOOKS
+    const MeshShapeAudit now = measure_mesh_shape(mesh);
+    std::cerr << "ses_stage_shape,stage=" << stage
+              << ",panels=" << mesh.triangles.size()
+              << ",max_edge_ratio=" << now.maximum_edge_ratio
+              << ",min_quality=" << now.minimum_quality
+              << ",poor=" << now.poor_triangles << std::endl;
+#else
+    (void)stage;
+#endif
+  };
+  stage_shape("marching");
   double repair_ms = 0.0;
   bool topology_certified = false;
   const auto collapse_rounds = [&](int maximum_rounds,
@@ -4865,6 +5269,7 @@ void repair_patch_ray_surface_local(
   const double initial_collapse_begin = repair_ms;
   collapse_rounds(8, 1.0e-2);
   metrics.initial_collapse_ms = repair_ms - initial_collapse_begin;
+  stage_shape("initial_collapse");
 
   const auto flip_rounds = [&](int maximum_rounds) {
     std::vector<CompactEdgeFlipUndo> undo;
@@ -4904,6 +5309,7 @@ void repair_patch_ray_surface_local(
                                  projection_begin)
                                  .count();
   metrics.projection_ms = metrics.stable_sliver_ms;
+  stage_shape("stable_sliver_smooth");
 
   // Projection can create a new, strictly local short edge.  One cleanup
   // round is enough because projected vertices are Jacobi-updated from a
@@ -4912,6 +5318,7 @@ void repair_patch_ray_surface_local(
   collapse_rounds(4, 1.0e-2);
   metrics.post_projection_collapse_ms =
       repair_ms - post_projection_collapse_begin;
+  stage_shape("post_projection_collapse");
   const auto refinement_begin = std::chrono::steady_clock::now();
   const auto local_sliver_begin = std::chrono::steady_clock::now();
   smooth_analytic_slivers_local(mesh, patches, projection, grid_spacing,
@@ -4920,6 +5327,7 @@ void repair_patch_ray_surface_local(
                                 std::chrono::steady_clock::now() -
                                 local_sliver_begin)
                                 .count();
+  stage_shape("local_sliver_smooth");
   const auto timed_project_all = [&]() {
     const auto project_begin = std::chrono::steady_clock::now();
     const bool accepted = project_all_vertices_to_analytic_patches(
@@ -4931,6 +5339,7 @@ void repair_patch_ray_surface_local(
     return accepted;
   };
   bool projected = timed_project_all();
+  stage_shape("full_projection");
   if (projected) {
     const auto weld_begin = std::chrono::steady_clock::now();
     SurfaceMesh welded_candidate;
@@ -4955,6 +5364,106 @@ void repair_patch_ray_surface_local(
                                .count();
     repair_ms += metrics.seam_weld_ms;
   }
+  // One refused vertex fails the certificate for the whole surface, and on a
+  // molecular mesh the obstruction is a micro-sliver in that vertex's one
+  // ring rather than anything wrong with its projection.  Collapse exactly
+  // those slivers and reproject, before the global short-edge cleanup below,
+  // which rewrites parts of the surface that were never in question.
+  // Repair whenever a refusal is large enough to matter rather than only when
+  // the certificate fails, so the tolerance above stays a backstop for what
+  // cannot be repaired instead of the mechanism that grants the certificate.
+  constexpr double kRefusedSliverRepairCells = 0.05;
+  const auto refused_sliver_begin = std::chrono::steady_clock::now();
+  for (int round = 0; round < 4 && projected &&
+                      !metrics.refused_vertex_indices.empty() &&
+                      metrics.analytic_vertex_refused_distance_max >
+                          kRefusedSliverRepairCells * grid_spacing;
+       ++round) {
+    const CompactVertexIncidence incidence =
+        build_compact_vertex_incidence(mesh);
+    if (incidence.offsets.size() != mesh.vertices.size() + 1U)
+      break;
+    double maximum_length = 0.0;
+    const std::vector<EdgeKey> sliver_edges =
+        collect_refused_vertex_sliver_edges(
+            mesh, incidence, metrics.refused_vertex_indices,
+            metrics.refused_vertex_distances,
+            metrics.refused_vertex_shape_flags, maximum_length);
+    if (sliver_edges.empty() || !(maximum_length > 0.0))
+      break;
+    const auto stage_begin = std::chrono::steady_clock::now();
+    SurfaceMesh candidate;
+    const std::size_t collapsed = collapse_selected_manifold_edges_compact(
+        mesh, candidate,
+        std::nextafter(maximum_length,
+                       std::numeric_limits<double>::infinity()),
+        sliver_edges, metrics.scratch_bytes);
+    bool accepted = false;
+    if (collapsed > 0U) {
+      // This repair may run on a surface that already holds a certificate, so
+      // it audits the candidate outright instead of inheriting the standing
+      // topology certificate the way the generic collapse rounds do.
+      orient_mesh_consistently(candidate);
+      ++metrics.topology_fallback_audits;
+      if (build_closed_surface_trace_spaces(candidate).quality.valid) {
+        // Keep the mesh that goes in, so a collapse that reprojects into a
+        // worse state can be put back exactly.  The retained metrics belong
+        // to that mesh and stay valid with it, so the rollback needs no
+        // second projection.
+        SurfaceMesh previous;
+        previous.vertices = mesh.vertices;
+        previous.triangles = mesh.triangles;
+        previous.panels = mesh.panels;
+        const bool previous_certificate = metrics.analytic_vertex_certificate;
+        const std::size_t previous_refused =
+            metrics.refused_vertex_indices.size();
+        const double previous_distance =
+            metrics.analytic_vertex_refused_distance_max;
+        const std::vector<std::uint32_t> previous_indices =
+            metrics.refused_vertex_indices;
+        const std::vector<double> previous_distances =
+            metrics.refused_vertex_distances;
+        const std::vector<std::uint8_t> previous_shape_flags =
+            metrics.refused_vertex_shape_flags;
+        mesh.vertices = std::move(candidate.vertices);
+        mesh.triangles = std::move(candidate.triangles);
+        mesh.panels = std::move(candidate.panels);
+        assign_all_analytic_triangle_owners(mesh);
+        topology_certified = true;
+        const bool reprojected = timed_project_all();
+        const bool regressed =
+            !reprojected ||
+            (previous_certificate && !metrics.analytic_vertex_certificate) ||
+            metrics.refused_vertex_indices.size() > previous_refused ||
+            metrics.analytic_vertex_refused_distance_max > previous_distance;
+        if (regressed) {
+          mesh.vertices = std::move(previous.vertices);
+          mesh.triangles = std::move(previous.triangles);
+          mesh.panels = std::move(previous.panels);
+          assign_all_analytic_triangle_owners(mesh);
+          metrics.analytic_vertex_certificate = previous_certificate;
+          metrics.refused_vertex_indices = previous_indices;
+          metrics.refused_vertex_distances = previous_distances;
+          metrics.refused_vertex_shape_flags = previous_shape_flags;
+          metrics.analytic_vertex_refused_distance_max = previous_distance;
+        } else {
+          metrics.collapsed_edges += collapsed;
+          metrics.refused_sliver_collapses += collapsed;
+          accepted = true;
+        }
+      }
+    }
+    repair_ms += std::chrono::duration<double, std::milli>(
+                     std::chrono::steady_clock::now() - stage_begin)
+                     .count();
+    if (!accepted)
+      break;
+  }
+  metrics.refused_sliver_repair_ms =
+      std::chrono::duration<double, std::milli>(
+          std::chrono::steady_clock::now() - refused_sliver_begin)
+          .count();
+  stage_shape("refused_sliver_repair");
   const auto certificate_cleanup_begin = std::chrono::steady_clock::now();
   for (int cleanup = 0;
        cleanup < 4 && projected && !metrics.analytic_vertex_certificate;
@@ -4970,6 +5479,7 @@ void repair_patch_ray_surface_local(
       std::chrono::duration<double, std::milli>(
           std::chrono::steady_clock::now() - certificate_cleanup_begin)
           .count();
+  stage_shape("certificate_cleanup");
   const auto orientation_repair_begin = std::chrono::steady_clock::now();
   bool orientation_topology_changed = false;
   for (int cleanup = 0; cleanup < 20 && projected; ++cleanup) {
@@ -5039,6 +5549,7 @@ void repair_patch_ray_surface_local(
       std::chrono::duration<double, std::milli>(
           std::chrono::steady_clock::now() - orientation_repair_begin)
           .count();
+  stage_shape("orientation_repair");
   if (projected && orientation_topology_changed) {
     // A topology transaction may remove the vertices whose safe projection
     // was rejected.  The collapse itself must not manufacture a certificate:
@@ -5292,6 +5803,7 @@ void repair_patch_ray_surface_local(
                                std::chrono::steady_clock::now() -
                                wide_repair_begin)
                                .count();
+  stage_shape("wide_repair");
   metrics.projection_ms += std::chrono::duration<double, std::milli>(
                                std::chrono::steady_clock::now() -
                                refinement_begin)
@@ -5330,7 +5842,7 @@ void repair_patch_ray_surface_local(
           std::chrono::steady_clock::now() - sampled_audit_begin)
           .count();
   if (!metrics.analytic_vertex_certificate)
-    metrics.analytic_audit_status = "vertex_projection_failed";
+    metrics.analytic_audit_status = analytic_vertex_failure_status(metrics);
   metrics.projection_ms += std::chrono::duration<double, std::milli>(
                                std::chrono::steady_clock::now() - audit_begin)
                                .count();
@@ -5683,8 +6195,11 @@ void polygonize_grid(SurfaceMesh &mesh, const AtomGrid &ownership_atom_grid,
             points[k] = cube_points[vertex];
             tetra_values[k] = cube_values[vertex];
           }
+          // Zero keeps this engine's geometry exactly as the runs already
+          // published with it produced; see
+          // docs/TITAN_SES_ENGINE_FIX_2026-09-15.md.
           polygonize_tetrahedron(mesh, vertex_lookup, ownership_atom_grid,
-                                 atoms, points, tetra_values);
+                                 atoms, points, tetra_values, 0.0);
         }
       }
     }
@@ -6010,6 +6525,27 @@ static_assert(sizeof(ActivePatchRayCell) <= 8U);
   return result;
 }
 
+// Fraction of a marching edge that every crossing is held away from both of
+// its endpoints, for the patch-ray engine only.  0.10 is the largest value
+// that improves every fixture on every measure at once: worst aspect ratio
+// 1.3x to 3.5x lower, poor triangles 10x to 16x fewer, normal fit better on
+// all of them, 1 percent more panels and 0.06 percent more area.  Larger
+// values improve shape further but approach a cliff where one fixture loses
+// 40 percent of its panels, which is resolution the caller did not ask to
+// give up.  The measurement is in docs/TITAN_SES_EDGE_MARGIN_2026-09-15.md;
+// test builds may override the value to repeat it.
+[[nodiscard]] double patch_ray_edge_margin() noexcept {
+  constexpr double kPatchRayEdgeMargin = 0.10;
+#ifdef TITAN_TABI_SES_TEST_HOOKS
+  if (const char *override_value = std::getenv("TITAN_TABI_SES_SNAP")) {
+    const double parsed = std::atof(override_value);
+    if (std::isfinite(parsed) && parsed >= 0.0 && parsed < 0.5)
+      return parsed;
+  }
+#endif
+  return kPatchRayEdgeMargin;
+}
+
 [[nodiscard]] std::pair<std::size_t, std::size_t> polygonize_patch_ray_grid(
     SurfaceMesh &mesh, const AtomGrid &ownership_atom_grid,
     std::span<const Atom> atoms, const Vec3 &lower, double grid_spacing,
@@ -6033,6 +6569,7 @@ static_assert(sizeof(ActivePatchRayCell) <= 8U);
       std::array<std::size_t, 3>{0, 1, 1}};
   std::unordered_map<VertexKey, std::size_t, VertexKeyHash> vertex_lookup;
   vertex_lookup.reserve(active.size() * 2U);
+  const double edge_margin = patch_ray_edge_margin();
   const std::size_t cell_nx = nx - 1U;
   const std::size_t cell_ny = ny - 1U;
   for (const ActivePatchRayCell &cell : active) {
@@ -6066,7 +6603,7 @@ static_assert(sizeof(ActivePatchRayCell) <= 8U);
         tetra_values[k] = cube_values[vertex];
       }
       polygonize_tetrahedron(mesh, vertex_lookup, ownership_atom_grid, atoms,
-                             points, tetra_values);
+                             points, tetra_values, edge_margin);
     }
   }
   return {active.size(), active.size_bytes()};
@@ -6121,6 +6658,29 @@ AuxiliarySurfaceResult build_patch_ray_experimental_surface(
                                    std::size_t iz) {
     return ix + nx * (iy + ny * iz);
   };
+  // The scale every tolerance below is measured against.  It has to include
+  // how far the molecule sits from the origin, not only how big it is: a
+  // double holds a coordinate of 1000 A to 1e-13, so a squared distance or a
+  // ray crossing computed there carries that much noise whatever the atom
+  // radii are.
+  double parity_scale = std::max(1.0, grid_spacing);
+  for (const Atom &atom : patches.atoms) {
+    parity_scale =
+        std::max(parity_scale, atom.radius + patches.probe_radius);
+    parity_scale = std::max({parity_scale, std::abs(atom.x), std::abs(atom.y),
+                             std::abs(atom.z)});
+  }
+  // How close a boundary may come to a grid vertex before the cheap tests
+  // below refuse to certify it either way.  Both of them decide an exact tie
+  // by the last bit of an inexact quantity, and a grid vertex can sit exactly
+  // on a boundary: at the origin with spacing 0.3 and radius 1.5 the vertex
+  // (0.9, 1.2, 0) is exactly on the sphere, since 0.81 + 1.44 = 2.25 = 1.5^2
+  // in binary too.  The same molecule a thousand angstrom away puts it 1e-13
+  // off and the answer flips.  Leaving the shell uncertified sends those few
+  // vertices to the symbolic-perturbation path, which exists for this case.
+  const double certificate_margin = std::max(
+      1024.0 * std::numeric_limits<double>::epsilon() * parity_scale,
+      1.0e-12 * grid_spacing);
   // 0 = unresolved, 1 = outside, 2 = inside.  An axis with an odd number of
   // crossings is ignored only for the grid vertices that use that row.  This
   // keeps certified parity authoritative everywhere else instead of turning a
@@ -6142,6 +6702,15 @@ AuxiliarySurfaceResult build_patch_ray_experimental_surface(
           unsigned inside_votes = 0U;
           for (std::size_t axis = 0; axis < crossings.size(); ++axis) {
             if ((crossings[axis].size() & 1U) != 0U)
+              continue;
+            // A crossing that lands on the query coordinate makes this axis
+            // parity a tie: upper_bound counts it as passed, which is a
+            // choice, not a measurement.  Refuse the axis rather than make
+            // the choice.
+            if (nearest_crossing_distance(
+                    crossings[axis], coordinates[axis],
+                    std::numeric_limits<double>::infinity()) <=
+                certificate_margin)
               continue;
             ++valid_votes;
             inside_votes += static_cast<unsigned>(
@@ -6178,10 +6747,6 @@ AuxiliarySurfaceResult build_patch_ray_experimental_surface(
   std::vector<std::size_t> local_repair_counts(workers, 0U);
   std::vector<std::size_t> morphology_counts(workers, 0U);
   std::vector<std::array<std::vector<double>, 3>> parity_scratch(workers);
-  double parity_scale = std::max(1.0, grid_spacing);
-  for (const Atom &atom : patches.atoms)
-    parity_scale =
-        std::max(parity_scale, atom.radius + patches.probe_radius);
   const double parity_duplicate_tolerance = std::max(
       512.0 * std::numeric_limits<double>::epsilon() * parity_scale,
       1.0e-11 * grid_spacing);
@@ -6220,12 +6785,14 @@ AuxiliarySurfaceResult build_patch_ray_experimental_surface(
             // regions from morphology sampling.  The VDW union is contained
             // in the SES body, while points outside every probe-expanded atom
             // cannot belong to it.
-            if (point_inside_union(atom_grid, patches.atoms, point)) {
+            if (point_inside_union(atom_grid, patches.atoms, point,
+                                   -certificate_margin)) {
               classification[index] = 2U;
               ++geometric_counts[worker];
               continue;
             }
-            if (!point_inside_union(expanded_grid, expanded_atoms, point)) {
+            if (!point_inside_union(expanded_grid, expanded_atoms, point,
+                                    certificate_margin)) {
               classification[index] = 1U;
               ++geometric_counts[worker];
               continue;
@@ -6472,7 +7039,8 @@ AuxiliarySurfaceResult build_patch_ray_experimental_surface(
             .count();
     local_metrics.sampled_analytic_audit_ms += sampled_audit_ms;
     if (!local_metrics.analytic_vertex_certificate)
-      local_metrics.analytic_audit_status = "vertex_projection_failed";
+      local_metrics.analytic_audit_status =
+          analytic_vertex_failure_status(local_metrics);
     local_metrics.projection_ms += orientation_ms + sampled_audit_ms;
   }
 #ifdef TITAN_TABI_SES_TEST_HOOKS
@@ -6497,6 +7065,7 @@ AuxiliarySurfaceResult build_patch_ray_experimental_surface(
   result.local_sliver_ms = local_metrics.local_sliver_ms;
   result.full_projection_ms = local_metrics.full_projection_ms;
   result.seam_weld_ms = local_metrics.seam_weld_ms;
+  result.refused_sliver_repair_ms = local_metrics.refused_sliver_repair_ms;
   result.certificate_cleanup_ms = local_metrics.certificate_cleanup_ms;
   result.orientation_repair_ms = local_metrics.orientation_repair_ms;
   result.wide_repair_ms = local_metrics.wide_repair_ms;
@@ -6561,6 +7130,15 @@ AuxiliarySurfaceResult build_patch_ray_experimental_surface(
       local_metrics.analytic_vertex_projection_misses;
   result.analytic_vertex_residual_max =
       local_metrics.analytic_vertex_residual_max;
+  result.analytic_vertex_refused =
+      local_metrics.refused_vertex_indices.size();
+  result.analytic_vertex_refused_distance_max =
+      local_metrics.analytic_vertex_refused_distance_max;
+  result.analytic_vertex_refused_for_shape =
+      local_metrics.analytic_vertex_refused_for_shape;
+  result.refused_sliver_collapses = local_metrics.refused_sliver_collapses;
+  result.analytic_sheet_bridge_faces =
+      local_metrics.analytic_sheet_bridge_faces;
   result.analytic_vertex_certificate =
       local_metrics.analytic_vertex_certificate;
   result.analytic_orientation_status =
@@ -6713,6 +7291,10 @@ build_implicit_surface(std::span<const Atom> atoms, double grid_spacing,
                        std::size_t max_grid_vertices, bool validate_topology) {
   const auto begin = std::chrono::steady_clock::now();
   AuxiliarySurfaceResult result;
+  // No analytic engine ran here.  The field defaults to the analytic default,
+  // so leaving it would report a grid-ses run as an analytic `current` run,
+  // which is exactly the provenance a reader would rely on.
+  result.analytic_ses_engine = "not_applicable";
   if (atoms.empty() || !(grid_spacing > 0.0) || !std::isfinite(grid_spacing) ||
       !(probe_radius >= 0.0) || !std::isfinite(probe_radius)) {
     result.status = "invalid_input";
@@ -6943,13 +7525,14 @@ AuxiliarySurfaceResult build_analytic_ses_surface(std::span<const Atom> atoms,
     result.status = "invalid_input";
     return result;
   }
-  if (engine != "current" && engine != "patch-ray-experimental") {
+  if (!is_current_family_engine(engine) &&
+      engine != "patch-ray-experimental") {
     result.status = "invalid_analytic_ses_engine";
     return result;
   }
   const auto patch_begin = std::chrono::steady_clock::now();
   analytic_ses::PatchComplex patches = analytic_ses::build_patch_complex(
-      atoms, probe_radius, executor, engine == "current");
+      atoms, probe_radius, executor, is_current_family_engine(engine));
   result.patch_build_ms = std::chrono::duration<double, std::milli>(
                               std::chrono::steady_clock::now() - patch_begin)
                               .count();
@@ -7012,7 +7595,8 @@ AuxiliarySurfaceResult build_analytic_ses_surface(std::span<const Atom> atoms,
   // from analytic ray crossings, so avoid 27 square roots and minimum-distance
   // reductions per grid vertex here.
   std::vector<std::uint8_t> topology_inside(result.grid_vertices, 0U);
-  const auto &sample_directions = topology_sample_directions();
+  const auto &sample_directions =
+      closing_sample_directions(engine == "current-dense" ? 2 : 1);
   const auto evaluate_topology_slices = [&](std::size_t begin_z,
                                             std::size_t end_z) {
     for (std::size_t iz = begin_z; iz < end_z; ++iz) {

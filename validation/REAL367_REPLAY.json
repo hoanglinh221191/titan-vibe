@@ -1,0 +1,85 @@
+{
+  "binary_sha256": "f4dc1e68d8a1ff40b9c1834bd0f526dcf90bf67a8816f931e3da4a2887099270",
+  "all_frames_requested": true,
+  "all_pass": true,
+  "systems_completed": 7,
+  "results": {
+    "S1_tetramer/A": {
+      "exit_code": 0,
+      "elapsed_s": 64.6812598999968,
+      "atom_records": 2575904,
+      "coordinates_identical_at_PDB_precision": true,
+      "frames": 101,
+      "scientific_fields_identical": true,
+      "route_changes": 0,
+      "input_checksum_changes": 0,
+      "pass": true
+    },
+    "S1_tetramer/t116400": {
+      "exit_code": 0,
+      "elapsed_s": 1.6748867000133032,
+      "atom_records": 25504,
+      "coordinates_identical_at_PDB_precision": true,
+      "frames": 1,
+      "scientific_fields_identical": true,
+      "route_changes": 0,
+      "input_checksum_changes": 0,
+      "pass": true
+    },
+    "S2_hexamer/A": {
+      "exit_code": 0,
+      "elapsed_s": 94.46648960000311,
+      "atom_records": 3863452,
+      "coordinates_identical_at_PDB_precision": true,
+      "frames": 101,
+      "scientific_fields_identical": true,
+      "route_changes": 95,
+      "input_checksum_changes": 0,
+      "pass": true
+    },
+    "S3_protein_glycan/A": {
+      "exit_code": 0,
+      "elapsed_s": 110.30451799998991,
+      "atom_records": 1453693,
+      "coordinates_identical_at_PDB_precision": true,
+      "frames": 101,
+      "scientific_fields_identical": true,
+      "route_changes": 2,
+      "input_checksum_changes": 0,
+      "pass": true
+    },
+    "S3_protein_glycan/t112000": {
+      "exit_code": 0,
+      "elapsed_s": 1.674798499996541,
+      "atom_records": 14393,
+      "coordinates_identical_at_PDB_precision": true,
+      "frames": 1,
+      "scientific_fields_identical": true,
+      "route_changes": 0,
+      "input_checksum_changes": 0,
+      "pass": true
+    },
+    "S4_peptide_pair/A": {
+      "exit_code": 0,
+      "elapsed_s": 5.010127600005944,
+      "atom_records": 38874,
+      "coordinates_identical_at_PDB_precision": true,
+      "frames": 31,
+      "scientific_fields_identical": true,
+      "route_changes": 1,
+      "input_checksum_changes": 2,
+      "pass": true
+    },
+    "S5_phase_separated/A": {
+      "exit_code": 0,
+      "elapsed_s": 6.808695499988971,
+      "atom_records": 329344,
+      "coordinates_identical_at_PDB_precision": true,
+      "frames": 31,
+      "scientific_fields_identical": true,
+      "route_changes": 0,
+      "input_checksum_changes": 0,
+      "pass": true
+    }
+  }
+}

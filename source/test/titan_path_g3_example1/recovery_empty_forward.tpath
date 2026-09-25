@@ -1,0 +1,12 @@
+TITAN_PATH 1
+route_id = example1-recovery-empty-forward
+branch_id = nav-p0-recovery
+source = synthetic local-recovery fixture with shell support only behind the current projection
+reference_structure_sha256 = 5738f639c53ee44aa19fbbd89ee345b1080bc203ff4a22f09b52da2734bc4ad2
+registration = static
+units = angstrom
+start_index = 0
+terminal_index = 2
+waypoint = 0 31.667845918471 87.357494209188 49.572293245943 0.5
+waypoint = 1 31.805397208101 85.362229905211 49.572293245943 0.5
+waypoint = 2 31.874172852915 84.364597753223 49.572293245943 0.5

@@ -226,7 +226,7 @@ int main() {
 '@
 
 $compiler = Resolve-Cxx $Cxx
-$includeRoot = $RepoRoot -replace '\\', '/'
+$includeRoot = (Join-Path $RepoRoot 'src') -replace '\\', '/'
 & $compiler -std=c++23 -O2 "-I$includeRoot" $sourcePath -o $exePath
 if ($LASTEXITCODE -ne 0) {
     throw "C++ compile failed for near-kernel block smoke using $compiler"

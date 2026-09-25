@@ -4,6 +4,8 @@
 
 #include "aligned_allocator.h"
 #include "titan_neighbor_grid.h"
+#include "titan_llps_geometry.h"
+#include <exception>
 #include "titan_thread_compat.h"
 #include <array>
 #include <atomic>
@@ -36,8 +38,9 @@ struct LLPSFrameResult {
   int gcc_size;         // macro-nodes in giant connected component
   float gcc_rg_nm;      // Rg of GCC (nm), PBC-corrected
   float mean_degree;    // <k> = 2*edges / n_macronodes
-  float density_dense;  // macro-nodes/nm^3 inside GCC (sphere approx)
-  float density_dilute; // macro-nodes/nm^3 outside GCC
+  float density_dense;  // representative macro-nodes/nm^3 in declared window
+  float density_dilute;
+  titan_llps_geometry::PhaseResult phase;
 };
 
 /// Full-trajectory LLPS results
@@ -95,6 +98,10 @@ public:
             bool dynamics_enabled = false, bool dynamics_detailed = false,
             float prna_cutoff_nm = 0.0f, const std::string &kernel_mode = "auto",
             const std::string &density_mode = "auto");
+  ~TitanLLPS() { try { flush_async(); } catch (...) {} }
+  void configure_phase(const titan_llps_geometry::PhaseConfig& config) {
+    flush_async(); config.validate(); phase_config_=config;
+  }
 
   void set_sticker_beads(const std::vector<mol_info> &info,
                          const std::string &sticker_str);
@@ -145,6 +152,7 @@ public:
 
 private:
   struct FrameWorkItem {
+    titan_llps_geometry::Cell cell;
     std::vector<float> pos_nm;
     std::optional<std::vector<float>> rna_nm;
     float bx, by, bz;
@@ -226,6 +234,7 @@ private:
   titan::jthread worker_thread_;
   bool async_mode_ = false;
   bool worker_processing_ = false;
+  std::exception_ptr worker_error_;
   static constexpr int MAX_QUEUE_SIZE_ = 4;
   std::condition_variable queue_full_cv_;
 
@@ -247,6 +256,13 @@ private:
   float prna_cutoff2_nm_{0.0f};
   LlpsKernelMode kernel_mode_{LlpsKernelMode::Auto};
   std::string density_mode_{"auto"};
+  titan_llps_geometry::Cell cell_;
+  titan_llps_geometry::PhaseConfig phase_config_;
+  mutable std::optional<titan_llps_geometry::Point> gcc_center_;
+  double frame_dist2(double dx,double dy,double dz,float bx,float by,float bz) const {
+    if (!cell_.metric) return pbc_dist2(dx,dy,dz,bx,by,bz);
+    auto p=cell_.delta({dx,dy,dz});return p[0]*p[0]+p[1]*p[1]+p[2]*p[2];
+  }
   bool density_disabled_by_budget_{false};
 
   std::vector<int> chain_start_;
@@ -323,8 +339,9 @@ private:
 
   float voxel_size_nm_ = 0.5f;
   int grid_nx_ = 0, grid_ny_ = 0, grid_nz_ = 0;
-  mutable std::vector<uint64_t> vox_pro_;
-  mutable std::vector<uint64_t> vox_rna_;
+  mutable std::vector<double> vox_pro_;
+  mutable std::vector<double> vox_rna_;
+  std::array<double,9> density_reference_cell_{};
   int density_frame_count_ = 0;
   float grid_bx_ = 0, grid_by_ = 0, grid_bz_ = 0;
 

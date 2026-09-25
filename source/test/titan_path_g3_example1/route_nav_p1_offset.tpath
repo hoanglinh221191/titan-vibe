@@ -1,0 +1,14 @@
+TITAN_PATH 1
+route_id = example1-nav-p1-offset
+branch_id = nav-p1-offset
+source = synthetic straight route shifted 0.75 A normal to exercise tube-return guidance
+reference_structure_sha256 = 5738f639c53ee44aa19fbbd89ee345b1080bc203ff4a22f09b52da2734bc4ad2
+registration = static
+units = angstrom
+start_index = 0
+terminal_index = 4
+waypoint = 0 34.8118 86.3195 52.9143 0.5
+waypoint = 1 33.4756377314594 86.2273744194345 51.4289773853691 0.5
+waypoint = 2 32.1394754629188 86.1352488388690 49.9436547707382 0.5
+waypoint = 3 30.8033131943782 86.0431232583035 48.4583321561074 0.5
+waypoint = 4 29.4671509258376 85.9509976777380 46.9730095414765 0.5

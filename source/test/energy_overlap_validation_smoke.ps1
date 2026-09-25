@@ -120,11 +120,10 @@ $selfProcess = Start-Process -FilePath $titanPath `
     -NoNewWindow -Wait -PassThru -RedirectStandardOutput $selfStdout `
     -RedirectStandardError $selfStderr
 if ($selfProcess.ExitCode -ne 0) {
-  throw "TITAN rejected a valid self-interaction selection."
+  throw "TITAN rejected a topology-bound self-interaction selection."
 }
-$selfEnergy = Get-Content -LiteralPath (Join-Path $work "cal.xvg") -Raw
-if ($selfEnergy -match '(?i)(^|\s)(inf|nan)(\s|$)') {
-  throw "TITAN emitted Inf/NaN for a valid self-interaction selection."
+if ((Get-Content -LiteralPath (Join-Path $work "cal.xvg") -Raw) -match '(?i)(^|\s)(inf|nan)(\s|$)') {
+  throw "TITAN emitted nonfinite self energy."
 }
 
 Remove-Item -LiteralPath $stdoutPath, $stderrPath -Force -ErrorAction SilentlyContinue

@@ -9,10 +9,13 @@ param(
     [ValidateSet('sphere-patch','grid-ses','analytic-ses')][string]$PrimarySurface = 'sphere-patch',
     [ValidateRange(0.25,4.0)][double]$SesGridSpacing = 1.25,
     [ValidateRange(1,86400)][int]$CaseTimeoutSeconds = 1800,
+    [ValidateRange(256,8192)][int]$RasMemoryBudgetMb = 1024,
     [switch]$Quick,
     [switch]$Force,
     [switch]$RerunFailed,
     [string[]]$RerunStages = @(),
+    [switch]$RecoverVerifiedProfiles,
+    [switch]$RecoveryOnly,
     [switch]$AllowFailedDecision
 )
 
@@ -52,7 +55,7 @@ function Get-SolverContractHash([string]$Root) {
         'src/tabi/tabi_fmm_m2l_preconditioner.cpp',
         'src/tabi/tabi_fmm_m2l_prototype.cpp',
         'src/tabi/tabi_fmm_m2l_fallback.cpp',
-        'src/tabi/linear_solver.cpp',
+        'src/tabi/tabi_preconditioner.cpp',
         'test/pbe_fmm_m2l_cli_helpers.ps1'
     )
     $parts = foreach ($relative in $relativePaths) {
@@ -81,6 +84,9 @@ $manifest = @(Import-Csv -LiteralPath $manifestPath)
 $fixtureNames = Split-Values $Fixtures
 if ($Quick) { $fixtureNames = @('1sh1') }
 $rerunLabels = Split-Values $RerunStages
+if ($RecoveryOnly -and -not $RecoverVerifiedProfiles) {
+    throw '-RecoveryOnly requires -RecoverVerifiedProfiles.'
+}
 
 $matrixPath = Join-Path $WorkRoot 'fagbi_graph_preconditioner_matrix.csv'
 $tracePath = Join-Path $WorkRoot 'fagbi_graph_preconditioner_residual_trace.csv'
@@ -139,64 +145,121 @@ foreach ($fixtureName in $fixtureNames) {
     if (-not (Test-Path -LiteralPath $pqr)) { throw "Missing fixture PQR: $pqr" }
     $pqrSha = (Get-FileHash -Algorithm SHA256 -LiteralPath $pqr).Hash.ToLowerInvariant()
     foreach ($stage in $stages) {
+        $isRas = [string]$stage.label -in @('fmm_near_graph_ras','distance_knn_graph_ras')
+        $stageMemoryBudgetMb = if ($isRas) { $RasMemoryBudgetMb } else { 256 }
+        $stageProtocol = if ($isRas) {
+            "$protocol;ras_memory_budget_mb=$stageMemoryBudgetMb"
+        } else { $protocol }
         $surfaceToken = if ($PrimarySurface -in @('grid-ses','analytic-ses')) {
             "$(($PrimarySurface -replace '-','_'))_h$(([string]$SesGridSpacing).Replace('.','p'))_"
         } else { '' }
         $rowId = "$fixtureName`_$surfaceToken$($stage.label)"
         $runDir = Join-Path $WorkRoot $rowId
         $old = $existing[$rowId]
-        $recoveryProfilePath = Join-Path $runDir 'pbe_tabi_profile.csv'
-        if ($null -eq $old -and (Test-Path -LiteralPath $recoveryProfilePath) -and
-            (Get-Item -LiteralPath $recoveryProfilePath).LastWriteTimeUtc -ge
-                (Get-Item -LiteralPath $TitanExe).LastWriteTimeUtc) {
-            $recoveryProfile = @(Import-Csv -LiteralPath $recoveryProfilePath)[-1]
-            $recoveryMemoryPath = Join-Path $runDir 'pbe_memory_profile.csv'
-            $recoveryMemory = if (Test-Path -LiteralPath $recoveryMemoryPath) {
-                @(Import-Csv -LiteralPath $recoveryMemoryPath)[-1]
-            } else { $null }
-            $effective = [string](P $recoveryProfile 'preconditioner_effective' '')
-            $residual = D (P $recoveryProfile 'true_residual_rel' (P $recoveryProfile 'final_residual'))
-            $audit = D (P $recoveryProfile 'tree_vs_direct_matvec_rel' (P $recoveryProfile 'matvec_audit_rel_rms'))
-            $iterations = I (P $recoveryProfile 'iterations')
-            $status = [string](P $recoveryProfile 'status' 'failed')
-            $finite = (Test-FmmCliFinite $residual) -and (Test-FmmCliFinite $audit)
-            $failure = if ($iterations -ge 720 -and $finite) { 'not_converged' } elseif ($status -ne 'ok') { 'runtime_failure' } elseif ($effective -ne $stage.expected) { 'preconditioner_fallback' } elseif (-not $finite -or $audit -gt 1e-2) { 'accuracy_gap' } elseif ($residual -gt 1e-4) { 'not_converged' } else { 'pass' }
-            $old = [pscustomobject]@{
-                row_id=$rowId; fixture=$fixtureName; protein_name=$fixture.protein_name; pdb_id=$fixture.pdb_id
-                surface_protocol=$PrimarySurface; ses_grid_spacing_A=$(if($PrimarySurface -in @('grid-ses','analytic-ses')){$SesGridSpacing}else{'NA'})
-                preconditioner_label=$stage.label; preconditioner_requested=$stage.precond
-                preconditioner_effective=$effective; graph_cap=64; panels=I (P $recoveryProfile 'panels')
-                status=$status; failure_class=$failure; iterations=$iterations
-                true_residual=$residual; final_residual=D (P $recoveryProfile 'final_residual')
-                audit_rms=$audit; wall_seconds=D (P $recoveryProfile 'total_seconds')
-                peak_rss_mb=(D (P $recoveryMemory 'peak_working_set_bytes') 0.0)/1MB
-                setup_seconds=D (P $recoveryProfile 'preconditioner_setup_seconds') 0.0
-                apply_seconds=D (P $recoveryProfile 'preconditioner_apply_seconds') 0.0
-                matvec_seconds_avg=D (P $recoveryProfile 'matvec_seconds_avg')
-                nnz_blocks=I (P $recoveryProfile 'preconditioner_sparse_nnz_blocks')
-                avg_degree=D (P $recoveryProfile 'preconditioner_sparse_avg_degree')
-                max_degree=I (P $recoveryProfile 'preconditioner_sparse_max_degree')
-                valid_blocks=I (P $recoveryProfile 'preconditioner_valid_blocks')
-                valid_panels=I (P $recoveryProfile 'preconditioner_valid_panels')
-                quality_status=[string](P $recoveryProfile 'preconditioner_quality_status')
-                residual_history=[string](P $recoveryProfile 'residual_history')
-                protocol=$protocol; solver_contract_sha256=$solverContractSha
-                titan_sha256=$titanSha; pqr_sha256=$pqrSha; run_dir=$runDir
+        if ($RecoverVerifiedProfiles) {
+            $recoveryProfilePath = Join-Path $runDir 'pbe_tabi_profile.csv'
+            $recoveryArgPath = Join-Path $runDir 'arg.in'
+            if ((Test-Path -LiteralPath $recoveryProfilePath) -and
+                (Test-Path -LiteralPath $recoveryArgPath) -and
+                (Get-Item -LiteralPath $recoveryProfilePath).LastWriteTimeUtc -ge
+                    (Get-Item -LiteralPath $TitanExe).LastWriteTimeUtc) {
+                $recoveryProfile = @(Import-Csv -LiteralPath $recoveryProfilePath)[-1]
+                $recoveryStatus = [string](P $recoveryProfile 'status' 'failed')
+                $recoveryIterations = I (P $recoveryProfile 'iterations')
+                $recoveryEffective = [string](P $recoveryProfile 'preconditioner_effective' '')
+                $normalizedPqr = $pqr.Replace('\','/')
+                $requiredArgLines = @(
+                    "-pbe-test-pqr=$normalizedPqr",
+                    '-pbe=tabi',
+                    '-pbe-max-iter=720',
+                    '-pbe-rms=0.0001',
+                    '-pbe-dphi=0.0001',
+                    '-nt=4',
+                    '-pbe-tabi-sum=treecode',
+                    '-pbe-tabi-fmm-m2l=single-matvec-analytic',
+                    '-pbe-tabi-surface-points=8',
+                    "-pbe-tabi-primary-surface=$PrimarySurface",
+                    "-pbe-tabi-ses-grid-spacing=$($SesGridSpacing.ToString('G15',$Inv))",
+                    '-pbe-tabi-opening-theta=0.45',
+                    '-pbe-tabi-near-integration=analytic_singular',
+                    '-pbe-tabi-taylor-order=4',
+                    "-pbe-tabi-precond=$($stage.precond)",
+                    "-pbe-tabi-precond-block-panel-cap=$($stage.block)",
+                    "-pbe-tabi-precond-overlap-panel-cap=$($stage.overlap)",
+                    "-pbe-tabi-precond-ilu-neighbor-cap=$($stage.ilu)",
+                    '-pbe-tabi-precond-ilu-drop-tol=0',
+                    "-pbe-tabi-precond-memory-budget-mb=$stageMemoryBudgetMb",
+                    '-pbe-tabi-gmres-restart=128',
+                    '-pbe-tabi-matvec-audit=sampled',
+                    '-pbe-tabi-matvec-audit-sample-count=256'
+                )
+                $argLines = @(Get-Content -LiteralPath $recoveryArgPath)
+                $argMatches = @($requiredArgLines | Where-Object { $argLines -notcontains $_ }).Count -eq 0
+                $profileComplete = $recoveryStatus -in @('ok','failed') -and
+                    $recoveryIterations -gt 0 -and $recoveryIterations -le 720 -and
+                    $recoveryEffective -eq $stage.expected
+                if ($argMatches -and $profileComplete) {
+                    $recoveryMemoryPath = Join-Path $runDir 'pbe_memory_profile.csv'
+                    $recoveryMemory = if (Test-Path -LiteralPath $recoveryMemoryPath) {
+                        @(Import-Csv -LiteralPath $recoveryMemoryPath)[-1]
+                    } else { $null }
+                    $residual = D (P $recoveryProfile 'true_residual_rel' (P $recoveryProfile 'final_residual'))
+                    $audit = D (P $recoveryProfile 'tree_vs_direct_matvec_rel' (P $recoveryProfile 'matvec_audit_rel_rms'))
+                    $finite = (Test-FmmCliFinite $residual) -and (Test-FmmCliFinite $audit)
+                    $failure = if ($recoveryIterations -ge 720 -and $finite) { 'not_converged' } elseif ($recoveryStatus -ne 'ok') { 'runtime_failure' } elseif (-not $finite -or $audit -gt 1e-2) { 'accuracy_gap' } elseif ($residual -gt 1e-4) { 'not_converged' } else { 'pass' }
+                    $old = [pscustomobject]@{
+                        row_id=$rowId; fixture=$fixtureName; protein_name=$fixture.protein_name; pdb_id=$fixture.pdb_id
+                        surface_protocol=$PrimarySurface; ses_grid_spacing_A=$(if($PrimarySurface -in @('grid-ses','analytic-ses')){$SesGridSpacing}else{'NA'})
+                        preconditioner_label=$stage.label; preconditioner_requested=$stage.precond
+                        preconditioner_effective=$recoveryEffective; graph_cap=64; panels=I (P $recoveryProfile 'panels')
+                        status=$recoveryStatus; failure_class=$failure; iterations=$recoveryIterations
+                        true_residual=$residual; final_residual=D (P $recoveryProfile 'final_residual')
+                        audit_rms=$audit; wall_seconds=D (P $recoveryProfile 'total_seconds')
+                        peak_rss_mb=(D (P $recoveryMemory 'peak_working_set_bytes') 0.0)/1MB
+                        setup_seconds=D (P $recoveryProfile 'preconditioner_setup_seconds') 0.0
+                        apply_seconds=D (P $recoveryProfile 'preconditioner_apply_seconds') 0.0
+                        matvec_seconds_avg=D (P $recoveryProfile 'matvec_seconds_avg')
+                        nnz_blocks=I (P $recoveryProfile 'preconditioner_sparse_nnz_blocks')
+                        avg_degree=D (P $recoveryProfile 'preconditioner_sparse_avg_degree')
+                        max_degree=I (P $recoveryProfile 'preconditioner_sparse_max_degree')
+                        valid_blocks=I (P $recoveryProfile 'preconditioner_valid_blocks')
+                        valid_panels=I (P $recoveryProfile 'preconditioner_valid_panels')
+                        quality_status=[string](P $recoveryProfile 'preconditioner_quality_status')
+                        residual_history=[string](P $recoveryProfile 'residual_history')
+                        protocol=$stageProtocol; solver_contract_sha256=$solverContractSha
+                        titan_sha256=$titanSha; pqr_sha256=$pqrSha; run_dir=$runDir
+                    }
+                    Write-Host "recover verified: $rowId"
+                }
             }
-            Write-Host "recover: $rowId"
         }
-        $sameSolver = $null -ne $old -and (
-            [string](P $old 'solver_contract_sha256') -eq $solverContractSha -or
-            ([string](P $old 'solver_contract_sha256') -eq '' -and
-             [string](P $old 'titan_sha256') -eq $titanSha))
-        $same = $sameSolver -and [string](P $old 'pqr_sha256') -eq $pqrSha -and
-            [string](P $old 'protocol') -eq $protocol
+        # A profile without a matrix row has no trustworthy executable/contract
+        # provenance.  Do not recover it from timestamps alone.
+        # Raising the RAS budget does not change a RAS matrix that was already
+        # constructed successfully under the old 256-MiB cap. Reuse only those
+        # exact-effective rows; fallback rows must be rebuilt with the new cap.
+        $oldEffectiveExact = $null -ne $old -and
+            [string](P $old 'preconditioner_effective') -eq [string]$stage.expected
+        $protocolCompatible = $null -ne $old -and (
+            [string](P $old 'protocol') -eq $stageProtocol -or
+            ($isRas -and $oldEffectiveExact -and [string](P $old 'protocol') -eq $protocol)
+        )
+        $same = $null -ne $old -and
+            [string](P $old 'titan_sha256') -eq $titanSha -and
+            [string](P $old 'solver_contract_sha256') -eq $solverContractSha -and
+            [string](P $old 'pqr_sha256') -eq $pqrSha -and
+            $protocolCompatible -and
+            (-not $isRas -or $oldEffectiveExact)
         $rerunStage = $rerunLabels -contains [string]$stage.label
         $reuse = -not $Force -and -not $rerunStage -and $same -and
             (-not $RerunFailed -or [string](P $old 'failure_class') -eq 'pass')
         if ($reuse) {
             Write-Host "resume: $rowId"
             $rows.Add($old)
+            continue
+        }
+        if ($RecoveryOnly) {
+            Write-Host "recovery skip (not verified complete): $rowId"
             continue
         }
         Write-Host "run: $rowId (timeout ${CaseTimeoutSeconds}s)"
@@ -209,7 +272,8 @@ foreach ($fixtureName in $fixtureNames) {
             -OpeningTheta 0.45 -AuditSampleCount 256 -AuditMode sampled `
             -Preconditioner $stage.precond -PreconditionerBlockPanelCap $stage.block `
             -PreconditionerOverlapPanelCap $stage.overlap -PreconditionerIluNeighborCap $stage.ilu `
-            -PreconditionerIluDropTol 0.0 -NearIntegration analytic_singular `
+            -PreconditionerIluDropTol 0.0 -PreconditionerMemoryBudgetMb $stageMemoryBudgetMb `
+            -NearIntegration analytic_singular `
             -TaylorOrder 4 -PrimarySurface $PrimarySurface -SesGridSpacing $SesGridSpacing
         $bare = @(Get-Content -LiteralPath $arg | Where-Object { $_ -match '^-[A-Za-z0-9-]+$' })
         if ($bare.Count -gt 0) { throw "Bare CLI options in $arg" }
@@ -243,9 +307,14 @@ foreach ($fixtureName in $fixtureNames) {
             valid_panels=I (P $profile 'preconditioner_valid_panels')
             quality_status=[string](P $profile 'preconditioner_quality_status')
             residual_history=[string](P $profile 'residual_history')
-            protocol=$protocol; solver_contract_sha256=$solverContractSha
+            protocol=$stageProtocol; solver_contract_sha256=$solverContractSha
             titan_sha256=$titanSha; pqr_sha256=$pqrSha; run_dir=$runDir
         })
+        # Persist every completed case immediately. Long cohort runs may outlive
+        # an interactive shell; the next invocation can then resume only rows
+        # whose executable, solver contract, PQR, and protocol hashes match.
+        @($rows.ToArray() | Sort-Object fixture,preconditioner_label) |
+            Export-Csv -LiteralPath $matrixPath -NoTypeInformation -Encoding UTF8
     }
 }
 $matrix = @($rows.ToArray() | Sort-Object fixture,preconditioner_label)

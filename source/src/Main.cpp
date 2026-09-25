@@ -95,7 +95,16 @@ int main(int argc, char **argv) {
       return engine(Arguments);
     }
   } catch (const std::exception &e) {
-    std::cerr << "Exception caught in main: " << e.what() << std::endl;
+    const std::string &option = titan_cli::active_option_token();
+    if (!option.empty()) {
+      // A std::sto* failure while reading an option value reports only the
+      // function name, which is useless on a long command line.
+      std::cerr << "Exception caught in main while handling '" << option
+                << "': " << e.what()
+                << "\n  Check the value supplied for that option." << std::endl;
+    } else {
+      std::cerr << "Exception caught in main: " << e.what() << std::endl;
+    }
     return 1;
   } catch (...) {
     std::cerr << "Unknown exception caught in main!" << std::endl;

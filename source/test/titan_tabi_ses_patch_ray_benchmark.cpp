@@ -155,7 +155,9 @@ int main(int argc, char **argv) {
                  "self_intersection_audit_ms,sampled_analytic_audit_ms,"
                  "initial_collapse_ms,stable_sliver_ms,post_projection_collapse_ms,"
                  "local_sliver_ms,full_projection_ms,seam_weld_ms,"
-                 "certificate_cleanup_ms,orientation_repair_ms,wide_repair_ms,"
+                 "refused_sliver_repair_ms,"
+                 "certificate_cleanup_ms,orientation_repair_ms,"
+                 "wide_repair_ms,"
                  "projection_index_bytes,repair_scratch_bytes,"
                  "projected_vertices,collapsed_edges,flipped_edges,"
                  "projection_queries,projection_hits,rejected_projection_vertices,"
@@ -187,7 +189,11 @@ int main(int argc, char **argv) {
                  "patch_residual_rms,patch_residual_max,"
                  "normal_angle_rms_deg,normal_angle_max_deg,"
                  "sampled_hausdorff_proxy,analytic_vertex_projection_misses,"
-                 "analytic_vertex_residual_max,analytic_vertex_certificate,"
+                 "analytic_vertex_residual_max,analytic_vertex_refused,"
+                 "analytic_vertex_refused_distance_max,"
+                 "analytic_vertex_refused_for_shape,"
+                 "refused_sliver_collapses,analytic_sheet_bridge_faces,"
+                 "analytic_vertex_certificate,"
                  "analytic_orientation_status,"
                  "analytic_orientation_certified_faces,analytic_orientation_centroid_queries,"
                  "analytic_orientation_uncertified_faces,analytic_inverted_faces,"
@@ -225,7 +231,8 @@ int main(int argc, char **argv) {
               << result.post_projection_collapse_ms << ','
               << result.local_sliver_ms << ','
               << result.full_projection_ms << ',' << result.seam_weld_ms
-              << ',' << result.certificate_cleanup_ms << ','
+              << ',' << result.refused_sliver_repair_ms << ','
+              << result.certificate_cleanup_ms << ','
               << result.orientation_repair_ms << ','
               << result.wide_repair_ms << ','
               << result.projection_index_bytes << ','
@@ -287,6 +294,11 @@ int main(int argc, char **argv) {
               << result.sampled_hausdorff_proxy << ','
               << result.analytic_vertex_projection_misses << ','
               << result.analytic_vertex_residual_max << ','
+              << result.analytic_vertex_refused << ','
+              << result.analytic_vertex_refused_distance_max << ','
+              << result.analytic_vertex_refused_for_shape << ','
+              << result.refused_sliver_collapses << ','
+              << result.analytic_sheet_bridge_faces << ','
               << (result.analytic_vertex_certificate ? 1 : 0) << ','
               << result.analytic_orientation_status << ','
               << result.analytic_orientation_certified_faces << ','

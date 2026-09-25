@@ -1,5 +1,6 @@
 #include "tabi_treecode_internal.h"
 #include "tabi_near.h"
+#include "tabi_node_patch_curved.h"
 
 #include "../titan_executor.h"
 #include "../titan_simd_dispatch.h"
@@ -127,14 +128,14 @@ inline bool accumulate_jcp_leaf_source(
     const double nxny = tnx * snx + tny * sny + tnz * snz;
     const double nxu_nyu = nxu * nyu;
     const double tangent_metric = nxny - nxu_nyu;
-    const double mixed0 = inv_four_pi * inv_r3 * (3.0 * nxu_nyu - nxny);
+    const double mixed0 = inv_four_pi * inv_r3 * (nxny - 3.0 * nxu_nyu);
     const double fprime_k_over_r =
         -expkr * one_plus_kr * inv_four_pi * inv_r3;
     const double fsecond_k =
         expkr * inv_four_pi *
         (kk * kk * inv_r + 2.0 * kk * inv_r2 + 2.0 * inv_r3);
     const double mixedk =
-        fsecond_k * nxu_nyu + fprime_k_over_r * tangent_metric;
+        -fsecond_k * nxu_nyu - fprime_k_over_r * tangent_metric;
     acc.phi += area * ((g0 - gk) * phin_j +
                        (eps_ratio * source_dk - source_d0) * phi_j);
     acc.phin += area * ((target_d0 - inv_eps_ratio * target_dk) * phin_j +
@@ -177,14 +178,14 @@ inline bool accumulate_jcp_leaf_source_channels(
     const double nxny = tnx * snx + tny * sny + tnz * snz;
     const double nxu_nyu = nxu * nyu;
     const double tangent_metric = nxny - nxu_nyu;
-    const double mixed0 = inv_four_pi * inv_r3 * (3.0 * nxu_nyu - nxny);
+    const double mixed0 = inv_four_pi * inv_r3 * (nxny - 3.0 * nxu_nyu);
     const double fprime_k_over_r =
         -expkr * one_plus_kr * inv_four_pi * inv_r3;
     const double fsecond_k =
         expkr * inv_four_pi *
         (kk * kk * inv_r + 2.0 * kk * inv_r2 + 2.0 * inv_r3);
     const double mixedk =
-        fsecond_k * nxu_nyu + fprime_k_over_r * tangent_metric;
+        -fsecond_k * nxu_nyu - fprime_k_over_r * tangent_metric;
     acc.channel[kJcpK1PhiChannel].phi += area * (g0 - gk) * phin_j;
     acc.channel[kJcpK2PhiNormalChannel].phi +=
         area * (eps_ratio * source_dk - source_d0) * phi_j;
@@ -458,8 +459,7 @@ JcpAccum direct_jcp_ordered_tile_sum_avx2(
       const __m256d mixed0 = _mm256_mul_pd(
           inv_four_pi_v,
           _mm256_mul_pd(inv_r3,
-                        _mm256_sub_pd(_mm256_mul_pd(three_v, nxu_nyu),
-                                      nxny)));
+                        _mm256_sub_pd(nxny, _mm256_mul_pd(three_v, nxu_nyu))));
       const __m256d fprime_k_over_r = _mm256_mul_pd(
           neg_one_v,
           _mm256_mul_pd(
@@ -475,9 +475,10 @@ JcpAccum direct_jcp_ordered_tile_sum_avx2(
                                 _mm256_mul_pd(_mm256_mul_pd(two_v, kk_v),
                                               inv_r2)),
                   _mm256_mul_pd(two_v, inv_r3))));
-      const __m256d mixedk = _mm256_add_pd(
-          _mm256_mul_pd(fsecond_k, nxu_nyu),
-          _mm256_mul_pd(fprime_k_over_r, tangent_metric));
+      const __m256d mixedk = _mm256_sub_pd(
+          _mm256_setzero_pd(), _mm256_add_pd(
+              _mm256_mul_pd(fsecond_k, nxu_nyu),
+              _mm256_mul_pd(fprime_k_over_r, tangent_metric)));
       const __m256d phi_term = _mm256_mul_pd(
           area,
           _mm256_add_pd(
@@ -856,8 +857,7 @@ void direct_jcp_target_batch_tile_sum_avx2(
           const __m256d mixed0 = _mm256_mul_pd(
               inv_four_pi_v,
               _mm256_mul_pd(inv_r3,
-                            _mm256_sub_pd(_mm256_mul_pd(three_v, nxu_nyu),
-                                          nxny)));
+                            _mm256_sub_pd(nxny, _mm256_mul_pd(three_v, nxu_nyu))));
           const __m256d fprime_k_over_r = _mm256_mul_pd(
               neg_one_v,
               _mm256_mul_pd(
@@ -873,9 +873,10 @@ void direct_jcp_target_batch_tile_sum_avx2(
                                     _mm256_mul_pd(_mm256_mul_pd(two_v, kk_v),
                                                   inv_r2)),
                       _mm256_mul_pd(two_v, inv_r3))));
-          const __m256d mixedk = _mm256_add_pd(
-              _mm256_mul_pd(fsecond_k, nxu_nyu),
-              _mm256_mul_pd(fprime_k_over_r, tangent_metric));
+          const __m256d mixedk = _mm256_sub_pd(
+              _mm256_setzero_pd(), _mm256_add_pd(
+                  _mm256_mul_pd(fsecond_k, nxu_nyu),
+                  _mm256_mul_pd(fprime_k_over_r, tangent_metric)));
           __m256d phi_term = _mm256_mul_pd(
               area,
               _mm256_add_pd(
@@ -1055,8 +1056,7 @@ void direct_jcp_target_batch_tile_sum_avx2(
         const __m256d mixed0 = _mm256_mul_pd(
             inv_four_pi_v,
             _mm256_mul_pd(inv_r3,
-                          _mm256_sub_pd(_mm256_mul_pd(three_v, nxu_nyu),
-                                        nxny)));
+                          _mm256_sub_pd(nxny, _mm256_mul_pd(three_v, nxu_nyu))));
         const __m256d fprime_k_over_r = _mm256_mul_pd(
             neg_one_v,
             _mm256_mul_pd(
@@ -1072,9 +1072,10 @@ void direct_jcp_target_batch_tile_sum_avx2(
                                   _mm256_mul_pd(_mm256_mul_pd(two_v, kk_v),
                                                 inv_r2)),
                     _mm256_mul_pd(two_v, inv_r3))));
-        const __m256d mixedk = _mm256_add_pd(
-            _mm256_mul_pd(fsecond_k, nxu_nyu),
-            _mm256_mul_pd(fprime_k_over_r, tangent_metric));
+        const __m256d mixedk = _mm256_sub_pd(
+            _mm256_setzero_pd(), _mm256_add_pd(
+                _mm256_mul_pd(fsecond_k, nxu_nyu),
+                _mm256_mul_pd(fprime_k_over_r, tangent_metric)));
         const __m256d phi_term = _mm256_mul_pd(
             area,
             _mm256_add_pd(
@@ -1256,8 +1257,7 @@ void direct_jcp_target_source_tile_sum_avx2_4x4(
       const __m256d mixed0 = _mm256_mul_pd(
           inv_four_pi_v,
           _mm256_mul_pd(inv_r3,
-                        _mm256_sub_pd(_mm256_mul_pd(three_v, nxu_nyu),
-                                      nxny)));
+                        _mm256_sub_pd(nxny, _mm256_mul_pd(three_v, nxu_nyu))));
       const __m256d fprime_k_over_r = _mm256_mul_pd(
           neg_one_v,
           _mm256_mul_pd(_mm256_mul_pd(expkr, one_plus_kr),
@@ -1272,9 +1272,10 @@ void direct_jcp_target_source_tile_sum_avx2_4x4(
                                 _mm256_mul_pd(_mm256_mul_pd(two_v, kk_v),
                                               inv_r2)),
                   _mm256_mul_pd(two_v, inv_r3))));
-      const __m256d mixedk = _mm256_add_pd(
-          _mm256_mul_pd(fsecond_k, nxu_nyu),
-          _mm256_mul_pd(fprime_k_over_r, tangent_metric));
+      const __m256d mixedk = _mm256_sub_pd(
+          _mm256_setzero_pd(), _mm256_add_pd(
+              _mm256_mul_pd(fsecond_k, nxu_nyu),
+              _mm256_mul_pd(fprime_k_over_r, tangent_metric)));
       const __m256d phi_term = _mm256_and_pd(
           _mm256_mul_pd(
               area,
@@ -1519,8 +1520,7 @@ void direct_jcp_target_batch_soa_avx2(
       const __m256d mixed0 = _mm256_mul_pd(
           inv_four_pi_v,
           _mm256_mul_pd(inv_r3,
-                        _mm256_sub_pd(_mm256_mul_pd(three_v, nxu_nyu),
-                                      nxny)));
+                        _mm256_sub_pd(nxny, _mm256_mul_pd(three_v, nxu_nyu))));
       const __m256d fprime_k_over_r = _mm256_mul_pd(
           neg_one_v,
           _mm256_mul_pd(_mm256_mul_pd(expkr, one_plus_kr),
@@ -1535,9 +1535,10 @@ void direct_jcp_target_batch_soa_avx2(
                                 _mm256_mul_pd(_mm256_mul_pd(two_v, kk_v),
                                               inv_r2)),
                   _mm256_mul_pd(two_v, inv_r3))));
-      const __m256d mixedk = _mm256_add_pd(
-          _mm256_mul_pd(fsecond_k, nxu_nyu),
-          _mm256_mul_pd(fprime_k_over_r, tangent_metric));
+      const __m256d mixedk = _mm256_sub_pd(
+          _mm256_setzero_pd(), _mm256_add_pd(
+              _mm256_mul_pd(fsecond_k, nxu_nyu),
+              _mm256_mul_pd(fprime_k_over_r, tangent_metric)));
       const __m256d phi_term = _mm256_and_pd(
           _mm256_mul_pd(
               area,
@@ -1875,7 +1876,7 @@ bool leaf_pair_batch_clean_for_target(const std::vector<Panel> &panels,
     if (source_index >= panels.size())
       return false;
     const Panel &source = panels[source_index];
-    if (is_singular_near_pair(target, target_index, source, source_index) ||
+    if (curved_dual_cell(source) || is_singular_near_pair(target, target_index, source, source_index) ||
         classify_geometric_near_buffer_pair(target, source, tree.quad_buffer)
             .active) {
       return false;

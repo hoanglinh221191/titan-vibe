@@ -6,6 +6,7 @@
 #include <cstdint>
 #include <fstream>
 #include <limits>
+#include <map>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
@@ -99,12 +100,15 @@ struct LLPSPaperConfig {
   int requested_blocks{0}; // 0 = auto
   std::string geometry{"auto"};
   bool fractal_enabled{false};
+  int slab_axis{2}; // reciprocal normal a/b/c, shared with main LLPS phase axis
+  double connectivity_cutoff_angstrom{10.0};
 };
 
 struct LLPSPaperFractalConfig {
   bool enabled{false};
   double min_scale_nm{0.5};
   double max_scale_fraction{0.75};
+  double connectivity_cutoff_angstrom{10.0};
 };
 
 struct LLPSPaperFractalFrame {
@@ -210,6 +214,7 @@ public:
   struct ProfileBin {
     uint64_t samples{0};
     double volume_nm3_sum{0.0};
+    double sampled_upper_nm_sum{0.0};
     double protein_count{0.0};
     double rna_count{0.0};
     double dense_protein_count{0.0};
@@ -250,6 +255,7 @@ private:
   std::vector<ProfileBin> profile_bins_;
   uint64_t skipped_no_dense_{0};
   uint64_t skipped_bad_box_{0};
+  std::map<std::string,uint64_t> geometry_failures_;
   std::string observed_geometry_{"none"};
   LLPSPaperFractalAccumulator fractal_;
 };

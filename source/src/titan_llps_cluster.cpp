@@ -1,6 +1,6 @@
 ﻿// titan_llps_cluster.cpp - DBSCAN Phase Separation Analysis
 #include "titan_llps_cluster.h"
-#include "BoxMatrix.h"
+#include "titan_exact_periodic_box.h"
 #include "MOL.h"
 #include "MOL_info.h"
 #include "box_type.h"
@@ -717,7 +717,7 @@ void TitanLLPSCluster::process_frame(TitanExecutor &executor, const MOL &pro,
                                      bead_is_dense, giant_cluster_id, pro.Box);
   }
 
-  const BoxMatrix bmat(pro.Box);
+  const TitanExactPeriodicBox bmat(pro.Box);
   auto emit_droplet_shape = [&](const DropletShapeFrame &row) {
     if (droplet_shape_streaming_ && droplet_shape_out_.is_open()) {
       droplet_shape_out_ << row.time_ps << "," << row.frame << ","
@@ -764,7 +764,13 @@ void TitanLLPSCluster::process_frame(TitanExecutor &executor, const MOL &pro,
         else
           ++shape_row.rna_nodes;
       }
-      if (!xyz.empty()) {
+      std::vector<std::array<double,3>> lifted;
+      const bool finite_shape=titan_lift_radius_graph(bmat,xyz,eps_,lifted);
+      if(!finite_shape) {
+        shape_row.rg_angstrom=shape_row.asphericity_angstrom2=shape_row.acylindricity_angstrom2=shape_row.relative_shape_anisotropy=shape_row.sphericity_proxy=std::numeric_limits<double>::quiet_NaN();
+      }
+      xyz=std::move(lifted);
+      if (finite_shape && !xyz.empty()) {
         double cx = 0.0;
         double cy = 0.0;
         double cz = 0.0;

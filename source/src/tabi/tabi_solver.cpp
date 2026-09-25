@@ -20,7 +20,10 @@
 #endif
 
 #include "tabi_near.h"
+#include "tabi_charge_resolution.h"
+#include "../titan_ui.h"
 #include "tabi_node_patch.h"
+#include "tabi_node_patch_curved.h"
 
 #include "../aligned_allocator.h"
 #include "../titan_executor.h"
@@ -681,11 +684,19 @@ struct FormulationConfig {
   double boundary_energy_scale{1.0};
 };
 
-double debye_kappa_inv_a(double salt_m, double temp_k) noexcept {
+// kappa^2 = 2 N_A e^2 I / (eps_0 eps_r k_B T), so kappa scales as
+// 1/sqrt(eps_r * T).  The 0.3291 A^-1 M^-1/2 prefactor is water at 298.15 K,
+// which already contains eps_r = 78.5; without the dielectric factor below a
+// run with any other solvent silently kept water's screening length.
+double debye_kappa_inv_a(double salt_m, double temp_k,
+                         double eps_out) noexcept {
   if (salt_m <= 0.0)
     return 0.0;
+  constexpr double kReferenceEpsOut = 78.5;
   const double temp_scale = std::sqrt(298.15 / std::max(1.0, temp_k));
-  return 0.3291 * std::sqrt(salt_m) * temp_scale;
+  const double diel_scale =
+      std::sqrt(kReferenceEpsOut / std::max(1.0e-6, eps_out));
+  return 0.3291 * std::sqrt(salt_m) * temp_scale * diel_scale;
 }
 
 double dot(const std::vector<double> &a, const std::vector<double> &b) {
@@ -3590,6 +3601,22 @@ build_energy_projection_sources(const std::vector<Panel> &panels,
                                 const std::vector<double> &unknowns,
                                 bool coupled) {
   const std::size_t n = panels.size();
+  if (n && curved_dual_cell(panels.front())) {
+    EnergyProjectionSources sources;
+    std::size_t count=0;
+    for(const auto&p:panels) count+=curved_dual_cell(p)->samples.size();
+    sources.x.reserve(count);sources.y.reserve(count);sources.z.reserve(count);
+    sources.nx.reserve(count);sources.ny.reserve(count);sources.nz.reserve(count);
+    sources.area.reserve(count);sources.phi.reserve(count);
+    if(coupled)sources.phin.reserve(count);
+    for(std::size_t j=0;j<n;++j)for(const auto&q:curved_dual_cell(panels[j])->samples){
+      sources.x.push_back(q.xyz[0]);sources.y.push_back(q.xyz[1]);sources.z.push_back(q.xyz[2]);
+      sources.nx.push_back(q.normal[0]);sources.ny.push_back(q.normal[1]);sources.nz.push_back(q.normal[2]);
+      sources.area.push_back(q.weight);sources.phi.push_back(unknowns[j]);
+      if(coupled)sources.phin.push_back(unknowns[n+j]);
+    }
+    return sources;
+  }
   EnergyProjectionSources sources;
   sources.x.resize(n);
   sources.y.resize(n);
@@ -4284,13 +4311,176 @@ static Result solve_linear_pb_single_attempt(const std::vector<Atom> &atoms,
   progress.write("surface_start", result, nullptr, 0, 0, 0, 0.0, "running",
                  true);
   std::vector<Panel> panels = build_surface(atoms, options, &result, &executor);
+  // The `current` analytic-SES engine takes its inside/outside sign from a
+  // 26-direction sampling of the probe ball.  That sampling does not refine
+  // with the grid, so the mesh converges to the sampled closing rather than
+  // to the SES, and no vertex is ever checked against the analytic patches.
+  // Measured on an isolated 1.7 A sphere with probe 1.4 A: vertices sit up to
+  // 0.086 A outside the surface at every spacing from 0.75 A down to
+  // 0.094 A, while the area error grows from -1.5% to +7.2%.  The engine is
+  // kept because it is what published TITAN runs used, and its status is a
+  // closed-mesh check only, so nothing else in the output says this.
+  if (options.primary_surface == "analytic-ses" &&
+      result.surface_analytic_ses_engine == "current") {
+    TitanUI::print_warning(
+        "TABI analytic-ses engine 'current': vertices are not certified"
+        " against the analytic SES.  Its sign comes from a 26-direction"
+        " sampling of the probe ball, whose boundary lies outside the true"
+        " surface between sample directions by up to 0.09 A at probe 1.4 A,"
+        " and refining -pbe-bie-ses-grid-spacing does not reduce it (measured"
+        " 8.3e-2, 8.1e-2, 8.6e-2, 8.6e-2 A at h=0.75, 0.375, 0.1875,"
+        " 0.09375 on a one-atom sphere, with area error -1.5% to +7.2%)."
+        "  Energies can still improve with h through error cancellation."
+        "  Use -pbe-bie-analytic-ses-engine=patch-ray-experimental for a"
+        " surface whose vertices are certified on the analytic patches,"
+        " or current-dense for the same engine at a finer angular"
+        " resolution; keep 'current' only to reproduce earlier runs.");
+  }
+  // current-dense samples 98 directions rather than 26.  That is a finer
+  // angular resolution and not a finer grid, so it lowers the floor by about
+  // four and does not remove it, and no vertex is certified either way.
+  if (options.primary_surface == "analytic-ses" &&
+      result.surface_analytic_ses_engine == "current-dense") {
+    TitanUI::print_warning(
+        "TABI analytic-ses engine 'current-dense': vertices are not certified"
+        " against the analytic SES.  Its sign comes from a 98-direction"
+        " sampling of the probe ball, which lowers the sampling error rather"
+        " than removing it: the boundary still lies outside the true surface"
+        " between sample directions, and refining -pbe-bie-ses-grid-spacing"
+        " does not reduce that part (measured mean radial error 4.9e-3 and"
+        " 6.7e-3 A at h=0.3 and 0.15 on a one-atom sphere, against 2.3e-2"
+        " and 2.5e-2 for 'current').  At h=0.6 and coarser the grid dominates"
+        " and the two are comparable.  Use"
+        " -pbe-bie-analytic-ses-engine=patch-ray-experimental for a surface"
+        " whose vertices are certified on the analytic patches, and 'current'"
+        " to reproduce earlier runs.");
+  }
+  // The convergence estimator, the far-expansion audit and the accepted-miss
+  // diagnostics are called from one of the two far-field traversals in
+  // tabi_treecode_operator.cpp, the one that reports interaction_mode
+  // "onthefly".  The cached traversal carries none of them, and analytical
+  // FMM/M2L does not send the far field through either.  Asking for those
+  // audits in any other configuration is not an error and changes no answer,
+  // but every counter they publish comes back zero -- which reads exactly
+  // like "the far field is fine".  Say so instead of leaving it silent.
+  {
+    const auto requested = [](const std::string &mode) {
+      return !mode.empty() && mode != "off";
+    };
+    const bool wants_instrumented_far =
+        requested(options.expansion_audit) ||
+        requested(options.convergence_audit) ||
+        requested(options.accepted_miss_diagnostics) ||
+        requested(options.convergence_overreject_audit) ||
+        options.convergence_estimator == "moment-tail" ||
+        options.convergence_estimator == "hybrid";
+    if (wants_instrumented_far) {
+      const bool analytic_m2l = options.fmm_m2l == "single-matvec-analytic";
+      const bool cached_traversal = options.interaction_mode != "onthefly";
+      if (analytic_m2l || cached_traversal) {
+        std::ostringstream message;
+        message
+            << "TABI far-field audits were requested but cannot observe this"
+               " configuration, so their counters will read zero rather than"
+               " clean.  ";
+        if (analytic_m2l)
+          message << "Analytical FMM/M2L carries the far field outside the"
+                     " instrumented traversal, so it sees no far"
+                     " interactions at all; add -pbe-bie-fmm-m2l=off after"
+                     " -pbe-bie-fast-operator to route through the treecode.";
+        if (analytic_m2l && cached_traversal)
+          message << "  ";
+        if (cached_traversal)
+          message << "The cached interaction traversal carries none of these"
+                     " audits; add -pbe-bie-interaction-mode=onthefly.  Note"
+                     " that this measures the on-the-fly traversal, which is"
+                     " not the default one.";
+        TitanUI::print_warning(message.str());
+      }
+    }
+  }
+  result.charge_resolution = diagnose_charge_resolution(atoms, panels, options);
+  if (result.charge_resolution.min_ratio >= 0.0) {
+    std::ostringstream message;
+    message << std::setprecision(5) << "TABI charge/mesh min d/h="
+            << result.charge_resolution.min_ratio
+            << " (retained curved panels; h=max edge; heuristic)";
+    if (result.charge_resolution.warning)
+      TitanUI::print_warning(message.str() +
+          " < 1.5: check local resolution and energy convergence.");
+    else
+      TitanUI::print_info(message.str() + "; no resolution flag, not an accuracy certificate.");
+  }
   std::size_t node_patch_topology_bytes = 0;
   if (node_patch_discretization) {
     if (options.surface_geometry != "triangle")
       throw std::runtime_error(
           "PBE BIE: node-patch discretization requires "
           "-pbe-bie-geometry=triangle.");
-    panels = build_node_patch_panels(panels, options.diagonal_mode);
+    auto parent_panels = std::move(panels);
+    panels = build_node_patch_panels(parent_panels, options.diagonal_mode);
+    // A node-patch cell is the barycentric dual of a vertex, which is well
+    // defined for an interior vertex of a closed mesh.  A closed triangulation
+    // has V/F = 0.5; every open patch boundary pushes the ratio up, and those
+    // boundary vertices get cells that do not close.  Test the measured ratio
+    // rather than the surface name: an isolated sphere built by sphere-patch
+    // is closed and works, while the same builder on a 43-atom ligand at 24
+    // points gave 6345 nodes to 5162 triangles, V/F 1.229, where GMRES
+    // stalled near residual 0.3 and centroid reached 1.8e-11 on the same
+    // input.  node-patch on a watertight grid-ses reached 1.9e-10 there in
+    // half the unknowns.
+    if (!parent_panels.empty()) {
+      const double vertex_face_ratio =
+          static_cast<double>(panels.size()) /
+          static_cast<double>(parent_panels.size());
+      if (vertex_face_ratio > 0.6) {
+        std::ostringstream message;
+        message << std::setprecision(4)
+                << "TABI node-patch on a surface that is not closed: "
+                << panels.size() << " nodes to " << parent_panels.size()
+                << " triangles, V/F=" << vertex_face_ratio
+                << " where a closed mesh gives 0.5.  The excess is dual cells"
+                   " on patch boundaries, which do not close; on a 43-atom"
+                   " test this stalled GMRES near residual 0.3 where centroid"
+                   " converged.  Prefer a watertight surface"
+                   " (-pbe-bie-primary-surface grid-ses or analytic-ses with a"
+                   " positive -pbe-probe) for node-patch, or"
+                   " -pbe-bie-discretization centroid on this one.  They are"
+                   " different surfaces, not two routes to one answer.";
+        TitanUI::print_warning(message.str());
+      }
+    }
+    const auto curved_begin=std::chrono::steady_clock::now();
+    const bool curved=prepare_curved_node_patches(parent_panels,panels,
+      std::max(1e-12,options.eps_out)/std::max(1e-12,options.eps_in),
+      debye_kappa_inv_a(options.salt_m,options.temperature_k,options.eps_out),
+      options.surface_only?0u:static_cast<std::size_t>(
+        std::max(0,options.curved_pair_cache_mb))*1024u*1024u,executor,options.sum_mode!="treecode");
+    result.node_patch_representation=
+        curved && !panels.empty() && panels.front().node_patch_geometry &&
+                panels.front().node_patch_geometry->curved
+            ? panels.front().node_patch_geometry->curved->representation
+            : std::string("flat_legacy");
+    if(curved){
+      if(!options.surface_only && options.fmm_m2l!="off")
+        throw std::runtime_error("curved_node_patch_requires_direct_or_classic_treecode");
+      result.surface_mesh_ms+=elapsed_ms(curved_begin,std::chrono::steady_clock::now());
+      result.surface_area_a2=std::accumulate(panels.begin(),panels.end(),0.0,[](double a,const Panel&p){return a+p.area;});
+    } else if(!options.surface_only) {
+      // A curved dual cell is normally always available: exact spherical
+      // parents on sphere-patch/vdW, and a PN-triangle lift from vertices and
+      // node normals on any other closed mesh.  Reaching this branch means the
+      // lift was refused - unusable node normals, or TITAN_CURVED_NODE_PATCH
+      // set to off - and the flat model is first order where the curved one is
+      // second, so say so rather than leave it to a policy field.
+      TitanUI::print_warning(
+          "TABI node-patch on surface '" + options.primary_surface + "' (" +
+          options.surface_mode + "): the curved dual cell was not built "
+          "(node normals unusable, or TITAN_CURVED_NODE_PATCH=off), so the "
+          "flat legacy cell is used.  It converges one order slower than "
+          "either curved representation.  Reported as "
+          "node_patch_representation=flat_legacy.");
+    }
     if (!panels.empty() && panels.front().node_patch_geometry != nullptr) {
       const NodePatchGeometry &geometry = *panels.front().node_patch_geometry;
       node_patch_topology_bytes =
@@ -4303,6 +4493,7 @@ static Result solve_linear_pb_single_attempt(const std::vector<Atom> &atoms,
            geometry.adjacent_nodes.size()) *
               sizeof(std::size_t);
       result.solid_angle_fallbacks = geometry.solid_angle_fallbacks;
+      result.solid_angle_clamps += geometry.solid_angle_clamps;
       result.diag_min = std::numeric_limits<double>::infinity();
       result.diag_max = -std::numeric_limits<double>::infinity();
       for (const Panel &panel : panels) {
@@ -4352,7 +4543,8 @@ static Result solve_linear_pb_single_attempt(const std::vector<Atom> &atoms,
     result.quad_buffer_auto_candidate = "off";
   result.memory_bytes =
       panels.size() * sizeof(Panel) + panels.size() * sizeof(double) * 8 +
-      node_patch_topology_bytes;
+      node_patch_topology_bytes + sphere_patch_quadrature_storage_bytes(panels) +
+      curved_node_storage_bytes(panels);
 
   if (options.surface_only) {
     result.surface_only = true;
@@ -4388,7 +4580,8 @@ static Result solve_linear_pb_single_attempt(const std::vector<Atom> &atoms,
     return result;
   }
 
-  const double kappa = debye_kappa_inv_a(options.salt_m, options.temperature_k);
+  const double kappa = debye_kappa_inv_a(options.salt_m, options.temperature_k,
+                                        options.eps_out);
   const double contrast = (options.eps_out - options.eps_in) /
                           std::max(1.0e-12, options.eps_out + options.eps_in);
   const double operator_contrast =
@@ -5966,8 +6159,12 @@ static Result solve_linear_pb_single_attempt(const std::vector<Atom> &atoms,
         options.fmm_cartesian_error_audit == "channel-shadow";
     std::vector<std::size_t> cartesian_channel_shadow_targets;
     std::uint64_t cartesian_channel_shadow_target_hash = 0;
+    // Order 1 or 4: see the note beside the matching CLI guard.  The audit
+    // is order agnostic and order 4 is needed as the matched control.
     if (cartesian_channel_shadow_requested &&
-        !(cartesian_full_gmres && options.bie_fmm_cartesian_order == 1 &&
+        !(cartesian_full_gmres &&
+          (options.bie_fmm_cartesian_order == 1 ||
+           options.bie_fmm_cartesian_order == 4) &&
           node_patch_discretization && coupled &&
           options.node_patch_operator_audit == "on")) {
       throw std::logic_error(

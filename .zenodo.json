@@ -1,6 +1,6 @@
 {
   "title": "TITAN-VIBE: Virtual Intact Block Extraction for periodic reconstruction",
-  "description": "TITAN-VIBE 1.0.2 adds a runnable Windows x86-64 executable, complete buildable TITAN host source with HoloLift omitted, and replay drivers for the deposited VIBE inputs. VIBE algorithms are unchanged from v1.0.1. Distribution version 1.0.2 is separate from the embedded frozen TITAN host build identity. Release checks and input/output provenance are included.",
+  "description": "TITAN-VIBE 1.0.3: faster framewise reconstruction; candidates are checked in the lattice gauge that placed them; frame status, warm start and rescue paths follow the contact assessment of the selected placement; optional evidence-relation export. Includes a Windows x86-64 executable, the buildable TITAN host source with HoloLift omitted, the focused VIBE library, and replay drivers. Every option of 1.0.2 is kept. Release checks and input/output provenance are included.",
   "license": "MIT",
   "upload_type": "software",
   "creators": [
@@ -27,6 +27,6 @@
     "molecular reconstruction",
     "uncertainty"
   ],
-  "version": "1.0.2",
-  "publication_date": "2026-09-12"
+  "version": "1.0.3",
+  "publication_date": "2026-09-25"
 }

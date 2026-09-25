@@ -1,6 +1,6 @@
 ﻿// Split from titan_llps_cluster.cpp. Keep TITAN_LLPS public behavior unchanged.
 #include "titan_llps_cluster.h"
-#include "BoxMatrix.h"
+#include "titan_exact_periodic_box.h"
 #include "MOL.h"
 #include "MOL_info.h"
 #include "box_type.h"
@@ -59,16 +59,17 @@ void TitanLLPSCluster::run_dbscan(TitanExecutor &executor,
                                   const box &Box) {
   if (nodes.empty())
     return;
-  const double bx = Box.get_a();
-  const double by = Box.get_b();
-  const double bz = Box.get_c();
-  if (bx <= 0.0 || by <= 0.0 || bz <= 0.0)
-    return;
-
-  const BoxMatrix bmat(Box);
-  const int nx = std::max(1, static_cast<int>(bx / eps_));
-  const int ny = std::max(1, static_cast<int>(by / eps_));
-  const int nz = std::max(1, static_cast<int>(bz / eps_));
+  if(!std::isfinite(eps_) || eps_<=0 || min_pts_<1)
+    throw std::invalid_argument("DBSCAN requires a positive finite radius and min_pts >= 1");
+  for(const auto& node:nodes)if(!std::isfinite(node.x)||!std::isfinite(node.y)||!std::isfinite(node.z))
+    throw std::invalid_argument("DBSCAN coordinates must be finite");
+  const TitanExactPeriodicBox bmat(Box);
+  const double bx=bmat.heights[0],by=bmat.heights[1],bz=bmat.heights[2];
+  // Larger candidate cells are conservative. Bound the dense grid independently
+  // of a nearly empty but very large simulation cell.
+  const int limit=std::clamp(int(std::ceil(std::cbrt(double(nodes.size())*8))),1,256);
+  const auto count=[&](double height){return int(std::clamp(std::floor(height/eps_),1.0,double(limit)));};
+  const int nx=count(bx),ny=count(by),nz=count(bz);
   const double cx = bx / nx;
   const double cy = by / ny;
   const double cz = bz / nz;
@@ -80,6 +81,7 @@ void TitanLLPSCluster::run_dbscan(TitanExecutor &executor,
   neighbor_count_.assign(nodes.size(), 0);
 
   auto cell_of = [&](double x, double y, double z) {
+    bmat.grid_coordinate(x,y,z);
     int ix = static_cast<int>(std::floor(x / cx));
     int iy = static_cast<int>(std::floor(y / cy));
     int iz = static_cast<int>(std::floor(z / cz));
@@ -148,8 +150,8 @@ void TitanLLPSCluster::run_dbscan(TitanExecutor &executor,
   const std::size_t workers = std::max<std::size_t>(
       1, std::min<std::size_t>(executor.capacity(), nodes.size()));
   executor.parallel_for(nodes.size(), workers, min_grain,
-                        [&](std::size_t begin, std::size_t end,
-                            std::size_t /*worker*/) {
+                        [&](std::size_t /*worker*/, std::size_t begin,
+                            std::size_t end) {
                           for (std::size_t i = begin; i < end; ++i) {
                             int count = 0;
                             enumerate_neighbors(static_cast<int>(i),
@@ -203,7 +205,7 @@ void TitanLLPSCluster::fuzzy_refine(TitanExecutor &executor,
   if (N == 0)
     return;
 
-  const BoxMatrix bmat(Box);
+  const TitanExactPeriodicBox bmat(Box);
   int max_cid = 0;
   for (const auto &n : nodes)
     if (n.cluster_id > max_cid)
@@ -334,7 +336,7 @@ void TitanLLPSCluster::fuzzy_refine(TitanExecutor &executor,
   for (int iter = 0; iter < max_iter; ++iter) {
     executor.parallel_for(
         static_cast<std::size_t>(N), fuzzy_workers, 96,
-        [&](std::size_t begin, std::size_t end, std::size_t /*worker*/) {
+        [&](std::size_t /*worker*/, std::size_t begin, std::size_t end) {
           for (std::size_t ii = begin; ii < end; ++ii) {
             const int i = static_cast<int>(ii);
             double sum_raw = 0.0;

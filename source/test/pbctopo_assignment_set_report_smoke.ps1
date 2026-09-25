@@ -201,11 +201,23 @@ int main() {
   std::ostringstream sole_out;
   write_pbctopo_assignment_set_rows(
       sole_out, 13, 8.0, sole_candidate, &sole_candidate[0],
-      exhaustive_unique, {1.0, 0.1, 0.2, 2.0, 0.3, 3.0}, better);
+      exhaustive_unique, {1.0, 0.1, 0.2, 2.0, 0.3, 3.0}, better,
+      0, 0, 0, 0, PbctopoFrameStatus::Certified);
   expect(sole_out.str().find(
              ",13,8,1,1,retained_certified_band,strong_bounded_anchor,1,1,1,1") !=
              std::string::npos,
-         "complete unique selected optimum was not a bounded strong anchor");
+          "complete unique selected optimum was not a bounded strong anchor");
+  std::ostringstream weak_sole_out;
+  write_pbctopo_assignment_set_rows(
+      weak_sole_out, 17, 12.0, sole_candidate, &sole_candidate[0],
+      exhaustive_unique, {1.0, 0.1, 0.2, 2.0, 0.3, 3.0}, better,
+      0, 0, 0, 0, PbctopoFrameStatus::WeakObservation);
+  expect(weak_sole_out.str().find("strong_bounded_anchor") ==
+                 std::string::npos &&
+             weak_sole_out.str().find(
+                 ",17,12,1,1,retained_certified_band,ambiguous_anchor,1,1,1,1") !=
+                 std::string::npos,
+         "weak route was promoted to a bounded strong anchor");
 
   auto global_candidate = sole_candidate;
   global_candidate[0].bounded_domain_only = false;

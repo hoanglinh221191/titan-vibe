@@ -239,7 +239,10 @@ build_node_patch_panels(const std::vector<Panel> &triangle_panels,
       const double diagonal = solid_angle / two_pi;
       if (std::isfinite(diagonal) && diagonal >= 0.10 && diagonal <= 2.50) {
         patch.solid_angle = solid_angle;
-        patch.diagonal = std::clamp(diagonal, 0.25, 1.75);
+        const double clamped = std::clamp(diagonal, 0.25, 1.75);
+        if (clamped != diagonal)
+          ++geometry->solid_angle_clamps;
+        patch.diagonal = clamped;
       } else
         ++geometry->solid_angle_fallbacks;
     }

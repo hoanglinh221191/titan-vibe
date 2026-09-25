@@ -67,27 +67,9 @@ std::pair<int, int> TitanLLPS::unpack_pair(uint64_t key) {
 
 float TitanLLPS::pbc_dist2(float dx, float dy, float dz, float bx, float by,
                            float bz) {
-  if (bx > 0) {
-    const float half = bx * 0.5f;
-    if (dx > half)
-      dx -= bx;
-    else if (dx < -half)
-      dx += bx;
-  }
-  if (by > 0) {
-    const float half = by * 0.5f;
-    if (dy > half)
-      dy -= by;
-    else if (dy < -half)
-      dy += by;
-  }
-  if (bz > 0) {
-    const float half = bz * 0.5f;
-    if (dz > half)
-      dz -= bz;
-    else if (dz < -half)
-      dz += bz;
-  }
+  if (bx > 0) dx -= bx * std::round(dx / bx);
+  if (by > 0) dy -= by * std::round(dy / by);
+  if (bz > 0) dz -= bz * std::round(dz / bz);
   return dx * dx + dy * dy + dz * dz;
 }
 
@@ -140,7 +122,8 @@ void TitanLLPS::build_contacts(
   float shift_x = 0.0f;
   float shift_y = 0.0f;
   float shift_z = 0.0f;
-  const bool periodic = (bx > 0.0f && by > 0.0f && bz > 0.0f);
+  const bool periodic = cell_.metric.has_value() || (bx > 0.0f && by > 0.0f && bz > 0.0f);
+  if(cell_.metric) {Lx=cell_.heights[0];Ly=cell_.heights[1];Lz=cell_.heights[2];}
   if (!periodic) {
     float xmin = std::numeric_limits<float>::max();
     float ymin = std::numeric_limits<float>::max();
@@ -182,6 +165,7 @@ void TitanLLPS::build_contacts(
     x = static_cast<double>(pos_nm[3 * atom + 0]);
     y = static_cast<double>(pos_nm[3 * atom + 1]);
     z = static_cast<double>(pos_nm[3 * atom + 2]);
+    cell_.grid_coordinate(x,y,z);
   };
 
   ++cur_gen_;
@@ -196,7 +180,7 @@ void TitanLLPS::build_contacts(
         if (mi < 0 || mj < 0)
           return;
 
-        const float d2 = pbc_dist2(
+        const double d2 = frame_dist2(
             pos_nm[3 * a + 0] - pos_nm[3 * b + 0],
             pos_nm[3 * a + 1] - pos_nm[3 * b + 1],
             pos_nm[3 * a + 2] - pos_nm[3 * b + 2], periodic ? bx : 0.0f,
@@ -312,7 +296,8 @@ void TitanLLPS::build_protein_rna_contacts(
   float shift_x = 0.0f;
   float shift_y = 0.0f;
   float shift_z = 0.0f;
-  const bool periodic = (bx > 0.0f && by > 0.0f && bz > 0.0f);
+  const bool periodic = cell_.metric.has_value() || (bx > 0.0f && by > 0.0f && bz > 0.0f);
+  if(cell_.metric) {Lx=cell_.heights[0];Ly=cell_.heights[1];Lz=cell_.heights[2];}
   if (!periodic) {
     float xmin = std::numeric_limits<float>::max();
     float ymin = std::numeric_limits<float>::max();
@@ -364,12 +349,14 @@ void TitanLLPS::build_protein_rna_contacts(
       x = static_cast<double>(pos_nm[3 * atom + 0]);
       y = static_cast<double>(pos_nm[3 * atom + 1]);
       z = static_cast<double>(pos_nm[3 * atom + 2]);
+      cell_.grid_coordinate(x,y,z);
       return;
     }
     const int rna_atom = static_cast<int>(idx - sticker_count);
     x = static_cast<double>(rna_nm_data[3 * rna_atom + 0]);
     y = static_cast<double>(rna_nm_data[3 * rna_atom + 1]);
     z = static_cast<double>(rna_nm_data[3 * rna_atom + 2]);
+    cell_.grid_coordinate(x,y,z);
   };
 
   prna_grid_.for_each_pair(
@@ -396,7 +383,7 @@ void TitanLLPS::build_protein_rna_contacts(
         const float rx = rna_nm_data[3 * rna_atom + 0];
         const float ry = rna_nm_data[3 * rna_atom + 1];
         const float rz = rna_nm_data[3 * rna_atom + 2];
-        const float d2 = pbc_dist2(px - rx, py - ry, pz - rz,
+        const double d2 = frame_dist2(px - rx, py - ry, pz - rz,
                                    periodic ? bx : 0.0f, periodic ? by : 0.0f,
                                    periodic ? bz : 0.0f);
         if (d2 >= prna_cutoff2_nm_)
@@ -448,40 +435,36 @@ void TitanLLPS::build_protein_rna_contacts(
 float TitanLLPS::compute_gcc_rg(const std::vector<float> &pos_nm, float bx,
                                 float by, float bz,
                                 const std::vector<int> &gcc_macros) const {
-  if (gcc_macros.empty())
-    return 0.0f;
-  const int ref = bb_atom_[gcc_macros.front()];
-  if (ref < 0)
-    return 0.0f;
-  const float rx = pos_nm[3 * ref + 0];
-  const float ry = pos_nm[3 * ref + 1];
-  const float rz = pos_nm[3 * ref + 2];
-  gcc_rg_x_buf_.resize(gcc_macros.size());
-  gcc_rg_y_buf_.resize(gcc_macros.size());
-  gcc_rg_z_buf_.resize(gcc_macros.size());
-
-  std::size_t count = 0;
-  for (int macro : gcc_macros) {
-    const int atom = bb_atom_[macro];
-    if (atom < 0)
-      continue;
-    float dx = pos_nm[3 * atom + 0] - rx;
-    float dy = pos_nm[3 * atom + 1] - ry;
-    float dz = pos_nm[3 * atom + 2] - rz;
-    if (bx > 0)
-      dx -= bx * std::round(dx / bx);
-    if (by > 0)
-      dy -= by * std::round(dy / by);
-    if (bz > 0)
-      dz -= bz * std::round(dz / bz);
-    gcc_rg_x_buf_[count] = static_cast<double>(rx + dx);
-    gcc_rg_y_buf_[count] = static_cast<double>(ry + dy);
-    gcc_rg_z_buf_[count] = static_cast<double>(rz + dz);
-    ++count;
+  (void)bx; (void)by; (void)bz;
+  using titan_llps_geometry::Point;
+  gcc_center_.reset();
+  const auto nan=std::numeric_limits<float>::quiet_NaN();
+  if(gcc_macros.empty()) return nan;
+  std::vector<Point> lifted(n_macro_);
+  std::vector<bool> visited(n_macro_,false),member(n_macro_,false);
+  std::vector<std::vector<int>> edges(n_macro_);
+  for(int m:gcc_macros) {if(bb_atom_[m]<0) return nan;member[m]=true;}
+  for(auto key:macro_contact_keys_buf_) {
+    auto [a,b]=unpack_pair(key);
+    if(member[a] && member[b]) {edges[a].push_back(b);edges[b].push_back(a);}
   }
-  if (count == 0)
-    return 0.0f;
-  const titan_gyration::PointStats stats = titan_gyration::build_point_stats_soa(
-      gcc_rg_x_buf_.data(), gcc_rg_y_buf_.data(), gcc_rg_z_buf_.data(), count);
-  return static_cast<float>(titan_gyration::compute_rg_from_stats(stats));
+  const int root=gcc_macros.front(), atom=bb_atom_[root];
+  lifted[root]={pos_nm[3*atom],pos_nm[3*atom+1],pos_nm[3*atom+2]};
+  std::vector<int> queue{root};visited[root]=true;
+  for(std::size_t q=0;q<queue.size();++q) {
+    int a=queue[q];
+    for(int b:edges[a]) {
+      Point d{};for(int k=0;k<3;++k)d[k]=double(pos_nm[3*bb_atom_[b]+k])-pos_nm[3*bb_atom_[a]+k];
+      bool ambiguous=false;d=cell_.delta(d,&ambiguous);
+      if(ambiguous) return nan;
+      Point candidate{};for(int k=0;k<3;++k) candidate[k]=lifted[a][k]+d[k];
+      if(!visited[b]) {lifted[b]=candidate;visited[b]=true;queue.push_back(b);}
+      else for(int k=0;k<3;++k) if(std::abs(lifted[b][k]-candidate[k])>1e-5) return nan; // winding representative graph
+    }
+  }
+  if(queue.size()!=gcc_macros.size()) return nan;
+  Point center{};for(int m:gcc_macros)for(int k=0;k<3;++k)center[k]+=lifted[m][k]/gcc_macros.size();
+  double r2=0;for(int m:gcc_macros)for(int k=0;k<3;++k)r2+=std::pow(lifted[m][k]-center[k],2);
+  gcc_center_=center;
+  return std::sqrt(r2/gcc_macros.size());
 }

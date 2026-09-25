@@ -1,14 +1,15 @@
 #ifndef TITAN_PBCTOPO_IDENTIFIABILITY_H
 #define TITAN_PBCTOPO_IDENTIFIABILITY_H
 
-#include "types.h"
+#include "evidence_support_policy.h"
 
 #include <cstddef>
 #include <span>
 
 namespace titan_pbctopo {
 
-inline constexpr double kPbctopoEvidenceMinConfidence = 0.05;
+inline constexpr double kPbctopoEvidenceMinConfidence =
+    PBCTOPO_SCORED_PAIR_SUPPORT_THRESHOLD;
 
 // Hard feasibility only proves that an image assignment is internally
 // consistent and nonclashing.  Relative component images may bypass the

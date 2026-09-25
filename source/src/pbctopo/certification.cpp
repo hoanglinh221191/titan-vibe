@@ -479,40 +479,83 @@ PbctopoStericAudit evaluate_pbctopo_sterics_impl(
   result.termination_reason =
       PbctopoStericTerminationReason::NumericalFailure;
   const double inv_grid = 1.0 / grid_cutoff;
-  std::unordered_map<PbctopoStericCellKey, std::vector<std::size_t>,
-                     PbctopoStericCellKeyHash>
-      grid;
-  grid.reserve(std::max<std::size_t>(64, atoms.size() / 2));
-
-  for (std::size_t atom_idx = 0; atom_idx < atoms.size(); ++atom_idx) {
+  const double cell_min =
+      static_cast<double>(std::numeric_limits<std::int64_t>::min() + 1);
+  const double cell_max =
+      static_cast<double>(std::numeric_limits<std::int64_t>::max() - 1);
+  auto atom_cell = [&](std::size_t atom_idx, PbctopoStericCellKey &cell) {
     const Vec3 &point = placed_points[atom_idx];
     if (!point_is_finite(point))
-      return result;
+      return false;
     const double cell_x = std::floor(point.x * inv_grid);
     const double cell_y = std::floor(point.y * inv_grid);
     const double cell_z = std::floor(point.z * inv_grid);
-    const double cell_min = static_cast<double>(
-        std::numeric_limits<std::int64_t>::min() + 1);
-    const double cell_max = static_cast<double>(
-        std::numeric_limits<std::int64_t>::max() - 1);
     if (cell_x < cell_min || cell_x > cell_max || cell_y < cell_min ||
         cell_y > cell_max || cell_z < cell_min || cell_z > cell_max) {
-      return result;
+      return false;
     }
-    const std::int64_t cx = static_cast<std::int64_t>(cell_x);
-    const std::int64_t cy = static_cast<std::int64_t>(cell_y);
-    const std::int64_t cz = static_cast<std::int64_t>(cell_z);
+    cell = {static_cast<std::int64_t>(cell_x),
+            static_cast<std::int64_t>(cell_y),
+            static_cast<std::int64_t>(cell_z)};
+    return true;
+  };
+
+  // The scan visits, for each atom in index order, the earlier atoms of the
+  // 27 cells around it: cells in (dx, dy, dz) order, atoms of a cell in
+  // index order.  That order decides ties of the running minima and which
+  // clash ends the scan, so it is kept exactly.  Instead of a hash grid
+  // filled as the scan goes (27 lookups and a push per atom), the atoms are
+  // sorted once by (cell, index): the three cells along z around a given
+  // (x, y) are then one contiguous run, found by one binary search, already
+  // in dz order and index order.  An atom whose point or cell is invalid
+  // stops the scan when it is reached, so it and every later atom are left
+  // out of the index; nothing before it could meet them.
+  struct CellEntry {
+    std::int64_t x;
+    std::int64_t y;
+    std::int64_t z;
+    std::size_t atom;
+  };
+  const auto entry_less = [](const CellEntry &lhs, const CellEntry &rhs) {
+    if (lhs.x != rhs.x)
+      return lhs.x < rhs.x;
+    if (lhs.y != rhs.y)
+      return lhs.y < rhs.y;
+    if (lhs.z != rhs.z)
+      return lhs.z < rhs.z;
+    return lhs.atom < rhs.atom;
+  };
+  thread_local std::vector<CellEntry> sorted_cells;
+  sorted_cells.clear();
+  sorted_cells.reserve(atoms.size());
+  for (std::size_t atom_idx = 0; atom_idx < atoms.size(); ++atom_idx) {
+    PbctopoStericCellKey cell;
+    if (!atom_cell(atom_idx, cell))
+      break;
+    sorted_cells.push_back({cell.x, cell.y, cell.z, atom_idx});
+  }
+  std::sort(sorted_cells.begin(), sorted_cells.end(), entry_less);
+
+  for (std::size_t atom_idx = 0; atom_idx < atoms.size(); ++atom_idx) {
+    const Vec3 &point = placed_points[atom_idx];
+    PbctopoStericCellKey cell;
+    if (!atom_cell(atom_idx, cell))
+      return result;
+    const std::int64_t cx = cell.x;
+    const std::int64_t cy = cell.y;
+    const std::int64_t cz = cell.z;
     for (int dx = -1; dx <= 1; ++dx) {
       for (int dy = -1; dy <= 1; ++dy) {
-        for (int dz = -1; dz <= 1; ++dz) {
-          const auto it = grid.find({cx + dx, cy + dy, cz + dz});
-          if (it == grid.end())
+        const CellEntry first{cx + dx, cy + dy, cz - 1, 0};
+        for (auto it = std::lower_bound(sorted_cells.begin(),
+                                        sorted_cells.end(), first, entry_less);
+             it != sorted_cells.end() && it->x == cx + dx &&
+             it->y == cy + dy && it->z <= cz + 1;
+             ++it) {
+          const std::size_t other_idx = it->atom;
+          if (other_idx >= atom_idx)
             continue;
-          for (std::size_t other_idx : it->second) {
-            if (excluded_pairs.contains(
-                    steric_pair_key(atom_idx, other_idx))) {
-              continue;
-            }
+          {
             const bool same_component =
                 atom_component_index[atom_idx] ==
                 atom_component_index[other_idx];
@@ -527,6 +570,13 @@ PbctopoStericAudit evaluate_pbctopo_sterics_impl(
               continue;
             if (same_component && !metadata_internal_pair)
               continue;
+            // The exclusion lookup comes after the cheap tests above: a pair
+            // they skip is skipped whether or not it is excluded, and most
+            // neighbouring pairs lie within one component.
+            if (excluded_pairs.contains(
+                    steric_pair_key(atom_idx, other_idx))) {
+              continue;
+            }
             const Vec3 &other = placed_points[other_idx];
             const double ddx = point.x - other.x;
             const double ddy = point.y - other.y;
@@ -541,11 +591,21 @@ PbctopoStericAudit evaluate_pbctopo_sterics_impl(
                 atoms[atom_idx], atoms[other_idx], fallback_cutoff);
             const double margin = std::sqrt(std::max(0.0, d2)) -
                                   threshold.cutoff;
+            // Two different pairs: the one closest to clashing (smallest
+            // margin, which decides the certificate) and the one closest in
+            // distance (min_pair_d2, which candidate ranking reads).  With
+            // unequal radii they need not coincide; reporting the margin
+            // pair's distance as the minimum distance was a defect.
             if (margin < result.min_margin_A) {
               result.min_margin_A = margin;
-              result.min_pair_d2 = d2;
+              result.min_margin_pair_d2 = d2;
               result.clash_atom_a = atom_idx;
               result.clash_atom_b = other_idx;
+            }
+            if (!same_component && d2 < result.min_pair_d2) {
+              result.min_pair_d2 = d2;
+              result.min_pair_atom_a = atom_idx;
+              result.min_pair_atom_b = other_idx;
             }
             const bool placed_clash = pbctopo_atoms_clash(
                 d2, atoms[atom_idx], atoms[other_idx], fallback_cutoff,
@@ -586,7 +646,6 @@ PbctopoStericAudit evaluate_pbctopo_sterics_impl(
         }
       }
     }
-    grid[{cx, cy, cz}].push_back(atom_idx);
   }
   result.decision_complete = true;
   result.pair_enumeration_complete = true;

@@ -1,4 +1,12 @@
-# TITAN-VIBE 1.0.1
+# TITAN-VIBE 1.0.3
+
+Faster reconstruction; candidates are checked in the lattice gauge that placed them; status, warm start and rescue paths follow the contact assessment of the selected placement. See `RELEASE_NOTES_v1.0.3.md`.
+
+## Version 1.0.2
+
+Executable distribution with buildable host source; see `RELEASE_NOTES_v1.0.2.md`.
+
+## Version 1.0.1
 
 Refresh VIBE implementation files from clean TITAN commit
 `6a8385cf1c63c42046b8a38053f003311e85e633`.

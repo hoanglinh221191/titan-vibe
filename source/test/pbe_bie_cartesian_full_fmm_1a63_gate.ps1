@@ -63,7 +63,7 @@ function Invoke-1A63Case([string]$Variant, [string]$Engine, [int]$Order,
     $libPath = Convert-ToTitanPath ((Resolve-Path -LiteralPath $LibRoot).Path.TrimEnd('\') + '\')
     $thetaText = $Theta.ToString('G15', $InvariantCulture)
     $spacingText = $SesGridSpacing.ToString('G15', $InvariantCulture)
-    $leafSize = if ($Engine -eq 'cartesian-full-experimental') {
+    $requestedLeafSize = if ($Engine -eq 'cartesian-full-experimental') {
         $FullLeafSize
     } else {
         64
@@ -116,7 +116,7 @@ function Invoke-1A63Case([string]$Variant, [string]$Engine, [int]$Order,
         $argLines += "-pbe-bie-fmm-cartesian-order=$Order"
     }
     if ($Engine -ne 'cartesian-full-experimental' -or -not $AutomaticFullTree) {
-        $argLines += "-pbe-bie-tree-leaf-size=$leafSize"
+        $argLines += "-pbe-bie-tree-leaf-size=$requestedLeafSize"
         $argLines += "-pbe-bie-opening-theta=$thetaText"
     }
     $argPath = Join-Path $runDir 'arg.in'
@@ -145,14 +145,39 @@ function Invoke-1A63Case([string]$Variant, [string]$Engine, [int]$Order,
         (-not (Test-Finite $audit) -or $audit -gt 1e-4)) {
         throw "1A63 $Variant direct matvec audit failed: $audit"
     }
+    $reportedTheta = $Theta
+    $reportedLeafSize = $requestedLeafSize
+    if ($Engine -eq 'cartesian-full-experimental') {
+        $reportedTheta = Convert-ToDouble $profile.bie_cartesian_full_fmm_opening_theta
+        $reportedLeafSize = [int]$profile.bie_cartesian_full_fmm_leaf_size
+        $expectedTheta = if ($AutomaticFullTree) {
+            if ($Order -eq 4) { 0.65 } else { 0.20 }
+        } else {
+            $Theta
+        }
+        $expectedLeafSize = if ($AutomaticFullTree) {
+            if ($Order -eq 4) { 80 } else { 64 }
+        } else {
+            $requestedLeafSize
+        }
+        if ($reportedLeafSize -ne $expectedLeafSize -or
+            [Math]::Abs($reportedTheta - $expectedTheta) -gt 1e-12) {
+            throw "1A63 $Variant effective full-FMM tree telemetry drifted: leaf=$reportedLeafSize theta=$reportedTheta expected_leaf=$expectedLeafSize expected_theta=$expectedTheta"
+        }
+        $expectedDirectPanels = [int64]$profile.bie_cartesian_full_fmm_direct_panel_pairs_expected
+        $appliedDirectPanels = [int64]$profile.bie_cartesian_full_fmm_direct_panel_pairs_applied_last
+        if ($expectedDirectPanels -le 0 -or $appliedDirectPanels -ne $expectedDirectPanels) {
+            throw "1A63 $Variant direct coverage telemetry is inconsistent: expected=$expectedDirectPanels applied=$appliedDirectPanels"
+        }
+    }
     return [pscustomobject]@{
         variant = $Variant
         fixture_force_field = 'PDB2PQR-CHARMM'
         fixture_sha256 = $fixtureSha256
         engine = $Engine
         order = $Order
-        theta = $Theta
-        leaf_size = $leafSize
+        theta = $reportedTheta
+        leaf_size = $reportedLeafSize
         surface = $profile.surface_generator
         discretization = $profile.discretization
         ses_grid_spacing_A = $SesGridSpacing

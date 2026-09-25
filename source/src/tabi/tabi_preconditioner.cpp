@@ -84,7 +84,8 @@ double mixed_normal_derivative_green(const Panel &target, const Panel &source,
       expkr * (kappa * kappa * inv_r + 2.0 * kappa * inv_r2 +
                2.0 * inv_r2 * inv_r) /
       (4.0 * kPi);
-  return fsecond * nxu * nyu + (fprime * inv_r) * (nxny - nxu * nyu);
+  // Mixed target/source derivative, not the target/target Hessian.
+  return -fsecond * nxu * nyu - (fprime * inv_r) * (nxny - nxu * nyu);
 }
 
 struct JcpKernels {

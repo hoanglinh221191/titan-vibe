@@ -39,6 +39,7 @@ struct NodePatchTriangle {
   std::size_t atom_index{0};
 };
 
+struct CurvedNodePatchGeometry;
 struct NodePatchGeometry {
   std::vector<std::array<double, 3>> vertex_xyz;
   std::vector<NodePatchTriangle> triangles;
@@ -47,6 +48,16 @@ struct NodePatchGeometry {
   std::vector<std::size_t> adjacent_offsets;
   std::vector<std::size_t> adjacent_nodes;
   std::size_t solid_angle_fallbacks{0};
+  std::size_t solid_angle_clamps{0};
+  std::shared_ptr<const CurvedNodePatchGeometry> curved;
+};
+
+// Dimensionless quadrature of one unit-sphere triangle. Shared by all atoms
+// using that mesh triangle; storage scales with mesh resolution, not atoms.
+struct SpherePatchQuadrature {
+  std::vector<std::array<double, 4>> nodes; // unit x,y,z and spherical area
+  double self_double_layer{0.0}; // integral dG0/dn_y, including 1/(4*pi)
+  std::shared_ptr<const std::vector<std::array<double, 4>>> spheres;
 };
 
 struct Panel {
@@ -81,9 +92,14 @@ struct Panel {
   std::size_t v1_index{static_cast<std::size_t>(-1)};
   std::size_t v2_index{static_cast<std::size_t>(-1)};
   bool has_triangle_geometry{false};
+  std::shared_ptr<const SpherePatchQuadrature> sphere_patch_quadrature;
   std::shared_ptr<const NodePatchGeometry> node_patch_geometry;
   std::size_t node_patch_index{static_cast<std::size_t>(-1)};
 };
+
+inline const std::array<double, 4> &sphere_patch_sphere(const Panel &panel) {
+  return panel.sphere_patch_quadrature->spheres->at(panel.atom_index);
+}
 
 inline double jcp_lhs_phi_for_panel(const Panel &panel, double eps_ratio,
                                     double flat_lhs) noexcept {
@@ -133,6 +149,9 @@ struct SurfaceMesh {
   std::size_t exposed_candidates{0};
   std::size_t buried_candidates{0};
   std::size_t solid_angle_fallbacks{0};
+  // Diagonals inside the accept band but outside [0.25,1.75] are clamped.
+  // Counted apart from fallbacks: a clamp is a silent change, not a reject.
+  std::size_t solid_angle_clamps{0};
   std::size_t nonmanifold_edges{0};
   double avg_valence{0.0};
   double diag_min{1.0};
@@ -226,11 +245,14 @@ struct Options {
   std::string calderon_aux_surface{"off"};
   double calderon_aux_grid_spacing{1.25};
   std::string primary_surface{"sphere-patch"};
-  std::string analytic_ses_engine{"current"};
+  // Matches the CLI default in arguments.h; see
+  // docs/TITAN_SES_ENGINE_FIX_2026-09-15.md for why it is not `current`.
+  std::string analytic_ses_engine{"patch-ray-experimental"};
   double ses_grid_spacing{0.75};
   std::size_t ses_max_grid_vertices{4000000};
   std::string sphere_mesh_mode{"auto"};
   int tree_leaf_size{32};
+  int curved_pair_cache_mb{256};
   bool tree_leaf_size_explicit{false};
   double tree_opening_theta{0.45};
   bool tree_opening_theta_explicit{false};
@@ -391,6 +413,7 @@ struct Result {
   double surface_area_a2{0.0};
   double panel_density_per_a2{0.0};
   std::string panel_budget_status{"off"};
+  ChargeResolutionDiagnostic charge_resolution;
   double surface_build_ms{0.0};
   double surface_neighbor_ms{0.0};
   double surface_mesh_ms{0.0};
@@ -544,6 +567,7 @@ struct Result {
   double avg_valence{0.0};
   std::size_t nonmanifold_edges{0};
   std::size_t solid_angle_fallbacks{0};
+  std::size_t solid_angle_clamps{0};
   double diag_min{1.0};
   double diag_max{1.0};
   int taylor_order{3};
@@ -1081,6 +1105,8 @@ struct Result {
   double preconditioner_coarse_verify_rel_error_max{0.0};
   std::string surface_generator{"titan_sphere_patch"};
   std::string discretization{"centroid"};
+  // "curved_dual", "flat_legacy", or "n/a" when not node-patch.
+  std::string node_patch_representation{"n/a"};
   double rhs_scale{1.0};
   double dielectric_contrast{0.0};
   double operator_contrast{0.0};

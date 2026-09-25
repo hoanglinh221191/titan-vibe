@@ -7,6 +7,7 @@
 #include "pbctopo/candidate_scoring.h"
 #include "pbctopo/certification.h"
 #include "pbctopo/evidence_audit.h"
+#include "pbctopo/evidence_relation_report.h"
 #include "pbctopo/component_graph.h"
 #include "pbctopo/component_metric.h"
 #include "pbctopo/component_refine.h"
@@ -254,6 +255,10 @@ using titan_pbctopo::write_pbctopo_frame_report_header;
 using titan_pbctopo::write_pbctopo_frame_report_row;
 using titan_pbctopo::write_pbctopo_assignment_set_header;
 using titan_pbctopo::write_pbctopo_assignment_set_rows;
+using titan_pbctopo::write_pbctopo_candidate_evidence_relation_header;
+using titan_pbctopo::write_pbctopo_candidate_evidence_summary_header;
+using titan_pbctopo::write_pbctopo_candidate_evidence_frame;
+using titan_pbctopo::upsert_pbctopo_candidate_evidence_audit_snapshot;
 using titan_pbctopo::write_pbctopo_component_layout_header;
 using titan_pbctopo::write_pbctopo_component_layout_rows;
 using titan_pbctopo::write_pbctopo_hard_edge_header;
@@ -317,6 +322,67 @@ ofstream open_pbctopo_assignment_set_report() {
   if (out.is_open()) {
     if (reset_report)
       write_pbctopo_assignment_set_header(out);
+    initialized = true;
+    initialized_cwd = cwd;
+  }
+  return out;
+}
+
+ofstream open_pbctopo_rejected_assignment_report() {
+  namespace fs = std::filesystem;
+  static bool initialized = false;
+  static fs::path initialized_cwd;
+  std::error_code ec;
+  const fs::path cwd = fs::current_path(ec);
+  const bool reset_report =
+      !initialized || ec || initialized_cwd.empty() || initialized_cwd != cwd;
+  ofstream out("pbctopo_rejected_candidates.csv",
+               ios::out | (reset_report ? ios::trunc : ios::app));
+  if (out.is_open()) {
+    if (reset_report)
+      titan_pbctopo::write_pbctopo_rejected_assignment_header(out);
+    initialized = true;
+    initialized_cwd = cwd;
+  }
+  return out;
+}
+
+ofstream open_pbctopo_candidate_evidence_summary_report() {
+  namespace fs = std::filesystem;
+  static bool initialized = false;
+  static fs::path initialized_cwd;
+
+  std::error_code ec;
+  const fs::path cwd = fs::current_path(ec);
+  const bool reset_report =
+      !initialized || ec || initialized_cwd.empty() || initialized_cwd != cwd;
+
+  ofstream out("pbctopo_candidate_evidence_summary.csv",
+               ios::out | (reset_report ? ios::trunc : ios::app));
+  if (out.is_open()) {
+    if (reset_report)
+      write_pbctopo_candidate_evidence_summary_header(out);
+    initialized = true;
+    initialized_cwd = cwd;
+  }
+  return out;
+}
+
+ofstream open_pbctopo_candidate_evidence_relation_report() {
+  namespace fs = std::filesystem;
+  static bool initialized = false;
+  static fs::path initialized_cwd;
+
+  std::error_code ec;
+  const fs::path cwd = fs::current_path(ec);
+  const bool reset_report =
+      !initialized || ec || initialized_cwd.empty() || initialized_cwd != cwd;
+
+  ofstream out("pbctopo_candidate_evidence_relations.csv",
+               ios::out | (reset_report ? ios::trunc : ios::app));
+  if (out.is_open()) {
+    if (reset_report)
+      write_pbctopo_candidate_evidence_relation_header(out);
     initialized = true;
     initialized_cwd = cwd;
   }
@@ -1551,6 +1617,60 @@ vector<Int3> extract_component_offsets_from_points(
   if (!rebase_component_offsets(offsets, Box))
     return {};
   return offsets;
+}
+
+// Offsets from extract_component_offsets_from_points are rebased to the
+// closest-lattice-mean gauge, but placed points keep the gauge that placed
+// them. Shift every offset by the one lattice vector that puts the first atom
+// of the first non-empty component on its placed point. A common shift only
+// changes the gauge: the relative assignment, and every other atom's check
+// against it, stay as they were.
+bool align_component_offsets_to_points(
+    const vector<PbctopoAtom> &atoms, const vector<vector<size_t>> &components,
+    const PbctopoLatticeMetric &lattice, const vector<Vec3> &placed_points,
+    vector<Int3> &offsets) {
+  if (offsets.size() != components.size())
+    return false;
+  size_t reference_component = components.size();
+  for (size_t comp_idx = 0; comp_idx < components.size(); ++comp_idx) {
+    if (!components[comp_idx].empty()) {
+      reference_component = comp_idx;
+      break;
+    }
+  }
+  if (reference_component == components.size())
+    return false;
+  const size_t reference_atom = components[reference_component].front();
+  if (reference_atom >= atoms.size() || reference_atom >= placed_points.size())
+    return false;
+  const auto absolute_scaled = lattice.cartesian_to_scaled(
+      placed_points[reference_atom].x - atoms[reference_atom].x,
+      placed_points[reference_atom].y - atoms[reference_atom].y,
+      placed_points[reference_atom].z - atoms[reference_atom].z);
+  Int3 absolute_reference_offset{};
+  if (!titan_pbctopo::pbctopo_checked_round_image(
+          absolute_scaled[0], absolute_reference_offset.x) ||
+      !titan_pbctopo::pbctopo_checked_round_image(
+          absolute_scaled[1], absolute_reference_offset.y) ||
+      !titan_pbctopo::pbctopo_checked_round_image(
+          absolute_scaled[2], absolute_reference_offset.z)) {
+    return false;
+  }
+  Int3 global_offset_correction{};
+  if (!titan_pbctopo::checked_int3_subtract(absolute_reference_offset,
+                                            offsets[reference_component],
+                                            global_offset_correction)) {
+    return false;
+  }
+  for (Int3 &offset : offsets) {
+    Int3 corrected{};
+    if (!titan_pbctopo::checked_int3_add(offset, global_offset_correction,
+                                         corrected)) {
+      return false;
+    }
+    offset = corrected;
+  }
+  return true;
 }
 
 const char *pbctopo_component_mode_name(PbctopoComponentMode mode) {
@@ -4090,10 +4210,9 @@ append_fragments_for_system(const Multi_MOL &system, const MOL &mol, int owner,
                   system.info[local].has_original_atom_id()
               ? system.info[local].get_original_atom_id()
               : local;
-      if (local < system.parameters.mass.size() &&
-          isfinite(system.parameters.mass[local]) &&
-          system.parameters.mass[local] > 0.0) {
-        atom.atomic_mass = system.parameters.mass[local];
+      if (const auto mass = system.topology.atomic_mass(static_cast<std::uint32_t>(local));
+          mass.has_value()) {
+        atom.atomic_mass = *mass;
         atom.has_atomic_mass = true;
       }
       atom.x = r[0];
@@ -4911,6 +5030,16 @@ int Multi_MOL::solve_pbc_pbctopo(Multi_MOL &mol2, arguments &Arguments,
   ofstream pbctopo_frame_report = open_pbctopo_frame_report();
   ofstream pbctopo_assignment_set_report =
       open_pbctopo_assignment_set_report();
+  ofstream pbctopo_rejected_assignment_report =
+      open_pbctopo_rejected_assignment_report();
+  ofstream pbctopo_candidate_evidence_summary_report;
+  ofstream pbctopo_candidate_evidence_relation_report;
+  if (Arguments.pbc.pbctopo_evidence_export) {
+    pbctopo_candidate_evidence_summary_report =
+        open_pbctopo_candidate_evidence_summary_report();
+    pbctopo_candidate_evidence_relation_report =
+        open_pbctopo_candidate_evidence_relation_report();
+  }
   ofstream pbctopo_component_layout_report =
       open_pbctopo_component_layout_report();
   ofstream pbctopo_hard_edge_report = open_pbctopo_hard_edge_report();
@@ -4934,6 +5063,19 @@ int Multi_MOL::solve_pbc_pbctopo(Multi_MOL &mol2, arguments &Arguments,
     append_pbctopo_log_line(
         "[pbctopo] observation export unavailable: "
         "artifact=pbctopo_assignment_candidates.csv");
+  }
+  if (!pbctopo_rejected_assignment_report.is_open()) {
+    append_pbctopo_log_line(
+        "[pbctopo] rejected-assignment audit unavailable: "
+        "artifact=pbctopo_rejected_candidates.csv");
+  }
+  if (Arguments.pbc.pbctopo_evidence_export &&
+      (!pbctopo_candidate_evidence_summary_report.is_open() ||
+       !pbctopo_candidate_evidence_relation_report.is_open())) {
+    append_pbctopo_log_line(
+        "[pbctopo] observation export unavailable: "
+        "artifacts=pbctopo_candidate_evidence_summary.csv|"
+        "pbctopo_candidate_evidence_relations.csv");
   }
   if (!pbctopo_component_layout_report.is_open()) {
     append_pbctopo_log_line(
@@ -5118,6 +5260,10 @@ int Multi_MOL::solve_pbc_pbctopo(Multi_MOL &mol2, arguments &Arguments,
   vector<PbctopoFrameReport> deferred_frame_reports(frame_count);
   vector<unsigned char> deferred_frame_report_valid(frame_count, 0);
   vector<PbctopoContactHypothesisSet> temporal_contact_hypotheses(frame_count);
+  size_t evidence_relation_export_groups = 0;
+  size_t evidence_relation_export_rows = 0;
+  size_t evidence_relation_export_duplicates = 0;
+  size_t evidence_relation_export_failures = 0;
   auto write_or_defer_frame_report = [&](size_t frame_idx,
                                           PbctopoFrameReport report) {
     if (frame_idx < pbctopo_frame_status_.size()) {
@@ -6113,10 +6259,46 @@ int Multi_MOL::solve_pbc_pbctopo(Multi_MOL &mol2, arguments &Arguments,
     size_t report_soft_valid_candidates = 0;
     size_t report_nonclashing_candidates = 0;
     vector<PbctopoCutCandidate> report_certified_candidates;
+    // Failed hard-certificate evaluations are audit records, not members of
+    // the certified band.  Neither selection nor certified counts use them.
+    vector<PbctopoCutCandidate> report_rejected_candidates;
+    vector<titan_pbctopo::PbctopoCandidateEvidenceAuditSnapshot>
+        evidence_relation_audit_snapshots;
+    string evidence_relation_cache_error;
+    bool evidence_relation_frame_written = false;
+    const bool evidence_relation_export_enabled =
+        pbctopo_candidate_evidence_summary_report.is_open() &&
+        pbctopo_candidate_evidence_relation_report.is_open();
+    auto cache_candidate_evidence_audit =
+        [&](const PbctopoImageAssignment &assignment,
+            const PbctopoSelectedEvidenceAudit &audit) {
+          if (!evidence_relation_export_enabled ||
+              !evidence_relation_cache_error.empty()) {
+            return;
+          }
+          const auto cached =
+              upsert_pbctopo_candidate_evidence_audit_snapshot(
+                  evidence_relation_audit_snapshots, assignment, audit);
+          if (!cached)
+            evidence_relation_cache_error = cached.error();
+        };
     auto record_report_certified_candidate =
         [&](const PbctopoCutCandidate &candidate) {
-          if (!candidate.valid || !candidate.assignment.valid ||
-              !candidate.hard_feasibility.certified()) {
+          if (!candidate.valid || !candidate.assignment.valid) {
+            return;
+          }
+          if (!candidate.hard_feasibility.certified()) {
+            // Export separately, with the failed hard predicates, so a
+            // consumer can distinguish a rejection from an unevaluated image.
+            const bool known = any_of(
+                report_rejected_candidates.begin(),
+                report_rejected_candidates.end(),
+                [&](const PbctopoCutCandidate &other) {
+                  return same_pbctopo_image_assignment(other.assignment,
+                                                        candidate.assignment);
+                });
+            if (!known)
+              report_rejected_candidates.push_back(candidate);
             return;
           }
           auto existing = find_if(
@@ -6149,46 +6331,112 @@ int Multi_MOL::solve_pbc_pbctopo(Multi_MOL &mol2, arguments &Arguments,
           sort(report_certified_candidates.begin(),
                report_certified_candidates.end(), better_cut_candidate);
         };
-    auto annotate_candidate_evidence =
-        [&](PbctopoCutCandidate &candidate,
-            const vector<Vec3> &points) -> bool {
+    // A candidate's evidence audit in two halves, so that the band loop can
+    // run the first on executor workers: compute reads only frame constants;
+    // apply writes the evidence cache and the candidate.  nullopt is the input
+    // the serial code turned away before auditing.
+    using CandidateEvidenceAudit =
+        std::expected<titan_pbctopo::PbctopoSelectedEvidenceAudit, string>;
+    auto compute_candidate_evidence =
+        [&](const PbctopoCutCandidate &candidate,
+            const vector<Vec3> &points) -> optional<CandidateEvidenceAudit> {
           if (!candidate.assignment.valid || points.size() != base_atoms.size())
-            return false;
-          const auto audit = titan_pbctopo::audit_pbctopo_selected_hypotheses(
+            return nullopt;
+          return titan_pbctopo::audit_pbctopo_selected_hypotheses(
               span<const PbctopoAtom>(base_atoms), span<const Vec3>(points),
               base_anchor_context.contact_hypotheses, candidate.assignment, true,
               explicit_evidence_component_edges);
-          if (!audit || !audit->evaluated)
+        };
+    auto apply_candidate_evidence =
+        [&](PbctopoCutCandidate &candidate,
+            const optional<CandidateEvidenceAudit> &computed) -> bool {
+          if (!computed || !*computed || !(*computed)->evaluated)
             return false;
+          const auto &audit = **computed;
+          cache_candidate_evidence_audit(candidate.assignment, audit);
           candidate.evidence_relative_relation_signature =
               candidate.assignment.signature;
           candidate.evidence_compatible_hypothesis_hash =
-              audit->selected_hypothesis_hash;
+              audit.selected_hypothesis_hash;
           candidate.evidence_compatible_pair_hash =
-              audit->selected_compatible_pair_hash;
+              audit.selected_compatible_pair_hash;
           candidate.evidence_compatible_hypothesis_count =
-              audit->compatible_hypothesis_count;
+              audit.compatible_hypothesis_count;
           candidate.evidence_supported_relation_count =
-              audit->supported_relation_count;
+              audit.supported_relation_count;
           candidate.evidence_compatible_contact_count =
-              audit->selected_compatible_contact_count;
+              audit.selected_compatible_contact_count;
           candidate.evidence_no_support_relation_count =
-              audit->no_supported_contact_relation_count;
-          return audit->state != PbctopoEvidenceState::Contradicted;
+              audit.no_supported_contact_relation_count;
+          return audit.state != PbctopoEvidenceState::Contradicted;
         };
-    auto certify_candidate_for_output =
-        [&](PbctopoCutCandidate &candidate, const vector<Vec3> &points,
-            const vector<Int3> *known_offsets = nullptr) {
-          const auto certification_lattice_audit_before =
+    auto annotate_candidate_evidence =
+        [&](PbctopoCutCandidate &candidate,
+            const vector<Vec3> &points) -> bool {
+          return apply_candidate_evidence(
+              candidate, compute_candidate_evidence(candidate, points));
+        };
+    // A candidate's certification in two halves.  compute does the geometry
+    // and touches nothing but the candidate and its work record, so the band
+    // loop runs it on TitanExecutor workers; apply then makes, on the frame's
+    // thread and in band order, every write the serial code made: counters,
+    // lattice failures, the rejection ledger, the evidence cache and the
+    // certified band.  certify_candidate_for_output is the two back to back.
+    struct CandidateCertificationWork {
+      bool assignment_valid = false;
+      bool lattice_failure = false;
+      bool certified = false;
+      // Lattice queries from the start of compute to the image equations
+      // (the serial failure test), and over all of compute when it ran on a
+      // worker, whose thread-local counts must reach the frame's thread.
+      titan_pbctopo::PbctopoLatticeQueryAudit certification_lattice_delta;
+      titan_pbctopo::PbctopoLatticeQueryAudit worker_lattice_delta;
+      bool ran_on_worker = false;
+      PbctopoImageEquationResiduals image_equations;
+      titan_pbctopo::PbctopoAssignmentPointResiduals assignment_points;
+      titan_pbctopo::PbctopoStericAudit steric_audit;
+      titan_pbctopo::PbctopoRequiredContactResiduals required_contacts;
+      // The only timing counters the steric scan touches (pbctopo_atoms_clash).
+      size_t vdw_pair_checks = 0;
+      size_t vdw_radius_pairs = 0;
+      size_t vdw_radius_fallback_pairs = 0;
+      size_t vdw_explicit_zero_lj_exempt_pairs = 0;
+      optional<CandidateEvidenceAudit> evidence;
+    };
+    auto compute_candidate_certification =
+        [&](CandidateCertificationWork &work, PbctopoCutCandidate &candidate,
+            const vector<Vec3> &points, const vector<Int3> *known_offsets,
+            bool on_worker) {
+          const auto lattice_before =
               titan_pbctopo::pbctopo_lattice_query_audit();
-          ++timing.pbctopo_certification_attempts;
-          ensure_component_context();
+          auto finish = [&]() {
+            if (!on_worker)
+              return;
+            work.ran_on_worker = true;
+            work.worker_lattice_delta =
+                titan_pbctopo::pbctopo_lattice_query_audit_delta(
+                    lattice_before,
+                    titan_pbctopo::pbctopo_lattice_query_audit());
+          };
+          // A worker runs only with the component context built and the
+          // offsets given, so these two frame-state writers stay serial.
+          if (!on_worker)
+            ensure_component_context();
           vector<Int3> extracted_offsets;
           const vector<Int3> *offsets = known_offsets;
-          if (offsets == nullptr || offsets->size() != components.size()) {
+          if (!on_worker &&
+              (offsets == nullptr || offsets->size() != components.size())) {
             extracted_offsets =
                 extract_offsets_and_time(component_atoms, points);
             offsets = &extracted_offsets;
+          }
+          // Extracted and search offsets are rebased; certify the points in
+          // the gauge that placed them, or every atom reads as a residual.
+          vector<Int3> aligned_offsets = *offsets;
+          if (align_component_offsets_to_points(component_atoms, components,
+                                                certification_lattice, points,
+                                                aligned_offsets)) {
+            offsets = &aligned_offsets;
           }
           candidate.assignment = make_pbctopo_image_assignment(
               *offsets, components, component_atoms);
@@ -6207,50 +6455,89 @@ int Multi_MOL::solve_pbc_pbctopo(Multi_MOL &mol2, arguments &Arguments,
           candidate.hard_feasibility.metadata_edges_available =
               metadata_edge_count;
           if (!candidate.assignment.valid) {
-            ++timing.pbctopo_certification_assignment_rejects;
             candidate.hard_feasibility = {};
             candidate.hard_feasibility.evaluated = candidate.valid;
-            return false;
+            finish();
+            return;
           }
-          const PbctopoImageEquationResiduals image_equations =
-              evaluate_pbctopo_image_equations(
-                  base_atoms, points, local_edges, certification_lattice);
-          const auto certification_lattice_audit_delta =
+          work.assignment_valid = true;
+          work.image_equations = evaluate_pbctopo_image_equations(
+              base_atoms, points, local_edges, certification_lattice);
+          work.certification_lattice_delta =
               titan_pbctopo::pbctopo_lattice_query_audit_delta(
-                  certification_lattice_audit_before,
-                  titan_pbctopo::pbctopo_lattice_query_audit());
-          frame_fatal_lattice_query_failures +=
-              certification_lattice_audit_delta.failures;
-          if (certification_lattice_audit_delta.failures > 0) {
-            ++timing.pbctopo_certification_hard_rejects;
+                  lattice_before, titan_pbctopo::pbctopo_lattice_query_audit());
+          if (work.certification_lattice_delta.failures > 0) {
+            work.lattice_failure = true;
             candidate.hard_feasibility = {};
             candidate.hard_feasibility.evaluated = candidate.valid;
-            return false;
+            finish();
+            return;
           }
-          const auto assignment_points =
+          work.assignment_points =
               titan_pbctopo::evaluate_pbctopo_assignment_point_consistency(
                   component_atoms, points, atom_component_index,
                   candidate.assignment, certification_lattice);
-          const auto steric_audit =
-              titan_pbctopo::evaluate_pbctopo_final_sterics(
-                  base_atoms, points, atom_component_index,
-                  steric_exclusion_set,
-                  runtime_cutoffs.clash_cutoff, &timing,
-                  &certification_lattice);
+          PbctopoTimingStats steric_timing;
+          work.steric_audit = titan_pbctopo::evaluate_pbctopo_final_sterics(
+              base_atoms, points, atom_component_index, steric_exclusion_set,
+              runtime_cutoffs.clash_cutoff, &steric_timing,
+              &certification_lattice);
+          work.vdw_pair_checks = steric_timing.pbctopo_vdw_pair_checks;
+          work.vdw_radius_pairs = steric_timing.pbctopo_vdw_radius_pairs;
+          work.vdw_radius_fallback_pairs =
+              steric_timing.pbctopo_vdw_radius_fallback_pairs;
+          work.vdw_explicit_zero_lj_exempt_pairs =
+              steric_timing.pbctopo_vdw_explicit_zero_lj_exempt_pairs;
+          const auto &steric_audit = work.steric_audit;
           candidate.ultra_clash = steric_audit.hard_clashes != 0;
+          // The candidate's min_pair_d2 and clash atoms describe its closest
+          // pair (analyze_cut_candidate_ultraclash sets them that way), so
+          // they are refreshed from the audit's closest pair, not from the
+          // pair with the smallest margin.  The margin itself is carried in
+          // hard_feasibility.min_steric_margin_A.
           if (isfinite(steric_audit.min_pair_d2) &&
               steric_audit.min_pair_d2 < candidate.min_pair_d2) {
             candidate.min_pair_d2 = steric_audit.min_pair_d2;
-            candidate.clash_atom_a = steric_audit.clash_atom_a;
-            candidate.clash_atom_b = steric_audit.clash_atom_b;
+            candidate.clash_atom_a = steric_audit.min_pair_atom_a;
+            candidate.clash_atom_b = steric_audit.min_pair_atom_b;
           }
-          const auto required_contacts =
+          work.required_contacts =
               titan_pbctopo::evaluate_pbctopo_required_contacts(
                   base_atoms, points, local_edges, explicit_required_contacts);
           candidate.geometry_classification =
               titan_pbctopo::classify_pbctopo_final_geometry(
                   points, certification_lattice, 1.0e-6,
-                  &image_equations);
+                  &work.image_equations);
+          work.certified = certify_pbctopo_candidate(
+              candidate, work.image_equations, work.assignment_points,
+              work.steric_audit, work.required_contacts);
+          if (work.certified)
+            work.evidence = compute_candidate_evidence(candidate, points);
+          finish();
+        };
+    auto apply_candidate_certification =
+        [&](const CandidateCertificationWork &work,
+            PbctopoCutCandidate &candidate) {
+          if (work.ran_on_worker)
+            titan_pbctopo::pbctopo_add_lattice_query_audit(
+                work.worker_lattice_delta);
+          ++timing.pbctopo_certification_attempts;
+          if (!work.assignment_valid) {
+            ++timing.pbctopo_certification_assignment_rejects;
+            return false;
+          }
+          frame_fatal_lattice_query_failures +=
+              work.certification_lattice_delta.failures;
+          if (work.lattice_failure) {
+            ++timing.pbctopo_certification_hard_rejects;
+            return false;
+          }
+          timing.pbctopo_vdw_pair_checks += work.vdw_pair_checks;
+          timing.pbctopo_vdw_radius_pairs += work.vdw_radius_pairs;
+          timing.pbctopo_vdw_radius_fallback_pairs +=
+              work.vdw_radius_fallback_pairs;
+          timing.pbctopo_vdw_explicit_zero_lj_exempt_pairs +=
+              work.vdw_explicit_zero_lj_exempt_pairs;
           ++timing.pbctopo_geometry_classifications;
           if (candidate.geometry_classification.topological_winding_rank > 0) {
             ++timing.pbctopo_winding_rejected_candidates;
@@ -6259,6 +6546,7 @@ int Multi_MOL::solve_pbc_pbctopo(Multi_MOL &mol2, arguments &Arguments,
               ++timing.pbctopo_extended_winding_rejected_candidates;
             }
           }
+          const auto &image_equations = work.image_equations;
           timing.pbctopo_certification_topology_edges_checked +=
               image_equations.topology_edges_checked;
           timing.pbctopo_certification_ambiguous_topology_edges +=
@@ -6270,29 +6558,37 @@ int Multi_MOL::solve_pbc_pbctopo(Multi_MOL &mol2, arguments &Arguments,
           timing.pbctopo_certification_atom_image_residuals +=
               image_equations.atom_image_residuals;
           timing.pbctopo_certification_assignment_point_residuals +=
-              assignment_points.point_residuals;
+              work.assignment_points.point_residuals;
           timing.pbctopo_certification_steric_pair_checks +=
-              steric_audit.pair_checks;
+              work.steric_audit.pair_checks;
           timing.pbctopo_certification_steric_clashes +=
-              steric_audit.hard_clashes;
+              work.steric_audit.hard_clashes;
           timing.pbctopo_certification_required_contacts_checked +=
-              required_contacts.contacts_checked;
+              work.required_contacts.contacts_checked;
           timing.pbctopo_certification_required_contacts_lost +=
-              required_contacts.contacts_lost;
+              work.required_contacts.contacts_lost;
           timing.pbctopo_certification_explicit_interface_contacts_checked +=
-              required_contacts.explicit_contacts_checked;
+              work.required_contacts.explicit_contacts_checked;
           timing.pbctopo_certification_explicit_interface_contacts_lost +=
-              required_contacts.explicit_contacts_lost;
-          if (!certify_pbctopo_candidate(candidate, image_equations,
-                                         assignment_points, steric_audit,
-                                         required_contacts)) {
+              work.required_contacts.explicit_contacts_lost;
+          if (!work.certified) {
             ++timing.pbctopo_certification_hard_rejects;
+            // Preserve the rejection in the separate audit ledger.
+            record_report_certified_candidate(candidate);
             return false;
           }
           ++timing.pbctopo_certification_successes;
-          if (annotate_candidate_evidence(candidate, points))
+          if (apply_candidate_evidence(candidate, work.evidence))
             record_report_certified_candidate(candidate);
           return true;
+        };
+    auto certify_candidate_for_output =
+        [&](PbctopoCutCandidate &candidate, const vector<Vec3> &points,
+            const vector<Int3> *known_offsets = nullptr) {
+          CandidateCertificationWork work;
+          compute_candidate_certification(work, candidate, points,
+                                          known_offsets, false);
+          return apply_candidate_certification(work, candidate);
         };
     auto record_temporal_certified_candidate =
         [&](const PbctopoCutCandidate &source_candidate,
@@ -6318,13 +6614,29 @@ int Multi_MOL::solve_pbc_pbctopo(Multi_MOL &mol2, arguments &Arguments,
             return;
           record_report_certified_candidate(candidate);
           auto &frame_candidates = temporal_cut_candidates[frame_idx];
-          const bool duplicate = any_of(
+          const auto existing = find_if(
               frame_candidates.begin(), frame_candidates.end(),
-              [&](const PbctopoCutCandidate &existing) {
-                return same_pbctopo_image_assignment(existing.assignment,
+              [&](const PbctopoCutCandidate &other) {
+                return same_pbctopo_image_assignment(other.assignment,
                                                       candidate.assignment);
               });
-          if (duplicate) {
+          if (existing != frame_candidates.end()) {
+            // The first copy keeps its scores, which feed the Viterbi costs,
+            // but the search provenance of a later copy of the same
+            // assignment is merged as the band and report ledger do. The
+            // exported search domain is frame-constant, so a virtual copy
+            // recorded before the search's must not hide the search audit.
+            const bool equivalence_known =
+                existing->search_equivalence_known ||
+                candidate.search_equivalence_known;
+            const bool equivalent_to_search_best =
+                (existing->search_equivalence_known &&
+                 existing->equivalent_to_search_best) ||
+                (candidate.search_equivalence_known &&
+                 candidate.equivalent_to_search_best);
+            existing->search_equivalence_known = equivalence_known;
+            existing->equivalent_to_search_best = equivalent_to_search_best;
+            merge_pbctopo_search_domain_provenance(*existing, candidate);
             ++timing.pbctopo_temporal_assignment_deduped;
             return;
           }
@@ -6942,57 +7254,11 @@ int Multi_MOL::solve_pbc_pbctopo(Multi_MOL &mol2, arguments &Arguments,
           } else {
             offsets = extract_offsets_and_time(component_atoms, points);
           }
-          if (offsets.size() != components.size()) {
+          if (!align_component_offsets_to_points(component_atoms, components,
+                                                 certification_lattice, points,
+                                                 offsets)) {
             ++timing.pbctopo_output_certification_band_precheck_rejects;
             return false;
-          }
-          size_t reference_component = components.size();
-          for (size_t comp_idx = 0; comp_idx < components.size(); ++comp_idx) {
-            if (!components[comp_idx].empty()) {
-              reference_component = comp_idx;
-              break;
-            }
-          }
-          if (reference_component == components.size()) {
-            ++timing.pbctopo_output_certification_band_precheck_rejects;
-            return false;
-          }
-          const size_t reference_atom =
-              components[reference_component].front();
-          if (reference_atom >= component_atoms.size() ||
-              reference_atom >= points.size()) {
-            ++timing.pbctopo_output_certification_band_precheck_rejects;
-            return false;
-          }
-          const auto absolute_scaled = certification_lattice.cartesian_to_scaled(
-              points[reference_atom].x - component_atoms[reference_atom].x,
-              points[reference_atom].y - component_atoms[reference_atom].y,
-              points[reference_atom].z - component_atoms[reference_atom].z);
-          Int3 absolute_reference_offset{};
-          if (!titan_pbctopo::pbctopo_checked_round_image(
-                  absolute_scaled[0], absolute_reference_offset.x) ||
-              !titan_pbctopo::pbctopo_checked_round_image(
-                  absolute_scaled[1], absolute_reference_offset.y) ||
-              !titan_pbctopo::pbctopo_checked_round_image(
-                  absolute_scaled[2], absolute_reference_offset.z)) {
-            ++timing.pbctopo_output_certification_band_precheck_rejects;
-            return false;
-          }
-          Int3 global_offset_correction{};
-          if (!titan_pbctopo::checked_int3_subtract(
-                  absolute_reference_offset, offsets[reference_component],
-                  global_offset_correction)) {
-            ++timing.pbctopo_output_certification_band_precheck_rejects;
-            return false;
-          }
-          for (Int3 &offset : offsets) {
-            Int3 corrected{};
-            if (!titan_pbctopo::checked_int3_add(
-                    offset, global_offset_correction, corrected)) {
-              ++timing.pbctopo_output_certification_band_precheck_rejects;
-              return false;
-            }
-            offset = corrected;
           }
           candidate.assignment =
               make_pbctopo_image_assignment(offsets, components,
@@ -7128,11 +7394,28 @@ int Multi_MOL::solve_pbc_pbctopo(Multi_MOL &mol2, arguments &Arguments,
         return;
       }
       selected_evidence_audit = *audit;
+      cache_candidate_evidence_audit(assignment, *audit);
       apply_selected_evidence_to_frame_identifiability();
       ++timing.pbctopo_selected_evidence_audits;
       timing.pbctopo_selected_evidence_contacts_checked +=
           audit->contacts_checked;
       timing.pbctopo_selected_evidence_contacts_lost += audit->contacts_lost;
+    };
+    // Status and the warm-state commit must follow the same selected-evidence
+    // audit that finalize_frame_report writes over the frame identifiability.
+    // The contact graph built before the search can still call a frame
+    // disconnected that the audit of the selected assignment finds supported.
+    auto selected_relative_images_identified = [&]() {
+      PbctopoIdentifiability selected_identifiability = frame_identifiability;
+      titan_pbctopo::apply_pbctopo_final_selected_evidence(
+          selected_identifiability, selected_evidence_audit.evaluated,
+          selected_evidence_audit.evidence_graph_connected,
+          selected_evidence_audit.evidence_component_count,
+          selected_evidence_audit.evidence_edge_count,
+          selected_evidence_audit.explicit_contact_evidence_edges,
+          selected_evidence_audit.scored_contact_evidence_edges,
+          selected_evidence_audit.evidence_connected_component_count);
+      return pbctopo_relative_images_identified(selected_identifiability);
     };
     auto export_h9_partition_and_orbit =
         [&](const PbctopoCutCandidate &base_candidate,
@@ -7573,11 +7856,55 @@ int Multi_MOL::solve_pbc_pbctopo(Multi_MOL &mol2, arguments &Arguments,
             frame_report.score_gap_metric = score_gap.metric;
             frame_report.score_gap = score_gap.gap;
           }
-          if (pbctopo_assignment_set_report.is_open() &&
+          if (evidence_relation_export_enabled &&
+              !evidence_relation_frame_written) {
+            evidence_relation_frame_written = true;
+            if (!evidence_relation_cache_error.empty()) {
+              ++evidence_relation_export_failures;
+              append_pbctopo_log_line(
+                  "[pbctopo] candidate evidence relation export failed "
+                  "closed at frame " +
+                  to_string(frame_report.frame) + ": " +
+                  evidence_relation_cache_error);
+            } else {
+              const auto &export_candidates =
+                  temporal_mode == PbctopoTemporalMode::Viterbi
+                      ? temporal_cut_candidates[frame_idx]
+                      : report_certified_candidates;
+              const auto exported = write_pbctopo_candidate_evidence_frame(
+                  pbctopo_candidate_evidence_summary_report,
+                  pbctopo_candidate_evidence_relation_report, frame_report,
+                  export_candidates, selected_for_report,
+                  temporal_mode == PbctopoTemporalMode::Viterbi,
+                  evidence_relation_audit_snapshots);
+              if (!exported) {
+                ++evidence_relation_export_failures;
+                append_pbctopo_log_line(
+                    "[pbctopo] candidate evidence relation export failed "
+                    "closed at frame " +
+                    to_string(frame_report.frame) + ": " + exported.error());
+              } else {
+                evidence_relation_export_groups +=
+                    exported->candidate_groups;
+                evidence_relation_export_rows += exported->relation_rows;
+                evidence_relation_export_duplicates +=
+                    exported->duplicate_candidates_skipped;
+              }
+            }
+          }
+          // The certified band is exported only for frames that have one.
+          // The rejection ledger records every evaluated rejection whatever
+          // the frame's status: a frame at which every candidate failed and
+          // fell back is where the ledger matters most, and an empty ledger
+          // must mean "nothing was rejected", not "the frame was skipped".
+          const bool band_status =
+              status == PbctopoFrameStatus::Certified ||
+              status == PbctopoFrameStatus::Rescued ||
+              status == PbctopoFrameStatus::WeakObservation;
+          if ((pbctopo_assignment_set_report.is_open() ||
+               pbctopo_rejected_assignment_report.is_open()) &&
               temporal_mode != PbctopoTemporalMode::Viterbi &&
-              (status == PbctopoFrameStatus::Certified ||
-               status == PbctopoFrameStatus::Rescued ||
-               status == PbctopoFrameStatus::WeakObservation)) {
+              (band_status || !report_rejected_candidates.empty())) {
             double v1[3]{}, v2[3]{}, v3[3]{};
             this->m_mol[frame_idx].Box.get_v1(v1);
             this->m_mol[frame_idx].Box.get_v2(v2);
@@ -7586,11 +7913,23 @@ int Multi_MOL::solve_pbc_pbctopo(Multi_MOL &mol2, arguments &Arguments,
                 titan_pbctopo::pbctopo_temporal_normalized_gram(
                     {v1[0], v1[1], v1[2], v2[0], v2[1], v2[2],
                      v3[0], v3[1], v3[2]});
-            write_pbctopo_assignment_set_rows(
+            vector<PbctopoCutCandidate> report_band =
+                report_certified_candidates;
+            report_band.insert(report_band.end(),
+                               report_rejected_candidates.begin(),
+                               report_rejected_candidates.end());
+            if (pbctopo_rejected_assignment_report.is_open())
+              titan_pbctopo::write_pbctopo_rejected_assignment_rows(
+                  pbctopo_rejected_assignment_report,
+                  frame_report_offset + frame_idx,
+                  this->m_mol[frame_idx].time_of_snap, report_band,
+                  normalized_gram, frame_report.topology_epoch_id);
+            if (band_status && pbctopo_assignment_set_report.is_open())
+              write_pbctopo_assignment_set_rows(
                 pbctopo_assignment_set_report,
                 frame_report_offset + frame_idx,
                 this->m_mol[frame_idx].time_of_snap,
-                report_certified_candidates, selected_for_report,
+                report_band, selected_for_report,
                 frame_report.identifiability, normalized_gram,
                 better_cut_candidate, frame_report.topology_epoch_id,
                 frame_report
@@ -7655,6 +7994,7 @@ int Multi_MOL::solve_pbc_pbctopo(Multi_MOL &mol2, arguments &Arguments,
             reset_kinematic_seed_history(warm_state, timing);
             temporal_cut_candidates[frame_idx].clear();
             report_certified_candidates.clear();
+            report_rejected_candidates.clear();
             ++timing.pbctopo_diagnostic_only_candidates;
             record_frame_failure(
                 PbctopoFailureReason::EvidenceHypothesisUnavailable);
@@ -7678,8 +8018,7 @@ int Multi_MOL::solve_pbc_pbctopo(Multi_MOL &mol2, arguments &Arguments,
                                                     runtime_cutoffs.clash_cutoff);
           if (evidence_contradicted) {
             warm_state = frame_start_warm_state;
-          } else if (!evidence_weak &&
-                     pbctopo_relative_images_identified(frame_identifiability)) {
+          } else if (!evidence_weak && selected_relative_images_identified()) {
             if (!commit_certified_candidate_to_warm_state(
                     best_safe_candidate)) {
               ++timing.pbctopo_diagnostic_only_candidates;
@@ -9067,34 +9406,105 @@ int Multi_MOL::solve_pbc_pbctopo(Multi_MOL &mol2, arguments &Arguments,
       optional<PbctopoCutCandidate> complete_band_winner;
       optional<PbctopoSelectedEvidenceAudit> complete_band_winner_audit;
       size_t complete_band_winner_index = 0;
+      size_t complete_band_winner_all_atom_rejects = 0;
       PbctopoFrameMode complete_band_winner_mode = PbctopoFrameMode::None;
       vector<Int3> complete_band_winner_offsets;
       bool evidence_audit_failed = false;
+      // Every band candidate is certified and audited, with no early exit,
+      // so the geometry of all of them is computed first -- on the
+      // TitanExecutor's workers when it has any -- and the loop below then
+      // replays, in band order, exactly what the serial loop did with it.
+      // Workers need the component context built and every offset vector
+      // complete (the only paths on which certification writes frame state
+      // before it finishes); otherwise the loop certifies serially as before.
+      const size_t band_size = output_candidate_band.size();
+      const size_t band_workers =
+          executor != nullptr ? min(executor->capacity(), band_size) : 1;
+      const bool band_parallel =
+          band_workers > 1 && component_context_ready &&
+          all_of(output_candidate_band.begin(), output_candidate_band.end(),
+                 [&](const auto &snapshot) {
+                   return snapshot.offsets.size() == components.size();
+                 });
+      vector<PbctopoCutCandidate> band_candidates;
+      vector<vector<Vec3>> band_points;
+      vector<CandidateCertificationWork> band_work;
+      if (band_parallel) {
+        band_candidates.resize(band_size);
+        band_points.resize(band_size);
+        band_work.resize(band_size);
+        executor->parallel_for(
+            band_size, band_workers, 1,
+            [&](size_t, size_t begin, size_t end) {
+              for (size_t index = begin; index < end; ++index) {
+                const auto &snapshot = output_candidate_band[index];
+                // The serial loop builds the points on the frame's thread
+                // too, so their lattice queries belong in the carried delta.
+                const auto worker_before =
+                    titan_pbctopo::pbctopo_lattice_query_audit();
+                band_candidates[index] = snapshot.candidate;
+                double shift_norm2 = 0.0;
+                build_component_points_from_offsets(
+                    component_atoms, components, this->m_mol[frame_idx].Box,
+                    snapshot.offsets, band_points[index], shift_norm2);
+                compute_candidate_certification(
+                    band_work[index], band_candidates[index],
+                    band_points[index], &snapshot.offsets, true);
+                band_work[index].worker_lattice_delta =
+                    titan_pbctopo::pbctopo_lattice_query_audit_delta(
+                        worker_before,
+                        titan_pbctopo::pbctopo_lattice_query_audit());
+              }
+            });
+      }
       for (size_t band_index = 0; band_index < output_candidate_band.size();
            ++band_index) {
         auto &snapshot = output_candidate_band[band_index];
-        PbctopoCutCandidate candidate = snapshot.candidate;
-        double output_shift_norm2 = 0.0;
-        build_component_points_from_offsets(
-            component_atoms, components, this->m_mol[frame_idx].Box,
-            snapshot.offsets, output_certification_points,
-            output_shift_norm2);
+        PbctopoCutCandidate candidate =
+            band_parallel ? std::move(band_candidates[band_index])
+                          : snapshot.candidate;
+        if (band_parallel) {
+          output_certification_points = band_points[band_index];
+        } else {
+          double output_shift_norm2 = 0.0;
+          build_component_points_from_offsets(
+              component_atoms, components, this->m_mol[frame_idx].Box,
+              snapshot.offsets, output_certification_points,
+              output_shift_norm2);
+        }
         ++timing.pbctopo_output_certification_band_rebuilds;
-        if (!certify_candidate_for_output(candidate,
-                                          output_certification_points,
-                                          &snapshot.offsets)) {
+        const bool certified =
+            band_parallel
+                ? apply_candidate_certification(band_work[band_index],
+                                                candidate)
+                : certify_candidate_for_output(candidate,
+                                               output_certification_points,
+                                               &snapshot.offsets);
+        if (!certified) {
           ++output_certificate_rejects;
           ++output_all_atom_certificate_rejects;
           ++timing.pbctopo_output_certification_band_rejects;
+          if (heavy_search_omits_atoms) {
+            ++timing.pbctopo_heavy_search_all_atom_candidate_rejects;
+            if (band_index == 0)
+              ++timing.pbctopo_heavy_search_top_candidate_rejects;
+          }
           ++timing.pbctopo_diagnostic_only_candidates;
           continue;
         }
+        // The audit the serial loop computed here has the same inputs as the
+        // one certification made for the evidence annotation, so a worker's
+        // copy of that one is reused.
         const auto audit_started = clock::now();
-        auto audit = titan_pbctopo::audit_pbctopo_selected_hypotheses(
-            span<const PbctopoAtom>(base_atoms),
-            span<const Vec3>(output_certification_points),
-            base_anchor_context.contact_hypotheses, candidate.assignment,
-            true, explicit_evidence_component_edges);
+        auto audit =
+            band_parallel && band_work[band_index].evidence.has_value()
+                ? *band_work[band_index].evidence
+                : titan_pbctopo::audit_pbctopo_selected_hypotheses(
+                      span<const PbctopoAtom>(base_atoms),
+                      span<const Vec3>(output_certification_points),
+                      base_anchor_context.contact_hypotheses,
+                      candidate.assignment, true,
+                      explicit_evidence_component_edges);
         timing.pbctopo_selected_evidence_audit_s +=
             chrono::duration<double>(clock::now() - audit_started).count();
         if (!audit || !audit->evaluated) {
@@ -9116,7 +9526,10 @@ int Multi_MOL::solve_pbc_pbctopo(Multi_MOL &mol2, arguments &Arguments,
         if (!complete_band_winner.has_value()) {
           complete_band_winner = candidate;
           complete_band_winner_audit = *audit;
+          cache_candidate_evidence_audit(candidate.assignment, *audit);
           complete_band_winner_index = band_index;
+          complete_band_winner_all_atom_rejects =
+              output_all_atom_certificate_rejects;
           complete_band_winner_mode = snapshot.mode;
           complete_band_winner_offsets = snapshot.offsets;
         }
@@ -9129,6 +9542,16 @@ int Multi_MOL::solve_pbc_pbctopo(Multi_MOL &mol2, arguments &Arguments,
       if (!complete_band_exported) {
         frame_identifiability.feasible_assignment_set_enumerated = false;
         frame_identifiability.feasible_assignments_within_domain = 0;
+        // apply_pbctopo_search_identifiability derives evidence_uniqueness_known
+        // from feasible_assignment_set_enumerated, so retracting the enumeration
+        // here has to retract the claim that uniqueness is known along with it.
+        // Leaving it set writes a frame that says the evidence uniqueness is
+        // known while reporting no feasible-set audit, a pair that downstream
+        // frame-binding validators reject as invalid_candidate_set. It only
+        // shows on frames with no evidence-compatible candidate, where the
+        // band cannot be exported.
+        frame_identifiability.evidence_uniqueness_known = false;
+        frame_identifiability.evidence_unique_within_search_domain = false;
       }
       if (complete_band_winner.has_value() &&
           complete_band_winner_audit.has_value()) {
@@ -9150,8 +9573,7 @@ int Multi_MOL::solve_pbc_pbctopo(Multi_MOL &mol2, arguments &Arguments,
                 PbctopoEvidenceState::WeakDisconnected ||
             selected_evidence_audit.state ==
                 PbctopoEvidenceState::WeakAmbiguous;
-        const bool output_identified =
-            pbctopo_relative_images_identified(frame_identifiability);
+        const bool output_identified = selected_relative_images_identified();
         bool winner_commit_ok = true;
         if (evidence_contradicted) {
           warm_state = frame_start_warm_state;
@@ -9191,9 +9613,17 @@ int Multi_MOL::solve_pbc_pbctopo(Multi_MOL &mol2, arguments &Arguments,
                               : PbctopoFailureReason::EvidenceDisconnected,
               &best_safe_candidate);
           output_candidate_committed = true;
+          // Every member ranked above the winner was rejected, so these are
+          // the recoveries the first-certifiable loop below counts.
+          if (complete_band_winner_index > 0)
+            ++timing.pbctopo_output_certification_band_recoveries;
           if (complete_band_winner_index >=
               kInitialOutputCertificationBand) {
             ++timing.pbctopo_output_certification_band_expanded_recoveries;
+          }
+          if (heavy_search_omits_atoms &&
+              complete_band_winner_all_atom_rejects > 0) {
+            ++timing.pbctopo_heavy_search_all_atom_ranking_recoveries;
           }
         }
       } else if (evidence_audit_failed) {
@@ -9201,6 +9631,7 @@ int Multi_MOL::solve_pbc_pbctopo(Multi_MOL &mol2, arguments &Arguments,
         reset_kinematic_seed_history(warm_state, timing);
         temporal_cut_candidates[frame_idx].clear();
         report_certified_candidates.clear();
+            report_rejected_candidates.clear();
         record_frame_failure(
             PbctopoFailureReason::EvidenceHypothesisUnavailable);
       }
@@ -9235,6 +9666,7 @@ int Multi_MOL::solve_pbc_pbctopo(Multi_MOL &mol2, arguments &Arguments,
         reset_kinematic_seed_history(warm_state, timing);
         temporal_cut_candidates[frame_idx].clear();
         report_certified_candidates.clear();
+            report_rejected_candidates.clear();
         ++output_certificate_rejects;
         ++timing.pbctopo_output_certification_band_rejects;
         ++timing.pbctopo_diagnostic_only_candidates;
@@ -9253,8 +9685,7 @@ int Multi_MOL::solve_pbc_pbctopo(Multi_MOL &mol2, arguments &Arguments,
                                             output_certification_points,
                                             &snapshot.offsets);
       }
-      const bool output_identified =
-          pbctopo_relative_images_identified(frame_identifiability);
+      const bool output_identified = selected_relative_images_identified();
       if (evidence_contradicted) {
         warm_state = frame_start_warm_state;
       } else if (output_identified && !evidence_weak) {
@@ -9391,8 +9822,7 @@ int Multi_MOL::solve_pbc_pbctopo(Multi_MOL &mol2, arguments &Arguments,
             string(pbctopo_hull::avx2_available() ? "on" : "off"));
         if (accept_rescue_candidate(best_hull_points, best_hull_candidate)) {
           ++timing.hull_rescue_successes;
-          const bool rescue_identified =
-              pbctopo_relative_images_identified(frame_identifiability);
+          const bool rescue_identified = selected_relative_images_identified();
           const bool rescue_evidence_weak =
               selected_evidence_audit.state == PbctopoEvidenceState::WeakDisconnected ||
               selected_evidence_audit.state == PbctopoEvidenceState::WeakAmbiguous;
@@ -9442,7 +9872,7 @@ int Multi_MOL::solve_pbc_pbctopo(Multi_MOL &mol2, arguments &Arguments,
           if (accept_rescue_candidate(rescued_points, rescued_candidate)) {
             ++timing.distance_rescue_successes;
             const bool rescue_identified =
-                pbctopo_relative_images_identified(frame_identifiability);
+                selected_relative_images_identified();
             const bool rescue_evidence_weak =
                 selected_evidence_audit.state == PbctopoEvidenceState::WeakDisconnected ||
                 selected_evidence_audit.state == PbctopoEvidenceState::WeakAmbiguous;
@@ -9830,17 +10260,11 @@ int Multi_MOL::solve_pbc_pbctopo(Multi_MOL &mol2, arguments &Arguments,
           if (pbctopo_assignment_set_report.is_open() &&
               report.status != PbctopoFrameStatus::Contradicted &&
               !temporal_cut_candidates[frame_idx].empty()) {
+            // selected_framewise marks the greedy choice. After a replay the
+            // report's assignment_signature names the temporal output, and
+            // consumers derive changed-from-greedy by comparing the two.
             const PbctopoCutCandidate *selected_for_report =
                 &greedy_selected_candidates[frame_idx];
-            const auto selected_it = find_if(
-                temporal_cut_candidates[frame_idx].begin(),
-                temporal_cut_candidates[frame_idx].end(),
-                [&](const PbctopoCutCandidate &candidate) {
-                  return candidate.assignment.signature ==
-                         report.assignment_signature;
-                });
-            if (selected_it != temporal_cut_candidates[frame_idx].end())
-              selected_for_report = &*selected_it;
             double v1[3]{}, v2[3]{}, v3[3]{};
             this->m_mol[frame_idx].Box.get_v1(v1);
             this->m_mol[frame_idx].Box.get_v2(v2);
@@ -9864,6 +10288,21 @@ int Multi_MOL::solve_pbc_pbctopo(Multi_MOL &mol2, arguments &Arguments,
       }
     }
   }
+
+  append_pbctopo_log_line(
+      "[pbctopo evidence relation export] requested=" +
+      string(Arguments.pbc.pbctopo_evidence_export ? "1" : "0") +
+      ", enabled=" +
+      string(pbctopo_candidate_evidence_summary_report.is_open() &&
+                     pbctopo_candidate_evidence_relation_report.is_open()
+                 ? "1"
+                 : "0") +
+      ", candidate_groups=" +
+      to_string(evidence_relation_export_groups) + ", relation_rows=" +
+      to_string(evidence_relation_export_rows) +
+      ", duplicate_candidates_skipped=" +
+      to_string(evidence_relation_export_duplicates) + ", failures=" +
+      to_string(evidence_relation_export_failures));
 
   timing.pbctopo_frame_point_buffer_peak_bytes_estimate =
       max(timing.pbctopo_frame_point_buffer_peak_bytes_estimate,

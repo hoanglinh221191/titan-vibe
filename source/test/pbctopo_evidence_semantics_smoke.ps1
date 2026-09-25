@@ -13,6 +13,7 @@ $exe = Join-Path $WorkRoot 'smoke.exe'
 #include "pbctopo/evidence_audit.h"
 #include "pbctopo/report.h"
 
+#include <algorithm>
 #include <array>
 #include <cstdlib>
 #include <iostream>
@@ -149,6 +150,21 @@ int main() {
              ambiguous->contacts_lost == 0 &&
              !ambiguous->selected_hypothesis_hash.empty(),
          "incompatible alternative was incorrectly counted as a lost contact");
+  expect(ambiguous->relation_audits.size() == 1 &&
+             ambiguous->relation_audits[0].component_a == 0 &&
+             ambiguous->relation_audits[0].component_b == 1 &&
+             ambiguous->relation_audits[0].component_id_a == 10 &&
+             ambiguous->relation_audits[0].component_id_b == 20 &&
+             ambiguous->relation_audits[0].observed_hypothesis_relation &&
+             ambiguous->relation_audits[0].support.compatibility_match &&
+             ambiguous->relation_audits[0].support.active_at_threshold &&
+             ambiguous->relation_audits[0].support.support_primary == 1.0 &&
+             ambiguous->relation_audits[0]
+                     .support.closest_shift_linf_distance == 0 &&
+             ambiguous->relation_audits[0].compatible_contact_count == 1 &&
+             ambiguous->relation_audits[0]
+                     .alternative_hypothesis_contact_count == 1,
+         "compatible relation support record was not provenance complete");
   selected.component_offsets[1] = {2, 0, 0};
   const auto no_support = audit_pbctopo_selected_hypotheses(
       std::span<const PbctopoAtom>(hypothesis_atoms),
@@ -158,6 +174,102 @@ int main() {
              no_support->no_supported_contact_relation_count == 1 &&
              no_support->selected_hypothesis_hash.empty(),
          "no-support complement was serialized as a selected hypothesis");
+  expect(no_support->relation_audits.size() == 1 &&
+             !no_support->relation_audits[0].support.compatibility_match &&
+             !no_support->relation_audits[0].support.active_at_threshold &&
+             no_support->relation_audits[0].support.support_primary == 0.0 &&
+             no_support->relation_audits[0]
+                     .support.closest_shift_linf_distance_defined &&
+             no_support->relation_audits[0]
+                     .support.closest_shift_linf_distance == 1 &&
+             no_support->relation_audits[0].support.reason ==
+                 PbctopoEvidenceSupportReason::NoCompatibleHypothesis &&
+             no_support->evidence_edge_count == 0,
+         "inactive relation support did not replay the disconnected graph");
+
+  const std::array<std::pair<std::size_t, std::size_t>, 1>
+      explicit_relation{{{1, 0}}};
+  const auto explicit_no_support = audit_pbctopo_selected_hypotheses(
+      std::span<const PbctopoAtom>(hypothesis_atoms),
+      std::span<const Point>(selected_points), hypotheses, selected, true,
+      explicit_relation);
+  expect(explicit_no_support && explicit_no_support->relation_audits.size() == 1 &&
+             explicit_no_support->relation_audits[0]
+                 .support.explicit_relation &&
+             explicit_no_support->relation_audits[0]
+                 .support.active_at_threshold &&
+             explicit_no_support->relation_audits[0]
+                     .support.support_primary == 1.0 &&
+             explicit_no_support->relation_audits[0].support.reason ==
+                 PbctopoEvidenceSupportReason::ExplicitRelation &&
+             explicit_no_support->evidence_edge_count == 1 &&
+             explicit_no_support->explicit_contact_evidence_edges == 1 &&
+             explicit_no_support->scored_contact_evidence_edges == 0 &&
+             explicit_no_support->evidence_graph_connected,
+         "explicit relation did not override an incompatible hypothesis");
+
+  PbctopoContactHypothesisSet empty_hypotheses;
+  empty_hypotheses.complete = true;
+  const auto explicit_only = audit_pbctopo_selected_hypotheses(
+      std::span<const PbctopoAtom>(hypothesis_atoms),
+      std::span<const Point>(selected_points), empty_hypotheses, selected, true,
+      explicit_relation);
+  expect(explicit_only && explicit_only->relation_audits.size() == 1 &&
+             !explicit_only->relation_audits[0]
+                  .observed_hypothesis_relation &&
+             explicit_only->relation_audits[0].support.explicit_relation &&
+             explicit_only->relation_audits[0].support.active_at_threshold &&
+             !explicit_only->relation_audits[0]
+                  .support.closest_shift_linf_distance_defined &&
+             explicit_only->evidence_edge_count == 1 &&
+             explicit_only->evidence_graph_connected,
+         "explicit-only relation was omitted from the support audit");
+
+  PbctopoContactHypothesisSet chain_hypotheses;
+  chain_hypotheses.hypotheses = {
+      {0, 1, 10, 20, {0, 0, 0}, {}},
+      {1, 2, 20, 30, {1, 0, 0}, {}}};
+  chain_hypotheses.component_relation_count = 2;
+  chain_hypotheses.complete = true;
+  PbctopoImageAssignment chain_selected;
+  chain_selected.component_ids = {10, 20, 30};
+  chain_selected.component_offsets = {{0, 0, 0}, {0, 0, 0}, {2, 0, 0}};
+  chain_selected.valid = true;
+  const auto weak_chain = audit_pbctopo_selected_hypotheses(
+      std::span<const PbctopoAtom>{}, std::span<const Point>{},
+      chain_hypotheses, chain_selected, true);
+  expect(weak_chain && weak_chain->relation_audits.size() == 2 &&
+             weak_chain->relation_audits[0].support.active_at_threshold &&
+             !weak_chain->relation_audits[1].support.active_at_threshold &&
+             weak_chain->evidence_edge_count == 1 &&
+             weak_chain->scored_contact_evidence_edges == 1 &&
+             weak_chain->evidence_connected_component_count == 2 &&
+             weak_chain->relative_lattice_degrees_of_freedom == 3 &&
+             !weak_chain->evidence_graph_connected,
+         "relation reduction did not reproduce a weak three-component chain");
+  const std::array<std::pair<std::size_t, std::size_t>, 1>
+      chain_explicit{{{2, 1}}};
+  const auto connected_chain = audit_pbctopo_selected_hypotheses(
+      std::span<const PbctopoAtom>{}, std::span<const Point>{},
+      chain_hypotheses, chain_selected, true, chain_explicit);
+  expect(connected_chain && connected_chain->relation_audits.size() == 2 &&
+             connected_chain->relation_audits[0].support.active_at_threshold &&
+             connected_chain->relation_audits[1].support.active_at_threshold &&
+             connected_chain->evidence_edge_count == 2 &&
+             connected_chain->explicit_contact_evidence_edges == 1 &&
+             connected_chain->scored_contact_evidence_edges == 1 &&
+             connected_chain->evidence_connected_component_count == 1 &&
+             connected_chain->relative_lattice_degrees_of_freedom == 0 &&
+             connected_chain->evidence_graph_connected,
+         "explicit support did not close the three-component evidence chain");
+
+  auto duplicate_ids = selected;
+  duplicate_ids.component_ids = {10, 10};
+  expect(!audit_pbctopo_selected_hypotheses(
+              std::span<const PbctopoAtom>(hypothesis_atoms),
+              std::span<const Point>(selected_points), hypotheses,
+              duplicate_ids, true),
+         "duplicate stable component IDs were accepted by the support audit");
 
   const Int3 n_ab{1, 0, 0};
   Int3 n_ba{};

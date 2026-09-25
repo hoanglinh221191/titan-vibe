@@ -1,11 +1,7 @@
 {
-  "distribution_version": "1.0.2",
-  "prior_software_doi": "10.5281/zenodo.22669272",
-  "published_v101_zip_md5": "2ab88134000f07383865cf7f62791254",
-  "published_v101_zip_sha256": "7e8243b858ff71d42f047d08b6bcb8782386e4f83d28865fb2f63bc6cf6d5bf7",
-  "prior_build_target": "titan_vibe STATIC; no standalone executable",
-  "new_distribution": "Executable plus complete HoloLift-excluded host source and replay drivers",
-  "base_titan_commit": "6a8385cf1c63c42046b8a38053f003311e85e633",
+  "distribution_version": "1.0.3",
+  "prior_software_doi": "10.5281/zenodo.22723358",
+  "base_titan_commit": "50ed41edecfe7b9cc5b72fec1ed5d38827d4c6ac",
   "source_comparison": "UTF-8 text with CRLF/LF normalized",
   "identical_published_source_files": [
     "src/aligned_allocator.h",
@@ -45,6 +41,11 @@
     "src/pbctopo/config.h",
     "src/pbctopo/evidence_audit.cpp",
     "src/pbctopo/evidence_audit.h",
+    "src/pbctopo/evidence_connectivity_margin.cpp",
+    "src/pbctopo/evidence_connectivity_margin.h",
+    "src/pbctopo/evidence_relation_report.cpp",
+    "src/pbctopo/evidence_relation_report.h",
+    "src/pbctopo/evidence_support_policy.h",
     "src/pbctopo/identifiability.cpp",
     "src/pbctopo/identifiability.h",
     "src/pbctopo/image_assignment.cpp",
@@ -102,14 +103,14 @@
     "src/topology_include_utils.h",
     "src/uti_func.h"
   ],
-  "adapted_host_headers": [
+  "adapted_or_library_only_files": [
     "src/arguments.h",
     "src/box_type.h",
     "src/MOL.h",
     "src/Multi_MOL.h",
     "src/titan_ui.h"
   ],
-  "hololift_source_included": false,
+  "hololift_source_included": true,
   "hololift_symbols_present": false,
   "imported_dlls": [
     "KERNEL32.dll",
@@ -126,16 +127,22 @@
     "api-ms-win-crt-time-l1-1-0.dll",
     "api-ms-win-crt-utility-l1-1-0.dll"
   ],
-  "binary_sha256": "34f00e72526137bb0bee87f16729a73525a98d3751646dc1df5c57f592b0b04f",
+  "binary_sha256": "f4dc1e68d8a1ff40b9c1834bd0f526dcf90bf67a8816f931e3da4a2887099270",
+  "heldout_reference_updates_vs_1.0.2": {
+    "pdb": 1,
+    "fields": {
+      "mode": 80
+    }
+  },
   "heldout_replayed": 480,
-  "heldout_coordinate_hashes_identical": 480,
-  "five_first_frames_pass": true,
-  "partial_long_replay_completed_sets": 2,
-  "partial_long_replay_completed_frames": 202,
-  "full_367_replay_complete": false,
-  "full_367_replay_stop_reason": "User requested no rerun of every test; completed subset retained",
-  "additional_figure_frames_pass": 2,
-  "algorithm_changed": false,
-  "initial_sequential_replay": "Interrupted for execution concurrency change; partial evidence retained outside delivery; full parallel replay is authoritative for this package",
-  "scope": "Reconstruction replay only; no new molecular dynamics, benchmark measurements, or physical validation"
+  "heldout_all_pass": true,
+  "first_frames_all_pass": true,
+  "real_frames_replayed_systems": 7,
+  "real_frames_all_pass": true,
+  "replay_exit_codes": {
+    "heldout": 0,
+    "first5": 0,
+    "all367": 0
+  },
+  "scope": "Reconstruction replay of fixed inputs; the article's validation records are in the data deposit."
 }

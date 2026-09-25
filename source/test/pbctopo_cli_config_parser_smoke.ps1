@@ -103,6 +103,9 @@ Invoke-PbctopoParserCase 'bad_temporal_k' `
 Invoke-PbctopoParserCase 'bad_temporal_penalty' `
     @('-pbctopo', '-pbctopo-temporal-penalty', '-1') `
     'pbctopo-temporal-penalty.*>= 0'
+Invoke-PbctopoParserCase 'bad_evidence_export_bool' `
+    @('-pbctopo-evidence-export=maybe') `
+    'boolean option.*pbctopo-evidence-export'
 Invoke-PbctopoParserCase 'bad_vdw_scale' `
     @('-pbctopo', '-pbctopo-vdw-clash-scale', '1.2') `
     'pbctopo-vdw-clash-scale.*\(0, 1\]'

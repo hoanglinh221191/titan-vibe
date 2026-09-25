@@ -53,6 +53,10 @@ public:
   }
   [[nodiscard]] std::optional<double>
   vdw_radius(std::uint32_t atom) const noexcept;
+  // Only source-identity-resolved topology masses; no parameter sentinel fallback.
+  [[nodiscard]] std::optional<double>
+  atomic_mass(std::uint32_t atom) const noexcept;
+  void set_atomic_masses(std::vector<double> masses);
   [[nodiscard]] MolTopologyVdwRadiusSource
   vdw_radius_source(std::uint32_t atom) const noexcept;
   [[nodiscard]] std::size_t vdw_radius_count() const noexcept {
@@ -82,6 +86,7 @@ private:
   std::vector<std::uint32_t> col_indices_;
   std::vector<std::uint32_t> source_atom_ids_;
   std::vector<double> vdw_radii_;
+  std::vector<double> atomic_masses_;
   std::vector<MolTopologyVdwRadiusSource> vdw_radius_sources_;
   std::size_t vdw_radius_count_ = 0;
 };

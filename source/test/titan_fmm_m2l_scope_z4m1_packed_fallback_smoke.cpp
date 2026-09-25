@@ -1,8 +1,10 @@
 #include "tabi/tabi_fmm_m2l_fallback.h"
+#include "tabi/tabi_near.h"
 #include "tabi/tabi_types.h"
 #include "titan_executor.h"
 
 #include <cmath>
+#include <cstdint>
 #include <cstdlib>
 #include <iostream>
 #include <string>
@@ -91,6 +93,52 @@ double rel_rms(const std::vector<double> &a, const std::vector<double> &b) {
   }
   return std::sqrt(diff_sq / std::max(1.0e-300, ref_sq));
 }
+
+struct DirectFallbackReference {
+  std::vector<double> phi;
+  std::vector<double> phin;
+  std::uint64_t applied_pairs{0};
+};
+
+DirectFallbackReference evaluate_direct_reference(
+    const std::vector<Panel> &panels,
+    const std::vector<std::size_t> &source_order,
+    const std::vector<fmm::PackedFallbackLeafInput> &leaves,
+    const std::vector<double> &phi, const std::vector<double> &phin,
+    bool coupled, const std::string &near_integration,
+    const std::string &quad_buffer) {
+  DirectFallbackReference result;
+  result.phi.assign(panels.size(), 0.0);
+  result.phin.assign(panels.size(), 0.0);
+  for (const auto &leaf : leaves) {
+    for (const std::size_t target : leaf.target_panels) {
+      for (const auto &span : leaf.source_spans) {
+        const std::size_t end = span.first_panel + span.panel_count;
+        for (std::size_t pos = span.first_panel; pos < end; ++pos) {
+          const std::size_t source = source_order[pos];
+          const auto kernel = TitanPBE::Tabi::evaluate_jcp_near_pair_kernel(
+              panels[target], target, panels[source], source, 1.0 / 80.0,
+              0.1, coupled, near_integration, quad_buffer, nullptr);
+          const bool intentional_zero_self =
+              TitanPBE::Tabi::is_intentional_zero_self_kernel(
+                  kernel, coupled, near_integration);
+          expect(kernel.valid || intentional_zero_self,
+                 "direct zero-self reference saw an unexpected invalid kernel");
+          if (kernel.valid) {
+            result.phi[target] += kernel.k2 * phi[source];
+            if (coupled) {
+              result.phi[target] += kernel.k1 * phin[source];
+              result.phin[target] +=
+                  kernel.k3 * phin[source] + kernel.k4 * phi[source];
+            }
+          }
+          ++result.applied_pairs;
+        }
+      }
+    }
+  }
+  return result;
+}
 } // namespace
 
 int main() {
@@ -127,6 +175,10 @@ int main() {
       "analytic_singular", "off", "packed-avx2", four);
   expect(scalar.finite_outputs && packed.finite_outputs,
          "fallback outputs must be finite");
+  expect(scalar.applied_pairs == metrics.total_pairs,
+         "scalar fallback applied-pair coverage mismatch");
+  expect(packed.applied_pairs == metrics.total_pairs,
+         "packed fallback applied-pair coverage mismatch");
   expect(rel_rms(packed.phi, scalar.phi) <= 1.0e-12 &&
              rel_rms(packed.phin, scalar.phin) <= 1.0e-12,
          "packed fallback must match scalar fallback");
@@ -134,6 +186,55 @@ int main() {
          "self terms must be evaluated exactly once");
   expect(packed.vectorized_lanes > 0 && packed.vectorized_sources > 0,
          "packed path must exercise AVX2 lanes");
+
+  // The near-kernel contract represents self terms as intentional zeroes for
+  // the uncoupled formulation. Both scalar and AVX paths must process and
+  // count them, without adding a fabricated numerical contribution.
+  const auto scalar_uncoupled = fmm::apply_packed_jcp_fallback(
+      plan, panels, phi_a, phin_a, 1.0 / 80.0, 0.1, false,
+      "analytic_singular", "off", "scalar", one);
+  const auto packed_uncoupled = fmm::apply_packed_jcp_fallback(
+      plan, panels, phi_a, phin_a, 1.0 / 80.0, 0.1, false,
+      "analytic_singular", "off", "packed-avx2", four);
+  expect(scalar_uncoupled.finite_outputs && packed_uncoupled.finite_outputs,
+         "uncoupled zero-self outputs must be finite");
+  expect(scalar_uncoupled.applied_pairs == metrics.total_pairs &&
+             packed_uncoupled.applied_pairs == metrics.total_pairs,
+         "uncoupled zero-self coverage mismatch");
+  expect(scalar_uncoupled.scalar_self_pairs == metrics.self_pairs &&
+             packed_uncoupled.scalar_self_pairs == metrics.self_pairs,
+         "uncoupled zero-self accounting mismatch");
+  expect(rel_rms(packed_uncoupled.phi, scalar_uncoupled.phi) <= 1.0e-12 &&
+             rel_rms(packed_uncoupled.phin, scalar_uncoupled.phin) <= 1.0e-12,
+         "uncoupled packed fallback must match scalar fallback");
+  const auto uncoupled_reference = evaluate_direct_reference(
+      panels, source_order, leaves, phi_a, phin_a, false, "analytic_singular",
+      "off");
+  expect(uncoupled_reference.applied_pairs == metrics.total_pairs,
+         "uncoupled direct reference coverage mismatch");
+  expect(rel_rms(scalar_uncoupled.phi, uncoupled_reference.phi) <= 1.0e-12 &&
+             rel_rms(scalar_uncoupled.phin, uncoupled_reference.phin) <=
+                 1.0e-12,
+         "uncoupled scalar fallback must match direct reference");
+
+  // Centroid mode has the same explicit zero-self contract even when coupled.
+  const auto scalar_centroid = fmm::apply_packed_jcp_fallback(
+      plan, panels, phi_a, phin_a, 1.0 / 80.0, 0.1, true, "centroid", "off",
+      "scalar", one);
+  expect(scalar_centroid.finite_outputs,
+         "centroid zero-self scalar output must be finite");
+  expect(scalar_centroid.applied_pairs == metrics.total_pairs,
+         "centroid zero-self scalar coverage mismatch");
+  expect(scalar_centroid.scalar_self_pairs == metrics.self_pairs,
+         "centroid zero-self scalar accounting mismatch");
+  const auto centroid_reference = evaluate_direct_reference(
+      panels, source_order, leaves, phi_a, phin_a, true, "centroid", "off");
+  expect(centroid_reference.applied_pairs == metrics.total_pairs,
+         "centroid direct reference coverage mismatch");
+  expect(rel_rms(scalar_centroid.phi, centroid_reference.phi) <= 1.0e-12 &&
+             rel_rms(scalar_centroid.phin, centroid_reference.phin) <=
+                 1.0e-12,
+         "centroid scalar fallback must match direct reference");
 
   const auto packed_one = fmm::apply_packed_jcp_fallback(
       plan, panels, phi_a, phin_a, 1.0 / 80.0, 0.1, true,

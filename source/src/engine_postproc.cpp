@@ -1,3 +1,4 @@
+#include "titan_dham_segments.h"
 // engine_postproc.cpp — Post-loop analysis orchestration
 // Extracted from impl_engine.cpp for faster incremental builds.
 // Each function manages its own timing via std::chrono and logs via fstream.
@@ -3877,23 +3878,28 @@ void run_gbsa_postproc(const arguments &args, size_t tot_snap_allfiles,
         TitanUI::print_info("Successfully exported 5 ML features to " +
                             ml_out_file);
 
-        double predicted_pKD = ml_extractor.predict_affinity();
-        double predicted_KD = std::pow(10.0, -predicted_pKD);
-
-        std::ostringstream ss_out;
-        ss_out << std::fixed << std::setprecision(4) << predicted_pKD
-               << " (KD = " << std::scientific << std::setprecision(2)
-               << predicted_KD << " M)";
-        std::string pKD_str = ss_out.str();
-
-        std::string pred_file = info_output.get_ml_prediction_filename();
-        std::ofstream pred_out(pred_file);
-        pred_out << "[Titan ML] Predicted pKD = " << pKD_str << "\n";
-        pred_out.close();
-
-        log << "[Titan ML] Predicted pKD = " << pKD_str << " (saved in "
-            << pred_file << ")\n";
-        TitanUI::print_info("[Titan ML] Predicted pKD = " + pKD_str);
+        // KIN-10: the bundled random forest is closed. Its training set,
+        // feature units, cross-validation score and applicability domain are
+        // unknown, and feature 0 is an absolute interaction energy, so the
+        // prediction is not transferable between systems, force fields or
+        // cutoff conventions. Feature export stays available because the five
+        // descriptors are reproducible on their own; only the pKd number is
+        // withheld. Re-open it by restoring this branch once a model card
+        // exists (see KIN-10 in docs/TITAN_CODE_REVIEW_2026-09-08.md).
+        const std::string ml_closed_notice =
+            "ML features exported. Affinity prediction is closed: the bundled "
+            "model has no training/calibration provenance and its leading "
+            "feature is an absolute energy, so the pKd is not transferable. No "
+            "prediction file is written.";
+        TitanUI::print_info(ml_closed_notice);
+        log << "[Titan ML] " << ml_closed_notice << "\n";
+        if (args.ml_predict_experimental) {
+          const std::string ml_optin_notice =
+              "-ml-predict-experimental no longer enables the bundled model; "
+              "the option is retained only to report that it has no effect.";
+          TitanUI::print_info(ml_optin_notice);
+          log << "[Titan ML] " << ml_optin_notice << "\n";
+        }
       }
     }
     try {
@@ -4871,18 +4877,19 @@ void run_dham_postproc(const arguments &args,
   }
 
   // 2. Read energy file list
-  if (args.dham.ener_list_file.empty()) {
+  const bool segment_audit = !args.dham.segment_map_file.empty();
+  if (args.dham.ener_list_file.empty() && !segment_audit) {
     TitanUI::print_error("DHAM: -dham-ener not set. Skipping DHAM.");
     return;
   }
-  auto ener_paths = TitanDHAM::read_file_list(args.dham.ener_list_file);
-  if (ener_paths.empty()) {
+  auto ener_paths = segment_audit ? std::vector<std::string>{} : TitanDHAM::read_file_list(args.dham.ener_list_file);
+  if (ener_paths.empty() && !segment_audit) {
     TitanUI::print_error("DHAM: No energy files read. Skipping.");
     return;
   }
 
   const int n_replicas = static_cast<int>(temps.size());
-  if (static_cast<int>(ener_paths.size()) != n_replicas) {
+  if (!segment_audit && static_cast<int>(ener_paths.size()) != n_replicas) {
     TitanUI::print_error(
         "DHAM: #temps (" + std::to_string(n_replicas) +
         ") != #energy_files (" + std::to_string(ener_paths.size()) + ").");
@@ -4902,8 +4909,8 @@ void run_dham_postproc(const arguments &args,
   // Fix C: Document the 1-file-per-replica assumption
   TitanUI::print_warning(
       "DHAM: Each input trajectory file is treated as one replica. "
-      "Use 'gmx trjcat' to merge multi-part trajectories per replica "
-      "before running DHAM.");
+      "Concatenation does not establish physical continuity; REMD inputs "
+      "need audited segment/exchange metadata.");
 
   // 3. Extract per-replica data from MSM
   if (!msm_analyzer->is_clustered()) {
@@ -4911,7 +4918,7 @@ void run_dham_postproc(const arguments &args,
         "Ensure -msm flag is set and enough frames are collected.");
     return;
   }
-  if (!msm_analyzer->is_built()) {
+  if (!segment_audit && !msm_analyzer->is_built()) {
     TitanUI::print_error(
         "DHAM: MSM transition model has not been built successfully.");
     return;
@@ -4932,6 +4939,57 @@ void run_dham_postproc(const arguments &args,
   if (per_replica_dtrajs.empty()) {
     TitanUI::print_error("DHAM: No per-replica discrete trajectories. "
                           "Was replica_id passed to add_projected_frame?");
+    return;
+  }
+
+  if (segment_audit) {
+    try {
+      const auto metadata = titan_dham_segments::Metadata::read(
+          args.dham.segment_map_file, n_replicas);
+      std::vector<titan_dham_segments::CountAudit> audits;
+      for (int k = 0; k < n_replicas; ++k) {
+        const auto &rep = metadata.replicas[k];
+        if (std::abs(rep.temperature - temps[k]) > 1e-6 ||
+            (use_npt_observable && std::abs(rep.pressure - args.dham.target_pressure_bar) > 1e-6))
+          throw std::invalid_argument("DHAM segment metadata ensemble mismatch");
+        const auto &states = per_replica_dtrajs.at(k);
+        const auto &times = per_replica_timestamps.at(k);
+        if (use_npt_observable) {
+          const auto &volumes = per_replica_box_volumes.at(k);
+          if (volumes.size() != times.size())
+            throw std::invalid_argument("DHAM segment volume dimensions differ");
+          for (size_t i = 0; i < times.size(); ++i) {
+            const double expected = metadata.match(k, times[i]).volume;
+            if (!std::isfinite(volumes[i]) ||
+                std::abs(volumes[i] - expected) > std::max(1e-4, 2e-6 * expected))
+              throw std::invalid_argument("DHAM segment trajectory volume mismatch");
+          }
+        }
+        audits.push_back(titan_dham_segments::audit_counts(
+            metadata, k, states, times, dham_lag, msm_analyzer->n_clusters()));
+      }
+      std::ofstream counts("dham_segment_counts.csv"), decisions("dham_segment_decisions.csv");
+      if (!counts || !decisions) throw std::runtime_error("Cannot write DHAM segment audit");
+      counts << "replica,state_from,state_to,candidate_count,physical_rates_validated\n";
+      decisions << "replica,decision,windows\n";
+      size_t eligible = 0;
+      for (int k = 0; k < n_replicas; ++k) {
+        for (const auto &[pair, n] : audits[k].counts)
+          counts << k << ',' << pair.first << ',' << pair.second << ',' << n << ",false\n";
+        for (const auto &[decision, n] : audits[k].decisions) {
+          decisions << k << ',' << titan_dham_segments::name(decision) << ',' << n << '\n';
+          if (decision == titan_dham_segments::Decision::eligible) eligible += n;
+        }
+      }
+      counts.flush();decisions.flush();
+      if (!counts || !decisions) throw std::runtime_error("Incomplete DHAM segment audit output");
+      TitanUI::log_kv(log, "DHAM Segment Audit Eligible", std::to_string(eligible));
+      TitanUI::log_kv(log, "DHAM Mode", "segment/exchange count audit; estimator not run");
+      TitanUI::print_info("DHAM segment/exchange candidate counts written. Exact endpoint energies required; no nearest substitution.");
+      TitanUI::print_warning("DHAM segment audit does not correct exchange censoring. No FES, rates, weights or bootstrap validation are produced by this mode.");
+    } catch (const std::exception &error) {
+      TitanUI::print_error(std::string("DHAM segment audit rejected: ") + error.what());
+    }
     return;
   }
 
