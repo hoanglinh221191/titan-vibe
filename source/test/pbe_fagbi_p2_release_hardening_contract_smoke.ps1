@@ -29,7 +29,8 @@ Assert-Contains $header "using SurfacePanelView = PrototypePanel;" "FMM/M2L head
 Assert-Contains $header "using JcpPanel = PrototypePanel;" "FMM/M2L header"
 Assert-Contains $header "using FmmM2lContext = FmmM2lAnalyticContext;" "FMM/M2L header"
 
-$parser = Read-RepoFile "src/cli/parse_arguments.cpp"
+$parser = (Get-ChildItem -LiteralPath (Join-Path $RepoRoot "src\cli") -File -Filter "parse_*.cpp" |
+    Sort-Object Name | ForEach-Object { Get-Content -Raw -LiteralPath $_.FullName }) -join "`n"
 Assert-Contains $parser '"rescan"' "argument parser"
 Assert-Contains $parser '"cached-metrics"' "argument parser"
 Assert-Contains $parser '"calibrated-tail-v1"' "argument parser"

@@ -4,6 +4,7 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+. (Join-Path $PSScriptRoot 'pbe_driver_topology.ps1')
 Set-StrictMode -Version Latest
 
 $InvariantCulture = [System.Globalization.CultureInfo]::InvariantCulture
@@ -70,6 +71,7 @@ function New-ArgFile([string]$RunDir, [string]$Backend, [string]$SumMode, [strin
     $libPath = Convert-ToTitanPath ((Resolve-Path -LiteralPath (Join-Path $RepoRoot 'lib_ff')).Path.TrimEnd('\') + '\')
     $argLines = @(
         "-f=$(Convert-ToTitanPath $pdbPath)",
+        "-common_topo=$(Convert-ToTitanPath (Write-PbeDriverTopology $pdbPath))",
         '-1pdb',
         '-ff=AMBER99SB',
         '-g=1&1',

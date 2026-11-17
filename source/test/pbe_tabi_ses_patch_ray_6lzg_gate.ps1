@@ -8,6 +8,7 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+. (Join-Path $PSScriptRoot 'pbe_driver_topology.ps1')
 Set-StrictMode -Version Latest
 . (Join-Path $PSScriptRoot 'pbe_fmm_m2l_cli_helpers.ps1')
 $RepoRoot = Split-Path -Parent $PSScriptRoot
@@ -36,7 +37,7 @@ function Invoke-SesCase([string]$Name, [string]$Engine) {
     $pdb = Join-Path $runDir 'driver.pdb'
     Write-FmmCliDummyPdb $pdb
     $argumentLines = @(
-        "-f=$(TP $pdb)", '-1pdb=true', '-ff=AMBER99SB', '-g=1&1',
+        "-f=$(TP $pdb)", "-common_topo=$(TP (Write-PbeDriverTopology $pdb))", '-1pdb=true', '-ff=AMBER99SB', '-g=1&1',
         "-path-a=$lib", "-path-n=$lib", '-pbe=bie',
         "-pbe-test-pqr=$(TP $Fixture)", '-pbe-surface=vdw',
         '-pbe-max-iter=720', '-pbe-rms=1e-4', '-pbe-dphi=1e-4',

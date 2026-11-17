@@ -4,6 +4,7 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+. (Join-Path $PSScriptRoot 'pbe_driver_topology.ps1')
 Set-StrictMode -Version Latest
 . (Join-Path $PSScriptRoot 'pbe_grid_fixture_helpers.ps1')
 
@@ -31,7 +32,7 @@ Set-Content -LiteralPath $driver -Encoding ASCII -Value @(
 $lib = Convert-ToTitanPath ((Resolve-Path -LiteralPath $ffRoot).Path.TrimEnd('\') + '\')
 $arg = Join-Path $WorkRoot 'arg.in'
 Set-Content -LiteralPath $arg -Encoding ASCII -Value @(
-    "-f=$(Convert-ToTitanPath $driver)", '-1pdb=true', '-ff=AMBER99SB', '-g=1&1',
+    "-f=$(Convert-ToTitanPath $driver)", "-common_topo=$(Convert-ToTitanPath (Write-PbeDriverTopology $driver))", '-1pdb=true', '-ff=AMBER99SB', '-g=1&1',
     "-path-a=$lib", "-path-n=$lib", '-pbe=grid',
     "-pbe-test-pqr=$(Convert-ToTitanPath $pqr)", '-pbe-surface=vdw',
     '-pbe-scale=1.0', '-pbe-margin=5.0', '-pbe-max-grid=500000',

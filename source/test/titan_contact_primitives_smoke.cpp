@@ -90,6 +90,26 @@ int main() {
                                                    ContactMode::Backbone),
           "Backbone mode excludes SER H");
 
+  // CHARMM names the amide H HN and the C-terminal oxygens OT1/OT2; AMBER
+  // names terminal glycine NGLY/CGLY. None of them is side chain.
+  require(!titan_contact::is_selected_contact_atom(
+              atom(5, "OT1", "ALA"), ContactMode::SidechainHeavy),
+          "sidechain-heavy excludes CHARMM OT1");
+  require(titan_contact::is_selected_contact_atom(atom(5, "OT2", "ALA"),
+                                                  ContactMode::Backbone),
+          "Backbone mode keeps CHARMM OT2");
+  require(titan_contact::is_selected_contact_atom(
+              atom(6, "CA", "NGLY"), ContactMode::SidechainHeavy),
+          "sidechain-heavy keeps AMBER NGLY CA fallback");
+  for (const char *name : {"HN", "OT1", "OT2", "OXT", "OC1", "HT1"}) {
+    mol_info backbone = atom(7, name, "LYS");
+    require(!backbone.check_side_chain(), "terminal/CHARMM backbone name");
+  }
+  mol_info side = atom(7, "NZ", "LYS");
+  require(side.check_side_chain(), "LYS NZ is side chain");
+  mol_info gly = atom(8, "HN", "GLY");
+  require(gly.check_side_chain(), "glycine keeps its whole residue");
+
   const auto residue_a = titan_contact::ResidueKey{1, 0, 10, "A", "SER", 7};
   const auto residue_b = titan_contact::ResidueKey{1, 0, 10, "A", "SER", 7};
   const auto residue_c = titan_contact::ResidueKey{1, 0, 10, "A", "SER", 8};

@@ -1,0 +1,64 @@
+[ moleculetype ]
+SYN001 3
+
+[ atoms ]
+1 CT 1 ALA C1 1 0.0 12.011
+2 CT 1 ALA C2 1 0.0 12.011
+3 CT 1 ALA C3 1 0.0 12.011
+4 CT 1 ALA C4 1 0.0 12.011
+
+[ bonds ]
+1 2 1
+1 3 1
+1 4 1
+
+[ moleculetype ]
+SYN002 3
+
+[ atoms ]
+1 CT 1 ALA C1 1 0.0 12.011
+2 CT 1 ALA C2 1 0.0 12.011
+3 CT 1 ALA C3 1 0.0 12.011
+4 CT 1 ALA C4 1 0.0 12.011
+
+[ bonds ]
+1 2 1
+1 3 1
+1 4 1
+
+[ moleculetype ]
+SYN003 3
+
+[ atoms ]
+1 CT 1 ALA C1 1 0.0 12.011
+2 CT 1 ALA C2 1 0.0 12.011
+3 CT 1 ALA C3 1 0.0 12.011
+4 CT 1 ALA C4 1 0.0 12.011
+
+[ bonds ]
+1 2 1
+1 3 1
+1 4 1
+
+[ moleculetype ]
+SYN004 3
+
+[ atoms ]
+1 CT 1 ALA C1 1 0.0 12.011
+2 CT 1 ALA C2 1 0.0 12.011
+3 CT 1 ALA C3 1 0.0 12.011
+4 CT 1 ALA C4 1 0.0 12.011
+
+[ bonds ]
+1 2 1
+1 3 1
+1 4 1
+
+[ system ]
+T4 extended-object cases
+
+[ molecules ]
+SYN001 1
+SYN002 1
+SYN003 1
+SYN004 1

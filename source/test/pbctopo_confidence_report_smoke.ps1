@@ -401,7 +401,7 @@ if ($certificateScopeIndex -lt 0 -or
 }
 
 foreach ($row in $rows) {
-    if ($row.schema_version -ne '7' -or
+    if ($row.schema_version -ne '8' -or
         [string]::IsNullOrWhiteSpace($row.producer_version) -or
         $row.coordinate_unit -ne 'angstrom' -or $row.time_unit -ne 'ps' -or
         $row.endianness -ne 'not_applicable_text' -or
@@ -573,7 +573,7 @@ foreach ($column in $requiredAssignmentColumns) {
     }
 }
 foreach ($assignmentRow in $assignmentRows) {
-    if ($assignmentRow.schema_version -ne '7' -or
+    if ($assignmentRow.schema_version -ne '8' -or
         $assignmentRow.coordinate_unit -ne 'angstrom' -or
         $assignmentRow.time_unit -ne 'ps' -or
         [uint64]$assignmentRow.topology_epoch_id -eq 0) {
@@ -647,7 +647,7 @@ if ($layoutRows.Count -eq 0) {
     throw 'Component layout report contains no exact membership rows'
 }
 foreach ($layoutRow in $layoutRows) {
-    if ($layoutRow.schema_version -ne '7' -or
+    if ($layoutRow.schema_version -ne '8' -or
         $layoutRow.coordinate_unit -ne 'angstrom' -or
         $layoutRow.canonical_atom_universe_hash -notmatch '^[0-9a-fA-F]{32}$' -or
         $layoutRow.hard_graph_source -ne 'explicit_topology' -or
@@ -668,7 +668,7 @@ if ($hardEdgeRows.Count -eq 0) {
     throw 'Hard-edge report contains no topology bonds'
 }
 foreach ($hardEdgeRow in $hardEdgeRows) {
-    if ($hardEdgeRow.schema_version -ne '7' -or
+    if ($hardEdgeRow.schema_version -ne '8' -or
         $hardEdgeRow.observation_scope -ne 'static_hard_edges' -or
         $hardEdgeRow.edge_kind -ne 'topology_bond' -or
         $hardEdgeRow.hard_graph_source -ne 'explicit_topology' -or

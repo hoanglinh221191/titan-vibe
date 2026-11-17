@@ -1,21 +1,29 @@
-# Reproducibility record for 1.0.3
+# Reproducibility record for 1.1.0
 
-The executable, the host source under `source/`, and the focused library under
-`src/` all come from TITAN commit `50ed41edecfe7b9cc5b72fec1ed5d38827d4c6ac`.
-Source normalization, adapted host headers, the executable hash, and imported
-DLLs are recorded in `SOURCE_AUDIT.json`.
+The executable and the host source under `source/` come from TITAN commit
+`dcb2bb5ffbcc9cf27d843a55f53d31f765b01794`. The excluded HoloLift paths are listed in
+`source/SOURCE_PROVENANCE.json`. The executable hash and the imported DLLs are
+recorded in `SOURCE_AUDIT.json`.
 
-The embedded host version is `0.2.0-dev.304+g50ed41edecfe.dirty`. The suffix
-records the HoloLift-excluded export and pinned metadata. The TITAN-VIBE
-distribution version 1.0.3 does not relabel that identity.
+The embedded host version is `0.2.0-dev.450+gdcb2bb5ffbcc.dirty`. Its suffix records the
+HoloLift-excluded export and the pinned metadata. The TITAN-VIBE distribution
+version 1.1.0 does not relabel that identity.
 
-Every VIBE calculation of the methods article was run with this executable.
-`validation/` records the checks shipped with the package. Replay of the 480
-held-out inputs and of the five molecular frame sets compares outputs with the
-reference outputs of this release. The original held-out endpoint table is kept
-in `examples/heldout480/ARCHIVED_CASE_ENDPOINTS.csv`.
+This is the executable for the VIBE calculations of the revised methods
+article. `validation/` records the checks shipped with the package:
+- `QUICKSTART_RESULT.txt`: the quick-start examples against their
+  `EXPECTED.json`.
+- `HELDOUT480_REPLAY.json`: the 480 held-out inputs against the references of
+  this release.
+- `REAL367_REPLAY.json` and `FIRST_FRAME5_REPLAY.json`: the five molecular frame
+  sets, compared with the deposited coordinates and with the report fields of
+  this release.
+
+The changes relative to 1.0.3 are counted in `SOURCE_AUDIT.json`. The original
+held-out endpoint table is kept in
+`examples/heldout480/ARCHIVED_CASE_ENDPOINTS.csv`.
 
 The designed-case oracle, the MDVWhole and GROMACS comparisons, and the timing
 protocol are archived in the data deposit (DOI 10.5281/zenodo.22710653 and its
-later versions). A replay establishes output agreement; it is not independent
-physical truth or a new held-out study.
+later versions). A replay establishes that outputs agree. It is not
+independent physical truth or a new held-out study.

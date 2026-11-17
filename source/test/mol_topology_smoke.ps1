@@ -73,7 +73,7 @@ LIG 1
 '@ | Set-Content -LiteralPath $standaloneTop -Encoding ASCII
 
 @'
-#include "mol_topology.h"
+#include "topology/mol_topology.h"
 #include "MOL_info.h"
 
 #include <iostream>
@@ -237,7 +237,7 @@ int main(int argc, char **argv) {
 }
 '@ | Set-Content -LiteralPath $src -Encoding ASCII
 
-& $Compiler -std=c++23 -O2 -Isrc $src src\mol_topology.cpp -o $exe
+& $Compiler -std=c++23 -O2 -Isrc $src src\topology\mol_topology.cpp -o $exe
 if ($LASTEXITCODE -ne 0) {
     throw 'Failed to compile mol_topology smoke'
 }

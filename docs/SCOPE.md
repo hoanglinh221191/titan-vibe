@@ -1,18 +1,26 @@
 # Release scope
 
-Version 1.0.3 includes the focused VIBE static reference library in `src/`,
-the runnable complete TITAN host under `source/`, and `titan.exe` at the
-repository root. The host supplies input, topology parsing, output, logging,
-PBCI fallback and other TITAN analysis functions, including the
-Poisson-Boltzmann and other source needed by its build. HoloLift implementation
-files and runners are excluded from the host source and the linked executable.
-The optional VIBE H9 diagnostic export does not include the HoloLift solver.
+Version 1.1.0 ships three things:
+- `titan.exe` at the repository root;
+- the runnable, complete TITAN host under `source/`, where VIBE is implemented
+  in `source/src/pbctopo`;
+- small examples under `examples/quickstart`.
 
-The eight-contact cap is applied before retained-contact translation hypotheses
-are built. Contact support and ambiguity are conditional on that retained set,
-not on every contact that could be found in the input.
+The host supplies input, topology parsing, output, logging, PBCI fallback and
+other TITAN analysis functions, including the Poisson-Boltzmann code and the
+other source its build needs. HoloLift implementation files, tests and runners
+are excluded from the host source and from the linked executable. The focused
+VIBE static library of the 1.0.x releases is not shipped, because the VIBE
+solver now spans several host directories.
 
-The top-level CMake target builds the focused static library; the Makefile under
-`source/` builds the runnable host. The README gives commands for prebuilt
-execution and for rebuilding the host. Large molecular frame subsets are in the
-separate data deposit; the 480 compact held-out inputs are included here.
+The eight-contact cap is applied before the retained-contact translation
+hypotheses are built. Contact support and ambiguity are therefore conditional
+on that retained set, not on every contact in the input. The contact-cycle
+lattice and the input-overlap counts use every pair within their cutoffs.
+
+The Makefile under `source/` builds the host, and the README gives commands
+for prebuilt execution and for rebuilding. The large molecular frame subsets
+are in the separate data deposit. The 480 compact held-out inputs and the
+quick-start snapshots are included here. The quick-start snapshots are
+selections, with water and ions removed, from simulations of the methods
+article; their topologies are reduced to the sections VIBE reads.

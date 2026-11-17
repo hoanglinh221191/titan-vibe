@@ -36,20 +36,24 @@ $explicitProduction = @(
     'src\titan_pbe.h',
     'src\arguments.cpp',
     'src\arguments.h',
-    'src\cli\parse_arguments.cpp',
     'src\cli\arg_file_parser.cpp',
     'src\cli\option_validation.h',
-    'src\impl_engine.cpp',
     'Makefile'
 )
 foreach ($name in $explicitProduction) {
     $path = Join-Path $RepoRoot $name
     if (Test-Path -LiteralPath $path) { $productionFiles.Add($path) }
 }
-$pbeDir = Join-Path $RepoRoot 'src\tabi'
-if (Test-Path -LiteralPath $pbeDir) {
-    Get-ChildItem -LiteralPath $pbeDir -Recurse -File -Include *.cpp,*.h |
-        ForEach-Object { $productionFiles.Add($_.FullName) }
+# the CLI parser: parse_arguments.cpp, parse_helpers.cpp, parse_options_*.cpp
+Get-ChildItem -LiteralPath (Join-Path $RepoRoot 'src\cli') -File -Filter 'parse_*.cpp' |
+    Sort-Object Name | ForEach-Object { $productionFiles.Add($_.FullName) }
+# src\engine holds engine() (formerly src\impl_engine.cpp)
+foreach ($dirName in @('src\tabi', 'src\engine')) {
+    $productionDir = Join-Path $RepoRoot $dirName
+    if (Test-Path -LiteralPath $productionDir) {
+        Get-ChildItem -LiteralPath $productionDir -Recurse -File -Include *.cpp,*.h |
+            ForEach-Object { $productionFiles.Add($_.FullName) }
+    }
 }
 
 $forbidden = @(

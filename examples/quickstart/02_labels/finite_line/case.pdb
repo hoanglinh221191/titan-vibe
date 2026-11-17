@@ -1,0 +1,81 @@
+TITLE     Title t= 0.00000 step= 0
+CRYST1   60.000   62.000   64.000  90.00  90.00  90.00 P 1           1
+MODEL        1
+ATOM      1  C1  ALA A   1      51.550   1.513  14.993  1.00  0.00      SYN  C
+ATOM      2  C2  ALA A   1      51.930   1.513  14.993  1.00  0.00      SYN  C
+ATOM      3  C3  ALA A   1      51.440   1.853  14.993  1.00  0.00      SYN  C
+ATOM      4  C4  ALA A   1      51.620   1.393  15.303  1.00  0.00      SYN  C
+ATOM      5  C1  ALA B   1      55.750   1.513  14.993  1.00  0.00      SYN  C
+ATOM      6  C2  ALA B   1      56.130   1.513  14.993  1.00  0.00      SYN  C
+ATOM      7  C3  ALA B   1      55.640   1.853  14.993  1.00  0.00      SYN  C
+ATOM      8  C4  ALA B   1      55.820   1.393  15.303  1.00  0.00      SYN  C
+ATOM      9  C1  ALA C   1      59.950   1.513  14.993  1.00  0.00      SYN  C
+ATOM     10  C2  ALA C   1       0.330   1.513  14.993  1.00  0.00      SYN  C
+ATOM     11  C3  ALA C   1      59.840   1.853  14.993  1.00  0.00      SYN  C
+ATOM     12  C4  ALA C   1       0.020   1.393  15.303  1.00  0.00      SYN  C
+ATOM     13  C1  ALA D   1       4.150   1.513  14.993  1.00  0.00      SYN  C
+ATOM     14  C2  ALA D   1       4.530   1.513  14.993  1.00  0.00      SYN  C
+ATOM     15  C3  ALA D   1       4.040   1.853  14.993  1.00  0.00      SYN  C
+ATOM     16  C4  ALA D   1       4.220   1.393  15.303  1.00  0.00      SYN  C
+ENDMDL
+TITLE     Title t= 1.00000 step= 1
+CRYST1   60.000   62.000   64.000  90.00  90.00  90.00 P 1           1
+MODEL        2
+ATOM      1  C1  ALA A   1      12.900  18.646  22.061  1.00  0.00      SYN  C
+ATOM      2  C2  ALA A   1      13.280  18.646  22.061  1.00  0.00      SYN  C
+ATOM      3  C3  ALA A   1      12.790  18.986  22.061  1.00  0.00      SYN  C
+ATOM      4  C4  ALA A   1      12.970  18.526  22.371  1.00  0.00      SYN  C
+ATOM      5  C1  ALA B   1      17.100  18.646  22.061  1.00  0.00      SYN  C
+ATOM      6  C2  ALA B   1      17.480  18.646  22.061  1.00  0.00      SYN  C
+ATOM      7  C3  ALA B   1      16.990  18.986  22.061  1.00  0.00      SYN  C
+ATOM      8  C4  ALA B   1      17.170  18.526  22.371  1.00  0.00      SYN  C
+ATOM      9  C1  ALA C   1      21.300  18.646  22.061  1.00  0.00      SYN  C
+ATOM     10  C2  ALA C   1      21.680  18.646  22.061  1.00  0.00      SYN  C
+ATOM     11  C3  ALA C   1      21.190  18.986  22.061  1.00  0.00      SYN  C
+ATOM     12  C4  ALA C   1      21.370  18.526  22.371  1.00  0.00      SYN  C
+ATOM     13  C1  ALA D   1      25.500  18.646  22.061  1.00  0.00      SYN  C
+ATOM     14  C2  ALA D   1      25.880  18.646  22.061  1.00  0.00      SYN  C
+ATOM     15  C3  ALA D   1      25.390  18.986  22.061  1.00  0.00      SYN  C
+ATOM     16  C4  ALA D   1      25.570  18.526  22.371  1.00  0.00      SYN  C
+ENDMDL
+TITLE     Title t= 2.00000 step= 2
+CRYST1   60.000   62.000   64.000  90.00  90.00  90.00 P 1           1
+MODEL        3
+ATOM      1  C1  ALA A   1       3.647  55.271  22.631  1.00  0.00      SYN  C
+ATOM      2  C2  ALA A   1       4.027  55.271  22.631  1.00  0.00      SYN  C
+ATOM      3  C3  ALA A   1       3.537  55.611  22.631  1.00  0.00      SYN  C
+ATOM      4  C4  ALA A   1       3.717  55.151  22.941  1.00  0.00      SYN  C
+ATOM      5  C1  ALA B   1       7.847  55.271  22.631  1.00  0.00      SYN  C
+ATOM      6  C2  ALA B   1       8.227  55.271  22.631  1.00  0.00      SYN  C
+ATOM      7  C3  ALA B   1       7.737  55.611  22.631  1.00  0.00      SYN  C
+ATOM      8  C4  ALA B   1       7.917  55.151  22.941  1.00  0.00      SYN  C
+ATOM      9  C1  ALA C   1      12.047  55.271  22.631  1.00  0.00      SYN  C
+ATOM     10  C2  ALA C   1      12.427  55.271  22.631  1.00  0.00      SYN  C
+ATOM     11  C3  ALA C   1      11.937  55.611  22.631  1.00  0.00      SYN  C
+ATOM     12  C4  ALA C   1      12.117  55.151  22.941  1.00  0.00      SYN  C
+ATOM     13  C1  ALA D   1      16.247  55.271  22.631  1.00  0.00      SYN  C
+ATOM     14  C2  ALA D   1      16.627  55.271  22.631  1.00  0.00      SYN  C
+ATOM     15  C3  ALA D   1      16.137  55.611  22.631  1.00  0.00      SYN  C
+ATOM     16  C4  ALA D   1      16.317  55.151  22.941  1.00  0.00      SYN  C
+ENDMDL
+TITLE     Title t= 3.00000 step= 3
+CRYST1   60.000   62.000   64.000  90.00  90.00  90.00 P 1           1
+MODEL        4
+ATOM      1  C1  ALA A   1      17.068  43.820  58.989  1.00  0.00      SYN  C
+ATOM      2  C2  ALA A   1      17.448  43.820  58.989  1.00  0.00      SYN  C
+ATOM      3  C3  ALA A   1      16.958  44.160  58.989  1.00  0.00      SYN  C
+ATOM      4  C4  ALA A   1      17.138  43.700  59.299  1.00  0.00      SYN  C
+ATOM      5  C1  ALA B   1      21.268  43.820  58.989  1.00  0.00      SYN  C
+ATOM      6  C2  ALA B   1      21.648  43.820  58.989  1.00  0.00      SYN  C
+ATOM      7  C3  ALA B   1      21.158  44.160  58.989  1.00  0.00      SYN  C
+ATOM      8  C4  ALA B   1      21.338  43.700  59.299  1.00  0.00      SYN  C
+ATOM      9  C1  ALA C   1      25.468  43.820  58.989  1.00  0.00      SYN  C
+ATOM     10  C2  ALA C   1      25.848  43.820  58.989  1.00  0.00      SYN  C
+ATOM     11  C3  ALA C   1      25.358  44.160  58.989  1.00  0.00      SYN  C
+ATOM     12  C4  ALA C   1      25.538  43.700  59.299  1.00  0.00      SYN  C
+ATOM     13  C1  ALA D   1      29.668  43.820  58.989  1.00  0.00      SYN  C
+ATOM     14  C2  ALA D   1      30.048  43.820  58.989  1.00  0.00      SYN  C
+ATOM     15  C3  ALA D   1      29.558  44.160  58.989  1.00  0.00      SYN  C
+ATOM     16  C4  ALA D   1      29.738  43.700  59.299  1.00  0.00      SYN  C
+ENDMDL
+END

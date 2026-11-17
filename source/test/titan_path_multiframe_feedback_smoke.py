@@ -3,6 +3,7 @@ import copy
 from pathlib import Path
 import sys
 import unittest
+from unittest.mock import patch
 import numpy as np
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'tools'))
 from titan_path_multiframe_feedback import new_state, observe_segment, observed_native_input, admit_direction, make_handoff, mode_at
@@ -24,6 +25,28 @@ def fixture():
 
 
 class Smoke(unittest.TestCase):
+    def test_rerouting_does_not_waive_bad_com(self):
+        s,r,w,p=fixture();p[10,9]+=1
+        state,boundary,_=self.observe((s,r,w,p),route_tracking='branch-aware-rerouting-v1')
+        self.assertEqual(state['status'],'HOLD');self.assertIn('LIGAND_COM_NATIVE_MISMATCH',boundary['reasons'])
+    def test_rerouting_does_not_waive_image_break(self):
+        s,r,w,p=fixture();r[10]['xyz'][0,0]+=100
+        state,boundary,_=self.observe((s,r,w,p),route_tracking='branch-aware-rerouting-v1')
+        self.assertEqual(state['status'],'HOLD');self.assertIn('PRIMARY_IMAGE_DISCONTINUITY',boundary['reasons'])
+    def test_rerouting_missing_projection_stays_hold(self):
+        from titan_path_rerouting import TrackedRoute
+        from titan_path_observation import ObservationError
+        with patch.object(TrackedRoute,'project_tracked',side_effect=ObservationError('TRACKED_PROGRESS_JUMP_UNRESOLVED')):
+            state,boundary,_=self.observe(route_tracking='branch-aware-rerouting-v1')
+        self.assertEqual(state['status'],'HOLD');self.assertIn('FRAME_PROJECTION_UNAVAILABLE',boundary['reasons'])
+    def test_missing_projection_is_not_mode_disagreement(self):
+        from titan_path_observation import Polyline, ObservationError
+        with patch.object(Polyline,'continuity',side_effect=ObservationError('PROJECTION_CONTINUITY_WINDOW_EXHAUSTED')):
+            state,boundary,rows=self.observe()
+        self.assertEqual(state['status'],'HOLD')
+        self.assertIn('FRAME_PROJECTION_UNAVAILABLE',boundary['reasons'])
+        self.assertNotIn('FRAME_MODE_DISAGREEMENT',boundary['reasons'])
+        self.assertTrue(all(f['projection_error']=='PROJECTION_CONTINUITY_WINDOW_EXHAUSTED' for r in rows for f in r['frames']))
     def observe(self,f=None,**kw):
         s,r,w,p=fixture() if f is None else f
         return observe_segment(s,r,w,p,core=list(range(81)),reference=CORE,waypoints=[[0,0,0],[10,0,0]],

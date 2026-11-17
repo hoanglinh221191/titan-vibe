@@ -1,5 +1,6 @@
 #include "titan_exact_periodic_box.h"
 #include "titan_llps_cluster.h"
+#include "titan_llps_geometry.h"
 #include "titan_lj.h"
 #include "titan_executor.h"
 #include <iostream>
@@ -61,6 +62,29 @@ int main(){try{
   require(weights.front()>.99&&weights.back()<.01,"fuzzy weights not calculated");
   if(threads==1)first_weights=weights;else for(std::size_t i=0;i<weights.size();++i)close(weights[i],first_weights[i]);
  }
- std::cout<<"PASS DBSCAN/LJ geometry "<<pairs<<" exhaustive lattice pair distances; "<<cases<<" DBSCAN serial/parallel label oracles; LJ complete unique edges/degrees; finite and winding embeddings\n";
+ {
+  // STR-01: lateral MSD of -llps-dynamics in a triclinic slab elongated
+  // along a. Three dense protein chains; chain 0 moves by (3, 4, 5) A
+  // between two frames, the others stay. The lag-1 lateral sum must be the
+  // squared displacement without its component along the normal of the b-c
+  // planes, in nm^2; the old code removed the Cartesian x component.
+  box slab(150.,60.,60.,70.,60.,75.);
+  const auto sn=titan_llps_geometry::slab_normal(titan_llps_geometry::Cell::from_box(slab,0,0,0));
+  require(sn.axis==0,"slab cell: a has the largest plane spacing");
+  TitanLLPSCluster dyn;dyn.configure_dynamics(true,false,2,.5,1,0.,0.);dyn.configure_liquidity(0,false,1.,1.);
+  std::vector<TitanLLPSCluster::ChainFrameSummary> f0(3);
+  for(int i=0;i<3;++i){f0[i].species=0;f0[i].raw_chain_id=i;f0[i].inside_dense=true;f0[i].cluster_id=0;f0[i].wrapped_com_x=20.+10*i;f0[i].wrapped_com_y=15;f0[i].wrapped_com_z=12;}
+  auto f1=f0;f1[0].wrapped_com_x+=3;f1[0].wrapped_com_y+=4;f1[0].wrapped_com_z+=5;
+  const std::vector<std::vector<int>> pro{{0,1,2}},rna;
+  dyn.update_dynamics(slab,0.,0,pro,rna,f0);dyn.update_dynamics(slab,1.,0,pro,rna,f1);
+  require(dyn.slab_normal_axis_==0,"dynamics slab axis");
+  const titan_llps_geometry::Point d{.3,.4,.5};
+  const double exact=titan_llps_geometry::lateral_sq(d,sn.normal),old=.4*.4+.5*.5;
+  require(std::abs(exact-old)>1e-3,"old Cartesian projection must differ on this cell");
+  require(dyn.msd_lat_sum_protein_.size()>1,"lateral MSD lag storage");
+  close(dyn.msd_lat_sum_protein_[1],exact,1e-12);
+  std::cout<<"lateral MSD (triclinic slab): "<<dyn.msd_lat_sum_protein_[1]<<" nm^2, exact "<<exact<<", old Cartesian rule "<<old<<"\n";
+ }
+ std::cout<<"PASS DBSCAN/LJ geometry "<<pairs<<" exhaustive lattice pair distances; "<<cases<<" DBSCAN serial/parallel label oracles; LJ complete unique edges/degrees; finite and winding embeddings; triclinic lateral MSD\n";
  return 0;
 }catch(const std::exception& e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}}

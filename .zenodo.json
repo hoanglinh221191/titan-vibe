@@ -1,6 +1,6 @@
 {
   "title": "TITAN-VIBE: Virtual Intact Block Extraction for periodic reconstruction",
-  "description": "TITAN-VIBE 1.0.3: faster framewise reconstruction; candidates are checked in the lattice gauge that placed them; frame status, warm start and rescue paths follow the contact assessment of the selected placement; optional evidence-relation export. Includes a Windows x86-64 executable, the buildable TITAN host source with HoloLift omitted, the focused VIBE library, and replay drivers. Every option of 1.0.2 is kept. Release checks and input/output provenance are included.",
+  "description": "TITAN-VIBE 1.1.0: steric overlaps are reported as a property of the input instead of choosing a placement; contact networks that close through the periodic boundary are labelled extended_periodic, with the rank and generators of their cycle lattice; bonded windings are reported; the common-topology reader follows [ molecules ]; titan.exe -vibe-help. Includes a Windows x86-64 executable, the buildable TITAN host source with HoloLift omitted, quick-start examples with several snapshots, the 480 held-out inputs, and replay drivers with the validation records of this release.",
   "license": "MIT",
   "upload_type": "software",
   "creators": [
@@ -27,6 +27,6 @@
     "molecular reconstruction",
     "uncertainty"
   ],
-  "version": "1.0.3",
-  "publication_date": "2026-09-25"
+  "version": "1.1.0",
+  "publication_date": "2026-11-17"
 }

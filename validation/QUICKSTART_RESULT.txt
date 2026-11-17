@@ -1,0 +1,12 @@
+binary_sha256 85101deb864d288911204c3ec6903e018a76d051e249546c17f1fa33186b8918
+PASS  01_peptide_pair                  arg.in           31 frames     2.1 s  max centroid diff 0.0000 A
+PASS  02_labels/finite_line            arg.in            4 frames     0.2 s  max centroid diff 0.0000 A
+PASS  02_labels/ring_bonded            arg.in            4 frames     0.2 s  max centroid diff 0.0000 A
+PASS  02_labels/rod_pair               arg.in            4 frames     0.4 s  max centroid diff 0.0000 A
+PASS  02_labels/rod_self               arg.in            4 frames     0.2 s  max centroid diff 0.0000 A
+PASS  02_labels/sheet_rank2            arg.in            4 frames     1.2 s  max centroid diff 0.0000 A
+PASS  02_labels/stack_rank1            arg.in            4 frames     0.3 s  max centroid diff 0.0000 A
+PASS  03_glycoprotein_pair             arg.in            5 frames     2.7 s  max centroid diff 0.0000 A
+PASS  04_condensate_martini            arg_global.in     6 frames     4.3 s  max centroid diff 0.0000 A
+PASS  04_condensate_martini            arg_local.in      6 frames     0.4 s  max centroid diff 0.0000 A
+RESULT: PASS

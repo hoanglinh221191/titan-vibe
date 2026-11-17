@@ -1,4 +1,8 @@
-# TITAN-VIBE 1.0.3
+# TITAN-VIBE 1.1.0
+
+Steric overlaps are reported instead of choosing a placement; a new evidence state, extended_periodic, reports contact networks that close through the periodic boundary; the common-topology reader follows [ molecules ]; quick-start examples with several snapshots. The focused library is no longer shipped. See `RELEASE_NOTES_v1.1.0.md`.
+
+## Version 1.0.3
 
 Faster reconstruction; candidates are checked in the lattice gauge that placed them; status, warm start and rescue paths follow the contact assessment of the selected placement. See `RELEASE_NOTES_v1.0.3.md`.
 

@@ -11,3 +11,8 @@
 *.bat text eol=lf
 *.png binary
 *.docx binary
+*.xtc binary
+*.trr binary
+*.tpr binary
+*.exe binary
+*.zip binary

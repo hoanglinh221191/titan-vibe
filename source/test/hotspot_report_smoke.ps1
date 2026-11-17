@@ -76,23 +76,36 @@ function Write-CasFixture([string]$Path) {
   ) | Set-Content -LiteralPath $Path -Encoding ASCII
 }
 
+# Windows PowerShell 5.1 turns every stderr line of a native command captured
+# with 2>&1 into an ErrorRecord, and under $ErrorActionPreference = "Stop" the
+# first one (TITAN prints warnings there) ends the script. Run TITAN as its own
+# process with stdout and stderr in files, as energy_overlap_validation_smoke
+# does, and judge it by its exit code.
+if ([Environment]::OSVersion.Platform -eq [PlatformID]::Win32NT) {
+  # Start-Process throws when both Path and PATH are in the environment.
+  $processPath = $env:Path
+  Remove-Item Env:Path -ErrorAction SilentlyContinue
+  $env:Path = $processPath
+}
+
 function Invoke-Titan([string]$CaseDir, [string]$ArgText, [bool]$ExpectSuccess = $true) {
   $arg = Join-Path $CaseDir "arg.in"
   [System.IO.File]::WriteAllText($arg, $ArgText, [System.Text.Encoding]::ASCII)
-  Push-Location $CaseDir
-  try {
-    $output = & $TitanExe -a $arg 2>&1
-    $code = $LASTEXITCODE
-  } finally {
-    Pop-Location
-  }
+  $stdoutPath = Join-Path $CaseDir "titan_stdout.txt"
+  $stderrPath = Join-Path $CaseDir "titan_stderr.txt"
+  $process = Start-Process -FilePath $TitanExe -ArgumentList @("-a", "`"$arg`"") `
+      -WorkingDirectory $CaseDir -NoNewWindow -Wait -PassThru `
+      -RedirectStandardOutput $stdoutPath -RedirectStandardError $stderrPath
+  $code = $process.ExitCode
+  $output = (Get-Content -LiteralPath $stdoutPath -Raw) + "`n" +
+            (Get-Content -LiteralPath $stderrPath -Raw)
   if ($ExpectSuccess -and $code -ne 0) {
     throw "TITAN failed with code $code. Output:`n$output"
   }
   if ((-not $ExpectSuccess) -and $code -eq 0) {
     throw "TITAN was expected to fail. Output:`n$output"
   }
-  return ($output -join "`n")
+  return $output
 }
 
 if (Test-Path -LiteralPath $WorkRoot) {
@@ -103,11 +116,14 @@ New-Item -ItemType Directory -Force -Path $WorkRoot | Out-Null
 $fixture = Join-Path $WorkRoot "hotspot_fixture.pdb"
 Write-CasFixture $fixture
 $lib = Convert-ToTitanPath ((Resolve-Path -LiteralPath (Join-Path $repo "lib_ff")).Path.TrimEnd('\') + '\')
+# Receptor chain A (LYS), ligand chain B (ALA): with -1pdb the groups are
+# 0 System, 1 protein, 2 chain_A, 3 chain_B. The smoke used -g=1&1, which
+# MM/GBSA (and so CAS) refuses: invalid_gbsa_identical_selections.
 $base = @"
 -f=$(Convert-ToTitanPath $fixture)
 -1pdb=true
 -ff=AMBER99SB
--g=1&1
+-g=2-3
 -mol-1-type=protein
 -mol-2-type=protein
 -path-a=$lib

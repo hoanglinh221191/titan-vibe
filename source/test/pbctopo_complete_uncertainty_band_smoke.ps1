@@ -120,7 +120,7 @@ if ($frameRows.Count -ne 2) {
     throw "Expected two frame reports, found $($frameRows.Count)"
 }
 $frame = $frameRows[0]
-if ($frame.schema_version -ne '7' -or $frame.component_count -ne '2' -or
+if ($frame.schema_version -ne '8' -or $frame.component_count -ne '2' -or
     $frame.component_feasible_assignment_set_enumerated -ne '1' -or
     $frame.component_feasible_assignments_within_domain -ne '125' -or
     $frame.feasible_assignment_set_enumerated -ne '1' -or

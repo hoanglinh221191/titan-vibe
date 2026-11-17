@@ -172,7 +172,10 @@ Write-ArgFile $edecompDir @(
   "-1pdb=true",
   "-path-a=$lib",
   "-path-n=$lib",
-  "-g=1-2",
+  # ENE-22: groups 1-2 of md1_short (protein vs glycans+NLN) are joined by
+  # peptide bonds and are refused on the lib_ff route (invalid_bonded_groups);
+  # chain A vs chain C are separate molecules.
+  "-g=3-5",
   "-edecomp=true",
   "-edecomp-source=mm",
   "-edecomp-level=both",

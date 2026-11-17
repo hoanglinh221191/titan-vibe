@@ -6,6 +6,7 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+. (Join-Path $PSScriptRoot 'pbe_driver_topology.ps1')
 Set-StrictMode -Version Latest
 $InvariantCulture = [System.Globalization.CultureInfo]::InvariantCulture
 $RepoRoot = Split-Path -Parent $PSScriptRoot
@@ -41,6 +42,7 @@ function Invoke-TabiJcp([string]$Mode) {
     $formulation = if ($Mode -eq 'treecode') { 'jcp2013-treecode' } else { 'jcp2013-centroid' }
     Set-Content -LiteralPath $argPath -Encoding ASCII -Value @(
         "-f=$(Convert-ToTitanPath $pdbPath)",
+        "-common_topo=$(Convert-ToTitanPath (Write-PbeDriverTopology $pdbPath))",
         '-1pdb',
         '-ff=AMBER99SB',
         '-g=1&1',

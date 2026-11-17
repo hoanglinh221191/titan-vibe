@@ -71,16 +71,20 @@ bool better(const PbctopoCutCandidate &lhs,
 }
 
 int main() {
-  expect(VIBE_OBSERVATION_SCHEMA_VERSION == 7,
-         "compiled observation schema version is not v7");
+  expect(VIBE_OBSERVATION_SCHEMA_VERSION == 8,
+         "compiled observation schema version is not v8");
+  expect(validate_vibe_observation_schema_version(8).has_value(),
+         "schema v8 was rejected");
   expect(validate_vibe_observation_schema_version(7).has_value(),
-         "schema v7 was rejected");
+         "schema v7 packages must stay readable");
+  expect(!validate_vibe_observation_schema_version(9).has_value(),
+         "a future schema v9 was accepted");
   const auto legacy = validate_vibe_observation_schema_version(6);
   expect(!legacy.has_value() &&
              legacy.error().find("unsupported VIBE observation schema") !=
                  std::string::npos,
          "legacy schema v6 rejection was not explicit");
-  const auto future = validate_vibe_observation_schema_version(8);
+  const auto future = validate_vibe_observation_schema_version(9);
   expect(!future.has_value() &&
              future.error().find("unsupported VIBE observation schema") !=
                  std::string::npos,
@@ -190,7 +194,7 @@ int main() {
                  split_csv(frame_lines[1]).size(),
          "frame report header/row column mismatch");
   const auto frame_fields = split_csv(frame_lines[1]);
-  expect(frame_fields.size() > 13 && frame_fields[0] == "7" &&
+  expect(frame_fields.size() > 13 && frame_fields[0] == "8" &&
                frame_fields[2] == "angstrom" && frame_fields[3] == "ps" &&
                frame_fields[5] == "IEEE754-binary64" &&
                frame_fields[6] == "sha256-128" &&

@@ -25,11 +25,11 @@ Assert-Contains -Path 'src/arguments.h' `
   -Pattern 'tabi_diagnostics\{"off"\}' `
   -Message 'P1A missing PBE TABI diagnostics option default.'
 
-Assert-Contains -Path 'src/cli/parse_arguments.cpp' `
+Assert-Contains -Path 'src/cli/parse_options_bie.cpp' `
   -Pattern 'pbe-bie-diagnostics' `
   -Message 'P1A missing -pbe-bie-diagnostics parser wiring.'
 
-Assert-Contains -Path 'src/cli/parse_arguments.cpp' `
+Assert-Contains -Path 'src/cli/parse_options_bie.cpp' `
   -Pattern '--diagnostics' `
   -Message 'P1A missing public --diagnostics alias.'
 

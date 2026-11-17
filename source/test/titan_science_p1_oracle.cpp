@@ -5,10 +5,12 @@
 #include "titan_tica_backend_policy.h"
 #include "titan_markov_estimator.h"
 #include "titan_dham.h"
+#include "titan_tram.h"
 
 #include <array>
 #include <iostream>
 #include <map>
+#include <memory>
 #include <random>
 #include <stdexcept>
 
@@ -78,7 +80,34 @@ void tica_oracle() {
     require((model.eigenvalues()-oracle.eigenvalues().reverse()).norm()<1e-9,
             "multivariate TICA generalized eigenvalue oracle");
   }
-  std::cout<<"PASS TICA circular-buffer lag, reversible paired estimator, all 4 backends, exact memory policy\n";
+  // KIN-25: fewer frames than features. exact_streaming solves in the data
+  // span; it must agree with the D x D dense solve and with exact_dual, and
+  // every backend must apply the same sign convention.
+  {
+    const int frames=15,dim=40,comps=3;
+    std::mt19937 rng(25);std::normal_distribution<double> noise(0.0,1.0);
+    Eigen::MatrixXd data(frames,dim);
+    Eigen::VectorXd state=Eigen::VectorXd::Zero(dim);
+    for(int f=0;f<frames;++f){for(int d=0;d<dim;++d)state[d]=0.8*state[d]+noise(rng);data.row(f)=state.transpose();}
+    std::vector<std::unique_ptr<TitanKinetics>> models;
+    for(auto backend:{TicaBackend::ExactDense,TicaBackend::ExactStreaming,TicaBackend::ExactDual}){
+      models.push_back(std::make_unique<TitanKinetics>(dim,1,comps,0.001,backend,comps));
+      for(int f=0;f<frames;++f)models.back()->accumulate_frame(data.row(f).transpose());
+      models.back()->solve_tica();
+      require(models.back()->is_solved(),"N < D TICA solve");
+    }
+    for(std::size_t m=1;m<models.size();++m){
+      require((models[m]->eigenvalues()-models[0]->eigenvalues()).cwiseAbs().maxCoeff()<1e-9,
+              "N < D: eigenvalues of every backend equal the dense solve");
+      require((models[m]->eigenvectors().leftCols(comps)-models[0]->eigenvectors().leftCols(comps)).cwiseAbs().maxCoeff()<1e-7,
+              "N < D: eigenvectors (sign convention) equal the dense solve");
+    }
+    for(const auto &model:models)for(int c=0;c<comps;++c){
+      Eigen::Index pivot=0;model->eigenvectors().col(c).cwiseAbs().maxCoeff(&pivot);
+      require(model->eigenvectors()(pivot,c)>0,"largest TICA eigenvector component is positive");
+    }
+  }
+  std::cout<<"PASS TICA circular-buffer lag, reversible paired estimator, all 4 backends, exact memory policy, N < D data span and sign convention\n";
 }
 
 void markov_oracle() {
@@ -105,24 +134,22 @@ void markov_oracle() {
   std::cout<<"PASS reversible MLE, metastable stationary solve, disconnected rejection\n";
 }
 
+// KIN-13: -dham runs TRAM (titan_tram.h); test/titan_tram_oracle.cpp holds
+// the multi-temperature checks. Here: one replica at the target is the
+// reversible MSM of its counts, whatever the sample energies.
 void dham_oracle() {
-  auto build=[](double temp,double offset) {
-    TitanDHAM dham(2,1,{temp},300);
-    const int counts[2][2]={{90,10},{10,40}};
-    for(int i=0;i<2;++i)for(int j=0;j<2;++j)for(int n=0;n<counts[i][j];++n)dham.accumulate_counts(0,i,j);
-    dham.set_state_energy(0,0,offset);dham.set_state_energy(0,1,5+offset);
-    require(dham.solve(),"DHAM solve");
-    return dham.get_unbiased_transition_matrix();
+  auto build=[](double offset) {
+    TitanTram tram(2,{300},300);
+    const double counts[2][2]={{90,10},{10,40}};
+    tram.add_sample(0,0,offset,100);tram.add_sample(0,1,5+offset,50);
+    for(int i=0;i<2;++i)for(int j=0;j<2;++j)tram.add_transition(0,i,j,counts[i][j]);
+    require(tram.solve(10000,1e-13).converged,"TRAM solve");
+    return tram.transition_matrix(0);
   };
-  auto t=build(300,0);
-  require(std::abs(t(0,1)-0.1)<1e-12 && std::abs(t(1,0)-0.2)<1e-12,"DHAM target-T identity");
-  auto biased=build(400,0),shifted=build(400,1000);
-  require((biased-shifted).cwiseAbs().maxCoeff()<1e-12,"DHAM energy offset invariance");
-  const double delta=(1/(DHAM_kB_kJ*400)-1/(DHAM_kB_kJ*300))*5;
-  const double a=0.1*std::exp(0.5*delta),b=0.2*std::exp(-0.5*delta);
-  require(std::abs(biased(0,1)-a/(0.9+a))<1e-12 &&
-          std::abs(biased(1,0)-b/(0.8+b))<1e-12,"DHAM pair bias denominator");
-  std::cout<<"PASS DHAM unbiased identity, explicit pair-bias formula, offset invariance\n";
+  const auto t=build(0),shifted=build(1000);
+  require(std::abs(t(0,1)-0.1)<1e-12 && std::abs(t(1,0)-0.2)<1e-12,"TRAM target-T identity");
+  require((t-shifted).cwiseAbs().maxCoeff()<1e-12,"TRAM energy offset invariance");
+  std::cout<<"PASS DHAM (TRAM) one replica at the target: reversible MSM, offset invariance\n";
 }
 
 void geometry_oracle() {

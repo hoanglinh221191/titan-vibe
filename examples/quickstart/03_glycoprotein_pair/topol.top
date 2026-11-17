@@ -1,0 +1,10 @@
+#include "toppar/forcefield.itp"
+#include "toppar/PROA.itp"
+#include "toppar/PROB.itp"
+
+[ system ]
+Two glycosylated protein chains (solvent and ions removed)
+
+[ molecules ]
+PROA 1
+PROB 1

@@ -1,0 +1,29 @@
+{
+  "schema": "titan-path-4w52-hj-source-manifest-v1",
+  "system": "T4 lysozyme L99A with benzene",
+  "pdb_id": "4W52",
+  "reference_structure_sha256": "709565a41029a20aff486a827678b907fcd9ee60eabe63a737716804e97b9503",
+  "route_id": "4w52-hj-literature-route-a",
+  "route_sha256": "55782047d6de2d5b15aa55ea8aea40473157d00bb3d73372b36cd5af7d58b0ed",
+  "branch": "H/J cyan",
+  "evidence_sources": [
+    {
+      "doi": "10.1016/j.bpj.2018.02.020",
+      "role": "H/J cyan unbinding channel and gate-motion residues M102, V111, W126, F153, R154"
+    },
+    {
+      "doi": "10.1073/pnas.2313542121",
+      "role": "independent multi-path T4L-benzene classification context; no raw spatial trajectory claimed here"
+    }
+  ],
+  "derivation": {
+    "start": "mass-weighted BNZ center in the pinned reference structure",
+    "inner_gate": "mean C-alpha position of M102 and V111",
+    "outer_gate": "mean C-alpha position of W126, F153 and R154",
+    "waypoint_1": "midpoint of inner_gate and outer_gate",
+    "waypoint_2": "outer_gate",
+    "terminal_extension_A": [8.0, 18.0],
+    "extension_direction": "normalized vector from ligand start to outer_gate",
+    "interpretation": "literature-seeded geometric route hypothesis; not an observed OPES trajectory and not a CAVER centerline"
+  }
+}

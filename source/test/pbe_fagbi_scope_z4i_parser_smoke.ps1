@@ -4,6 +4,7 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+. (Join-Path $PSScriptRoot 'pbe_driver_topology.ps1')
 $RepoRoot = Split-Path -Parent $PSScriptRoot
 if (-not (Test-Path -LiteralPath $TitanExe)) { throw "Missing titan executable: $TitanExe" }
 $TitanExe = (Resolve-Path -LiteralPath $TitanExe).Path
@@ -23,6 +24,7 @@ Set-Content -LiteralPath $driver -Encoding ASCII -Value @(
 $argPath = Join-Path $WorkRoot 'arg.in'
 $lines = @(
     "-f=$($driver.Replace('\','/'))",
+    "-common_topo=$((Write-PbeDriverTopology $driver).Replace('\','/'))",
     '-1pdb=true',
     '-ff=AMBER99SB',
     '-g=1&1',

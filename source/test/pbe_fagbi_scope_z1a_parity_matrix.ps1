@@ -7,6 +7,7 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+. (Join-Path $PSScriptRoot 'pbe_driver_topology.ps1')
 Set-StrictMode -Version Latest
 . (Join-Path $PSScriptRoot 'pbe_fmm_m2l_cli_helpers.ps1')
 . (Join-Path $PSScriptRoot 'pbe_fagbi_validation_helpers.ps1')
@@ -90,6 +91,7 @@ function Write-Z1aArgFile([string]$RunDir, [string]$PqrPath, [object]$Backend, [
     $libPath = Convert-FmmCliToTitanPath ((Resolve-Path -LiteralPath (Join-Path $RepoRoot 'lib_ff')).Path.TrimEnd('\') + '\')
     $argLines = @(
         "-f=$(Convert-FmmCliToTitanPath $pdbPath)",
+        "-common_topo=$(Convert-FmmCliToTitanPath (Write-PbeDriverTopology $pdbPath))",
         '-1pdb=true',
         '-ff=AMBER99SB',
         '-g=1&1',

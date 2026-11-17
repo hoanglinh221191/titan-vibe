@@ -1,0 +1,77 @@
+; G4C1 calibration seed builder. Not a production/confirmatory trajectory.
+integrator = md
+tinit = 0
+dt = 0.002
+init-step = 0
+nsteps = 1000
+simulation-part = 1
+continuation = no
+gen-vel = yes
+gen-temp = 300
+gen-seed = 202608251
+ld-seed = 202608251
+
+comm-mode = Linear
+nstcomm = 10
+cutoff-scheme = Verlet
+nstlist = 25
+pbc = xyz
+verlet-buffer-tolerance = 0.001
+rlist = 0.9
+coulombtype = PME
+coulomb-modifier = Potential-shift-Verlet
+rcoulomb = 0.9
+vdwtype = Cut-off
+vdw-modifier = Potential-shift-Verlet
+rvdw = 0.9
+DispCorr = no
+fourierspacing = 0.12
+pme-order = 4
+ewald-rtol = 1e-5
+
+tcoupl = v-rescale
+tc-grps = Protein_BNZ Water_and_ions
+tau-t = 0.5 0.5
+ref-t = 300 300
+pcoupl = C-rescale
+pcoupltype = isotropic
+tau-p = 1.0
+compressibility = 4.5e-5
+ref-p = 1.0
+
+constraints = h-bonds
+constraint-algorithm = Lincs
+lincs-order = 6
+lincs-iter = 2
+lincs-warnangle = 30
+
+nstcalcenergy = 10
+nstenergy = 100
+nstlog = 100
+nstxout = 0
+nstvout = 0
+nstfout = 0
+nstxout-compressed = 100
+compressed-x-precision = 1000
+
+pull = yes
+pull-ngroups = 2
+pull-ncoords = 1
+pull-group1-name = Protein
+pull-group2-name = BNZ
+pull-coord1-type = umbrella
+pull-coord1-geometry = direction
+pull-coord1-groups = 1 2
+pull-coord1-dim = Y Y Y
+pull-coord1-vec = 0.275142967023365 0.954346694489914 0.116270092516325
+pull-coord1-start = yes
+pull-coord1-init = 0
+pull-coord1-rate = 0.005
+pull-coord1-k = 600
+pull-nstxout = 1
+pull-nstfout = 1
+pull-print-ref-value = yes
+pull-print-com = yes
+pull-print-components = yes
+pull-xout-average = no
+pull-fout-average = no

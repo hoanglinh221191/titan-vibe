@@ -12,7 +12,8 @@ if (-not (Test-Path -LiteralPath $Compiler)) {
   throw "Missing clang++ compiler: $Compiler"
 }
 
-$parser = Get-Content -Raw -LiteralPath (Join-Path $repo "src\cli\parse_arguments.cpp")
+$parser = (Get-ChildItem -LiteralPath (Join-Path $repo "src\cli") -File -Filter "parse_*.cpp" |
+  Sort-Object Name | ForEach-Object { Get-Content -Raw -LiteralPath $_.FullName }) -join "`n"
 $mbarEnableBlock = [regex]::Match(
   $parser,
   'if \(string\(argv\[i\]\) == "-mbar"\) \{(?<body>.*?)\n\s*\}',
@@ -23,7 +24,8 @@ if (-not $mbarEnableBlock.Success) {
 if ($mbarEnableBlock.Groups['body'].Value -match 'msm\.flag_(tica|msm)') {
   throw "mbar_tica_metadata_smoke: -mbar must defer TICA/MSM activation to the resolved MBAR domain"
 }
-if ($parser -notmatch '(?s)const int arg_file_status = parse_arg_file\(\);.*?if \(arg_file_status != titan_cli::kParseSuccess\).*?return arg_file_status;.*?\+\+i;\s*continue;') {
+# the option families return option_consumed() where the single loop had `continue;`
+if ($parser -notmatch '(?s)const int arg_file_status = parse_arg_file\(\);.*?if \(arg_file_status != titan_cli::kParseSuccess\).*?return (?:option_exit\()?arg_file_status\)?;.*?\+\+i;\s*(?:continue;|return option_consumed\(\);)') {
   throw "mbar_tica_metadata_smoke: command-line overrides after -a must remain reachable"
 }
 

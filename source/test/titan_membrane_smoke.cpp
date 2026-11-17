@@ -12,8 +12,9 @@
 #include <string>
 #include <vector>
 
-std::string arguments::set_Buildnumber() { return "titan_membrane_smoke"; }
+#ifndef TITAN_SMOKE_LINK_ENGINE  // engine objects define it (test/engine_linked_oracles.py)
 std::string arguments::get_build_number() const { return "titan_membrane_smoke"; }
+#endif
 
 namespace {
 
@@ -290,10 +291,10 @@ void run_proximity_coupling_contract() {
           "proximity coupling includes APL rows");
   require(coupling.find("thickness_A") != std::string::npos,
           "proximity coupling includes thickness rows");
-  require(coupling.find("order_S") != std::string::npos,
+  require(coupling.find("order_P2_bond") != std::string::npos,
           "proximity coupling includes order rows");
-  require(coupling.find("curvature_proxy_Ainv") != std::string::npos,
-          "proximity coupling includes curvature rows");
+  require(coupling.find("height_dev_over_cell_edge") != std::string::npos,
+          "proximity coupling includes height-deviation rows");
   require(coupling.find("lipid_enrichment") != std::string::npos,
           "proximity coupling includes leaflet composition rows");
   const std::string summary =

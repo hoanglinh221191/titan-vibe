@@ -4,6 +4,7 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+. (Join-Path $PSScriptRoot 'pbe_driver_topology.ps1')
 Set-StrictMode -Version Latest
 
 $InvariantCulture = [System.Globalization.CultureInfo]::InvariantCulture
@@ -85,12 +86,13 @@ function Invoke-PbeCase([string]$Fixture, [string]$Mode) {
     $libPath = Convert-ToTitanPath ((Resolve-Path -LiteralPath $ForceFieldRoot).Path.TrimEnd('\') + '\')
     $argLines = @(
         "-f=$(Convert-ToTitanPath $pdbPath)",
+        "-common_topo=$(Convert-ToTitanPath (Write-PbeDriverTopology $pdbPath))",
         '-1pdb',
         '-ff=AMBER99SB',
         '-g=1&1',
         "-path-a=$libPath",
         "-path-n=$libPath",
-        '-pbe',
+        '-pbe=grid',
         "-pbe-test-pqr=$(Convert-ToTitanPath $pqrPath)",
         '-pbe-scale=0.45',
         '-pbe-margin=3.0',
@@ -106,6 +108,12 @@ function Invoke-PbeCase([string]$Fixture, [string]$Mode) {
     )
     if ($Mode -eq 'focus') {
         $argLines += @('-pbe-multigrid=focus', '-pbe-focus-levels=2')
+    } elseif ($Mode -eq 'nl_default') {
+        # GRID-04: nonlinear PB with the default solver (auto = Newton)
+        $argLines += @('-pbe-multigrid=off', '-pbe-model=nonlinear', '-pbe-salt=0.15')
+    } elseif ($Mode -eq 'nl_picard') {
+        $argLines += @('-pbe-multigrid=off', '-pbe-model=nonlinear', '-pbe-salt=0.15',
+                       '-pbe-nl-solver=picard')
     } elseif ($Mode -eq 'vcycle') {
         $argLines += @(
             '-pbe-multigrid=vcycle',
@@ -143,8 +151,23 @@ function Invoke-PbeCase([string]$Fixture, [string]$Mode) {
         throw "Expected one PBE row for ${caseName}, observed $($rows.Count)"
     }
     $row = $rows[0]
+    if ($Mode -eq 'nl_picard') {
+        # GRID-04: Picard may stall; ok must then mean residual <= tolerance
+        $residual = Convert-ToDouble $row.nl_residual
+        $within = $residual -le 1.0e-5
+        if (($row.status -eq 'ok') -ne $within -or ($row.nl_status -eq 'ok') -ne $within) {
+            throw "Picard status disagrees with its residual for ${caseName}: status=$($row.status) nl_status=$($row.nl_status) residual=$residual"
+        }
+        return $row
+    }
     if ($row.status -ne 'ok') {
         throw "PBE multigrid case did not converge for ${caseName}: $($row.status)"
+    }
+    if ($Mode -eq 'nl_default') {
+        $residual = Convert-ToDouble $row.nl_residual
+        if ($row.nl_solver -ne 'newton' -or $row.nl_status -ne 'ok' -or $residual -gt 1.0e-5) {
+            throw "Default nonlinear PB for ${caseName}: solver=$($row.nl_solver) nl_status=$($row.nl_status) residual=$residual (expected newton, ok, <= 1e-5)"
+        }
     }
     $energy = Convert-ToDouble $row.E_rxn_kJmol
     if ([double]::IsNaN($energy) -or [double]::IsInfinity($energy)) {
@@ -177,20 +200,27 @@ function Invoke-PbeCase([string]$Fixture, [string]$Mode) {
 function Invoke-PbsaVcycleCase() {
     $runDir = Join-Path $WorkRoot 'pbsa_vcycle'
     New-CleanDir $runDir
-    $pdbPath = Join-Path $runDir 'ala.pdb'
-    Write-PbsaPdb $pdbPath
+    # ENE-21: MM/PBSA refuses -g=x&x, so the case uses the two-chain fixture
+    # of pbe_grid_fixture_helpers.ps1 (receptor chain A, ligand chain B).
+    # One V-cycle costs (2 + 2) + 80 sweeps here and convergence is judged
+    # between cycles, so the budget allows several cycles.
+    $pdbPath = Join-Path $runDir 'ala2.pdb'
+    $topPath = Join-Path $runDir 'ala2.top'
+    Write-PbsaTwoChainPdb $pdbPath
+    Write-PbsaTwoChainTopology $topPath
     $libPath = Convert-ToTitanPath ((Resolve-Path -LiteralPath $ForceFieldRoot).Path.TrimEnd('\') + '\')
     $argLines = @(
         "-f=$(Convert-ToTitanPath $pdbPath)",
         '-1pdb',
         '-ff=AMBER99SB',
-        '-g=1&1',
+        "-g=$PbsaTwoChainGroups",
+        "-common_topo=$(Convert-ToTitanPath $topPath)",
         "-path-a=$libPath",
         "-path-n=$libPath",
         '-pbsa=true',
         '-pbe-scale=0.35',
         '-pbe-margin=2.0',
-        '-pbe-max-iter=240',
+        '-pbe-max-iter=1240',
         '-pbe-rms=1e-4',
         '-pbe-dphi=1e-3',
         '-pbe-max-grid=200000',
@@ -224,8 +254,8 @@ function Invoke-PbsaVcycleCase() {
         $rows[0].dgsolv_status -ne 'ok') {
         throw "PBSA V-cycle did not report vcycle dgsolv success"
     }
-    if ([int]$rows[0].iterations_solvent -gt 240 -or
-        [int]$rows[0].iterations_vacuum -gt 240) {
+    if ([int]$rows[0].iterations_solvent -gt 1240 -or
+        [int]$rows[0].iterations_vacuum -gt 1240) {
         throw "PBSA V-cycle exceeded -pbe-max-iter."
     }
     $pbsa = Read-SummaryMap (Join-Path $runDir 'mm_pbsa_summary.dat')
@@ -266,6 +296,10 @@ foreach ($fixture in @('mini-protein', 'charged-peptide', 'compact-mini-protein'
     }
     Write-Host ("PBE multigrid smoke PASS: {0} sor_iter={1} mg_cycles={2} E_kJ={3}" -f
         $fixture, $baseline.iterations_solvent, $vcycle.mg_cycles, $vcycle.E_rxn_kJmol)
+    $nonlinear = Invoke-PbeCase -Fixture $fixture -Mode 'nl_default'
+    $picard = Invoke-PbeCase -Fixture $fixture -Mode 'nl_picard'
+    Write-Host ("PBE multigrid smoke PASS: {0} nonlinear default newton residual={1} E_kJ={2}; picard {3} residual={4}" -f
+        $fixture, $nonlinear.nl_residual, $nonlinear.E_rxn_kJmol, $picard.status, $picard.nl_residual)
 }
 
 Invoke-PbsaVcycleCase

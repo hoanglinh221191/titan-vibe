@@ -11,10 +11,11 @@
 #include <string>
 #include <vector>
 
-std::string arguments::set_Buildnumber() { return "titan_qnative_smoke"; }
+#ifndef TITAN_SMOKE_LINK_ENGINE  // engine objects define it (test/engine_linked_oracles.py)
 std::string arguments::get_build_number() const {
   return "titan_qnative_smoke";
 }
+#endif
 
 namespace {
 
@@ -226,10 +227,15 @@ void run_soft_q_contract(TitanExecutor &executor) {
 
   const std::string summary = read_file(out_dir / "qnative_summary.dat");
   const std::string timeseries = read_file(out_dir / "qnative_timeseries.csv");
-  require(contains(summary, "soft: true") && contains(summary, "beta: 1.000000"),
-          "soft mode and beta are recorded");
-  require(contains(timeseries, "1,1.000000,0.500000,0.500000,1"),
-          "soft Q is continuous at the cutoff");
+  require(contains(summary, "soft: true") && contains(summary, "beta: 1.000000") &&
+              contains(summary, "soft_lambda: 1.800000"),
+          "soft mode, beta and lambda are recorded");
+  // Best-Hummer switch around lambda * r0 = 1.8 * 5 A (MDB-14):
+  // 1/(1+exp(5-9)) and 1/(1+exp(6.5-9)); the old switch at the 6.5 A cutoff
+  // gave 0.5 in frame 1.
+  require(contains(timeseries, "0,0.000000,0.982014,0.982014,1") &&
+              contains(timeseries, "1,1.000000,0.924142,0.924142,1"),
+          "soft Q switches at lambda times the reference distance");
 }
 
 } // namespace

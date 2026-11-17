@@ -68,11 +68,48 @@
 /**********************************************************************************************************************/
 #include "functions.h"
 #include "cli/option_validation.h"
+#ifndef TITAN_WITHOUT_HOLOLIFT
+#include "hololift/temporal_runner.h"
+#endif
 #include "titan_ui.h"
+#include <algorithm>
+#include <filesystem>
 #include <iostream>
 #include <sstream>
+#include <thread>
 
 using namespace std;
+
+// -pbctopo-temporal=hololift: once VIBE has written its package into the working directory, HoloLift-MD selects the
+// relative periodic images for the whole trajectory (default settings: strict admission, evidence charge 1000) and
+// writes hololift_*.csv beside the package, with the selected path as hololift_coordinates.{xtc,pdb,csv}.  The
+// coordinates keep HoloLift's relative images and unwrap the common translation with the displacement-preserving
+// (toroidal) scheme, so they serve transport under constant pressure directly.
+static int run_engine(arguments &Arguments) {
+  const int status = engine(Arguments);
+  if (status != 0 || !Arguments.pbc.solv_pbctopo || Arguments.pbc.pbctopo_temporal != "hololift")
+    return status;
+#ifdef TITAN_WITHOUT_HOLOLIFT
+  // Built with HOLOLIFT=0; arguments.cpp refuses -pbctopo-temporal=hololift.
+  return 1;
+#else
+  titan_hololift::HoloLiftRunOptions options;
+  options.system_label = "hololift";
+  options.package_directory = std::filesystem::current_path();
+  options.trajectory_path = Arguments.traj_file;
+  options.output_directory = std::filesystem::current_path();
+  const std::size_t threads =
+      Arguments.nt > 0 ? Arguments.nt : std::max<std::size_t>(1, std::thread::hardware_concurrency());
+  options.dp_workers = std::min<std::size_t>(threads, 64);
+  options.trajectory_workers = *options.dp_workers;
+  options.coordinates = titan_hololift::HoloLiftCoordinateOutput::Toroidal;
+  options.pdb = titan_hololift::HoloLiftPdbOutput::First;
+  options.reference_pdb = Arguments.pdb_name;
+  TitanUI::print_info("HoloLift-MD: temporal selection of periodic images on the VIBE package");
+  return titan_hololift::run_hololift_temporal_value(options);
+#endif
+}
+
 int main(int argc, char **argv) {
   try {
     arguments Arguments{};
@@ -82,17 +119,17 @@ int main(int argc, char **argv) {
         return 0;
       if (parse_status != titan_cli::kParseSuccess)
         return parse_status;
-      return engine(Arguments);
+      return run_engine(Arguments);
     } else {
       const int parse_status = Arguments.parse_arg_file();
       if (parse_status == titan_cli::kParseSuccess)
-        return engine(Arguments);
+        return run_engine(Arguments);
       if (parse_status == titan_cli::kHandledAndExit)
         return 0;
       if (parse_status != titan_cli::kNoArgumentFile)
         return parse_status;
       Arguments.parse_arguments_interactive(argc);
-      return engine(Arguments);
+      return run_engine(Arguments);
     }
   } catch (const std::exception &e) {
     const std::string &option = titan_cli::active_option_token();

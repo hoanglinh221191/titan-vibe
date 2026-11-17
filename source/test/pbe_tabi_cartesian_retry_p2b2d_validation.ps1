@@ -8,6 +8,7 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+. (Join-Path $PSScriptRoot 'pbe_driver_topology.ps1')
 Set-StrictMode -Version Latest
 
 $InvariantCulture = [Globalization.CultureInfo]::InvariantCulture
@@ -196,11 +197,13 @@ function New-ArgFile([string]$RunDir, [object]$Fixture, [string]$Mode,
                      [double]$Theta) {
     Write-DriverPdb $RunDir
     $driver = Convert-ToTitanPath (Join-Path $RunDir 'driver.pdb')
+    $driverTopology = Convert-ToTitanPath (Write-PbeDriverTopology (Join-Path $RunDir 'driver.pdb'))
     $pqr = Convert-ToTitanPath (Join-Path $RepoRoot $Fixture.pqr_relative)
     $lib = Convert-ToTitanPath ((Resolve-Path -LiteralPath $script:LibRoot).Path.TrimEnd('\\') + '\\')
     $thetaText = $Theta.ToString('G17', $InvariantCulture)
     $lines = @(
         "-f=$driver",
+        "-common_topo=$driverTopology",
         '-1pdb=true',
         '-ff=AMBER99SB',
         '-g=1&1',

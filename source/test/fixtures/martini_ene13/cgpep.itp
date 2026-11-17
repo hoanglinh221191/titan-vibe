@@ -1,0 +1,24 @@
+; written by test/fixtures/martini_ene13/make_fixture.py
+[ moleculetype ]
+; name nrexcl
+CGPEP 1
+
+[ atoms ]
+; nr type resnr residue atom cgnr charge mass
+   1    P5    1   LYS   BB    1   0.000 72.0
+   2    C3    1   LYS  SC1    2   0.000 72.0
+   3    Qd    1   LYS  SC2    3   1.000 72.0
+   4    P5    2   PHE   BB    4   0.000 72.0
+   5   SC4    2   PHE  SC1    5   0.000 72.0
+   6   SC4    2   PHE  SC2    6   0.000 72.0
+   7   SC4    2   PHE  SC3    7   0.000 72.0
+
+[ bonds ]
+; i j funct length force
+   1    2 1 0.350 1250
+   2    3 1 0.350 1250
+   1    4 1 0.350 1250
+   4    5 1 0.350 1250
+   5    6 1 0.350 1250
+   6    7 1 0.350 1250
+   5    7 1 0.350 1250

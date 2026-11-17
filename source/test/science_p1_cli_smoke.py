@@ -46,7 +46,12 @@ for name,group,extra,expected in [
     ('self_force','1-1',['-cal-force'],None),
     ('self_decomposition','1-1',['-edecomp=true'],None),
     ('unsupported_self','1-1',[],'unsupported_topology_self_energy'),
-    ('self_gbsa','1-1',['-gbsa=true'],'invalid_gbsa_identical_selections')]:
+    ('self_gbsa','1-1',['-gbsa=true'],'invalid_gbsa_identical_selections'),
+    # ENE-21: MM/PBSA with the same group twice used to run and report a
+    # "binding" energy of two superposed copies.
+    ('self_pbsa','1-1',['-pbsa=true'],'invalid_pbsa_identical_selections'),
+    # STR-31: -llps under -nocal used to write header-only files.
+    ('nocal_llps','1-2',['-nocal=true','-llps'],'unsupported_nocal_llps')]:
     case=work/name
     case.mkdir()
     options=[f'-f={(work/"fixture.pdb").as_posix()}','-1pdb=true','-ff=AMBER99SB',

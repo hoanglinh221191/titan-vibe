@@ -39,7 +39,8 @@ $manifestPath = Join-Path $FixtureRoot 'public_fixture_manifest.csv'
 
 function Assert-E45StaticContract {
   $arguments = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'src\arguments.cpp')
-  $parser = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'src\cli\parse_arguments.cpp')
+  $parser = (Get-ChildItem -LiteralPath (Join-Path $RepoRoot 'src\cli') -File -Filter 'parse_*.cpp' |
+    Sort-Object Name | ForEach-Object { Get-Content -Raw -LiteralPath $_.FullName }) -join "`n"
   $solver = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'src\tabi\tabi_solver.cpp')
   $realPanelHeader = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'src\tabi\tabi_fmm_kifmm_hierarchy_real_panel.h')
   foreach ($needle in @(

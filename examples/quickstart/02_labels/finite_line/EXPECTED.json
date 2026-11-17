@@ -1,0 +1,213 @@
+{
+ "runs": {
+  "arg.in": {
+   "output_pdb": "placed.pdb",
+   "frames": [
+    {
+     "frame": "0",
+     "time_ps": "0",
+     "status": "certified",
+     "evidence_state": "supported_connected",
+     "fallback_reason": "none",
+     "component_count": "4",
+     "contact_cycle_rank": "0",
+     "contact_cycle_b0_x": "0",
+     "contact_cycle_b0_y": "0",
+     "contact_cycle_b0_z": "0",
+     "contact_cycle_b1_x": "0",
+     "contact_cycle_b1_y": "0",
+     "contact_cycle_b1_z": "0",
+     "contact_cycle_b2_x": "0",
+     "contact_cycle_b2_y": "0",
+     "contact_cycle_b2_z": "0",
+     "contact_graph_components": "1",
+     "contact_periodic_graph_components": "0",
+     "self_image_units": "0",
+     "input_overlap_pairs": "0",
+     "bonded_winding_rank": "0",
+     "topological_winding_rank": "0"
+    },
+    {
+     "frame": "1",
+     "time_ps": "1",
+     "status": "certified",
+     "evidence_state": "supported_connected",
+     "fallback_reason": "none",
+     "component_count": "4",
+     "contact_cycle_rank": "0",
+     "contact_cycle_b0_x": "0",
+     "contact_cycle_b0_y": "0",
+     "contact_cycle_b0_z": "0",
+     "contact_cycle_b1_x": "0",
+     "contact_cycle_b1_y": "0",
+     "contact_cycle_b1_z": "0",
+     "contact_cycle_b2_x": "0",
+     "contact_cycle_b2_y": "0",
+     "contact_cycle_b2_z": "0",
+     "contact_graph_components": "1",
+     "contact_periodic_graph_components": "0",
+     "self_image_units": "0",
+     "input_overlap_pairs": "0",
+     "bonded_winding_rank": "0",
+     "topological_winding_rank": "0"
+    },
+    {
+     "frame": "2",
+     "time_ps": "2",
+     "status": "certified",
+     "evidence_state": "supported_connected",
+     "fallback_reason": "none",
+     "component_count": "4",
+     "contact_cycle_rank": "0",
+     "contact_cycle_b0_x": "0",
+     "contact_cycle_b0_y": "0",
+     "contact_cycle_b0_z": "0",
+     "contact_cycle_b1_x": "0",
+     "contact_cycle_b1_y": "0",
+     "contact_cycle_b1_z": "0",
+     "contact_cycle_b2_x": "0",
+     "contact_cycle_b2_y": "0",
+     "contact_cycle_b2_z": "0",
+     "contact_graph_components": "1",
+     "contact_periodic_graph_components": "0",
+     "self_image_units": "0",
+     "input_overlap_pairs": "0",
+     "bonded_winding_rank": "0",
+     "topological_winding_rank": "0"
+    },
+    {
+     "frame": "3",
+     "time_ps": "3",
+     "status": "certified",
+     "evidence_state": "supported_connected",
+     "fallback_reason": "none",
+     "component_count": "4",
+     "contact_cycle_rank": "0",
+     "contact_cycle_b0_x": "0",
+     "contact_cycle_b0_y": "0",
+     "contact_cycle_b0_z": "0",
+     "contact_cycle_b1_x": "0",
+     "contact_cycle_b1_y": "0",
+     "contact_cycle_b1_z": "0",
+     "contact_cycle_b2_x": "0",
+     "contact_cycle_b2_y": "0",
+     "contact_cycle_b2_z": "0",
+     "contact_graph_components": "1",
+     "contact_periodic_graph_components": "0",
+     "self_image_units": "0",
+     "input_overlap_pairs": "0",
+     "bonded_winding_rank": "0",
+     "topological_winding_rank": "0"
+    }
+   ],
+   "molecule_ranges": [
+    [
+     0,
+     4
+    ],
+    [
+     4,
+     8
+    ],
+    [
+     8,
+     12
+    ],
+    [
+     12,
+     16
+    ]
+   ],
+   "centroids_A": [
+    [
+     [
+      23.7,
+      31.0,
+      31.9995
+     ],
+     [
+      27.9,
+      31.0,
+      31.9995
+     ],
+     [
+      32.1,
+      31.0,
+      31.9995
+     ],
+     [
+      36.3,
+      31.0,
+      31.9995
+     ]
+    ],
+    [
+     [
+      23.7,
+      31.0,
+      31.9995
+     ],
+     [
+      27.9,
+      31.0,
+      31.9995
+     ],
+     [
+      32.1,
+      31.0,
+      31.9995
+     ],
+     [
+      36.3,
+      31.0,
+      31.9995
+     ]
+    ],
+    [
+     [
+      23.7,
+      31.0,
+      31.9995
+     ],
+     [
+      27.9,
+      31.0,
+      31.9995
+     ],
+     [
+      32.1,
+      31.0,
+      31.9995
+     ],
+     [
+      36.3,
+      31.0,
+      31.9995
+     ]
+    ],
+    [
+     [
+      23.7,
+      31.0,
+      31.9995
+     ],
+     [
+      27.9,
+      31.0,
+      31.9995
+     ],
+     [
+      32.1,
+      31.0,
+      31.9995
+     ],
+     [
+      36.3,
+      31.0,
+      31.9995
+     ]
+    ]
+   ]
+  }
+ }
+}

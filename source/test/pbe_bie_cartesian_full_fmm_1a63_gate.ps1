@@ -12,6 +12,7 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+. (Join-Path $PSScriptRoot 'pbe_driver_topology.ps1')
 Set-StrictMode -Version Latest
 . (Join-Path $PSScriptRoot 'pbe_fmm_m2l_cli_helpers.ps1')
 
@@ -70,6 +71,7 @@ function Invoke-1A63Case([string]$Variant, [string]$Engine, [int]$Order,
     }
     $argLines = @(
         "-f=$(Convert-ToTitanPath $pdbPath)",
+        "-common_topo=$(Convert-ToTitanPath (Write-PbeDriverTopology $pdbPath))",
         '-1pdb=true',
         # This force field parses the dummy driver only. The BIE atoms, charges,
         # and radii come entirely from the PDB2PQR/CHARMM fixture below.

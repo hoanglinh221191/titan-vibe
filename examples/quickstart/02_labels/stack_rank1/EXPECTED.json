@@ -1,0 +1,453 @@
+{
+ "runs": {
+  "arg.in": {
+   "output_pdb": "placed.pdb",
+   "frames": [
+    {
+     "frame": "0",
+     "time_ps": "0",
+     "status": "weak_observation",
+     "evidence_state": "extended_periodic",
+     "fallback_reason": "evidence_periodic",
+     "component_count": "14",
+     "contact_cycle_rank": "1",
+     "contact_cycle_b0_x": "1",
+     "contact_cycle_b0_y": "0",
+     "contact_cycle_b0_z": "0",
+     "contact_cycle_b1_x": "0",
+     "contact_cycle_b1_y": "0",
+     "contact_cycle_b1_z": "0",
+     "contact_cycle_b2_x": "0",
+     "contact_cycle_b2_y": "0",
+     "contact_cycle_b2_z": "0",
+     "contact_graph_components": "1",
+     "contact_periodic_graph_components": "1",
+     "self_image_units": "0",
+     "input_overlap_pairs": "0",
+     "bonded_winding_rank": "0",
+     "topological_winding_rank": "0"
+    },
+    {
+     "frame": "1",
+     "time_ps": "1",
+     "status": "weak_observation",
+     "evidence_state": "extended_periodic",
+     "fallback_reason": "evidence_periodic",
+     "component_count": "14",
+     "contact_cycle_rank": "1",
+     "contact_cycle_b0_x": "1",
+     "contact_cycle_b0_y": "0",
+     "contact_cycle_b0_z": "0",
+     "contact_cycle_b1_x": "0",
+     "contact_cycle_b1_y": "0",
+     "contact_cycle_b1_z": "0",
+     "contact_cycle_b2_x": "0",
+     "contact_cycle_b2_y": "0",
+     "contact_cycle_b2_z": "0",
+     "contact_graph_components": "1",
+     "contact_periodic_graph_components": "1",
+     "self_image_units": "0",
+     "input_overlap_pairs": "0",
+     "bonded_winding_rank": "0",
+     "topological_winding_rank": "0"
+    },
+    {
+     "frame": "2",
+     "time_ps": "2",
+     "status": "weak_observation",
+     "evidence_state": "extended_periodic",
+     "fallback_reason": "evidence_periodic",
+     "component_count": "14",
+     "contact_cycle_rank": "1",
+     "contact_cycle_b0_x": "1",
+     "contact_cycle_b0_y": "0",
+     "contact_cycle_b0_z": "0",
+     "contact_cycle_b1_x": "0",
+     "contact_cycle_b1_y": "0",
+     "contact_cycle_b1_z": "0",
+     "contact_cycle_b2_x": "0",
+     "contact_cycle_b2_y": "0",
+     "contact_cycle_b2_z": "0",
+     "contact_graph_components": "1",
+     "contact_periodic_graph_components": "1",
+     "self_image_units": "0",
+     "input_overlap_pairs": "0",
+     "bonded_winding_rank": "0",
+     "topological_winding_rank": "0"
+    },
+    {
+     "frame": "3",
+     "time_ps": "3",
+     "status": "weak_observation",
+     "evidence_state": "extended_periodic",
+     "fallback_reason": "evidence_periodic",
+     "component_count": "14",
+     "contact_cycle_rank": "1",
+     "contact_cycle_b0_x": "1",
+     "contact_cycle_b0_y": "0",
+     "contact_cycle_b0_z": "0",
+     "contact_cycle_b1_x": "0",
+     "contact_cycle_b1_y": "0",
+     "contact_cycle_b1_z": "0",
+     "contact_cycle_b2_x": "0",
+     "contact_cycle_b2_y": "0",
+     "contact_cycle_b2_z": "0",
+     "contact_graph_components": "1",
+     "contact_periodic_graph_components": "1",
+     "self_image_units": "0",
+     "input_overlap_pairs": "0",
+     "bonded_winding_rank": "0",
+     "topological_winding_rank": "0"
+    }
+   ],
+   "molecule_ranges": [
+    [
+     0,
+     4
+    ],
+    [
+     4,
+     8
+    ],
+    [
+     8,
+     12
+    ],
+    [
+     12,
+     16
+    ],
+    [
+     16,
+     20
+    ],
+    [
+     20,
+     24
+    ],
+    [
+     24,
+     28
+    ],
+    [
+     28,
+     32
+    ],
+    [
+     32,
+     36
+    ],
+    [
+     36,
+     40
+    ],
+    [
+     40,
+     44
+    ],
+    [
+     44,
+     48
+    ],
+    [
+     48,
+     52
+    ],
+    [
+     52,
+     56
+    ]
+   ],
+   "centroids_A": [
+    [
+     [
+      53.571,
+      31.0,
+      31.9995
+     ],
+     [
+      57.857,
+      31.0,
+      31.9995
+     ],
+     [
+      2.143,
+      31.0,
+      31.9995
+     ],
+     [
+      6.429,
+      31.0,
+      31.9995
+     ],
+     [
+      10.714,
+      31.0,
+      31.9995
+     ],
+     [
+      15.0,
+      31.0,
+      31.9995
+     ],
+     [
+      19.286,
+      31.0,
+      31.9995
+     ],
+     [
+      23.571,
+      31.0,
+      31.9995
+     ],
+     [
+      27.857,
+      31.0,
+      31.9995
+     ],
+     [
+      32.143,
+      31.0,
+      31.9995
+     ],
+     [
+      36.429,
+      31.0,
+      31.9995
+     ],
+     [
+      40.714,
+      31.0,
+      31.9995
+     ],
+     [
+      45.0,
+      31.0,
+      31.9995
+     ],
+     [
+      49.286,
+      31.0,
+      31.9995
+     ]
+    ],
+    [
+     [
+      15.0,
+      31.0,
+      31.9995
+     ],
+     [
+      19.286,
+      31.0,
+      31.9995
+     ],
+     [
+      23.572,
+      31.0,
+      31.9995
+     ],
+     [
+      27.857,
+      31.0,
+      31.9995
+     ],
+     [
+      32.143,
+      31.0,
+      31.9995
+     ],
+     [
+      36.429,
+      31.0,
+      31.9995
+     ],
+     [
+      40.715,
+      31.0,
+      31.9995
+     ],
+     [
+      45.0,
+      31.0,
+      31.9995
+     ],
+     [
+      49.286,
+      31.0,
+      31.9995
+     ],
+     [
+      53.572,
+      31.0,
+      31.9995
+     ],
+     [
+      57.857,
+      31.0,
+      31.9995
+     ],
+     [
+      2.143,
+      31.0,
+      31.9995
+     ],
+     [
+      6.429,
+      31.0,
+      31.9995
+     ],
+     [
+      10.715,
+      31.0,
+      31.9995
+     ]
+    ],
+    [
+     [
+      57.857,
+      31.0,
+      31.9995
+     ],
+     [
+      2.143,
+      31.0,
+      31.9995
+     ],
+     [
+      6.429,
+      31.0,
+      31.9995
+     ],
+     [
+      10.714,
+      31.0,
+      31.9995
+     ],
+     [
+      15.0,
+      31.0,
+      31.9995
+     ],
+     [
+      19.286,
+      31.0,
+      31.9995
+     ],
+     [
+      23.572,
+      31.0,
+      31.9995
+     ],
+     [
+      27.857,
+      31.0,
+      31.9995
+     ],
+     [
+      32.143,
+      31.0,
+      31.9995
+     ],
+     [
+      36.429,
+      31.0,
+      31.9995
+     ],
+     [
+      40.714,
+      31.0,
+      31.9995
+     ],
+     [
+      45.0,
+      31.0,
+      31.9995
+     ],
+     [
+      49.286,
+      31.0,
+      31.9995
+     ],
+     [
+      53.572,
+      31.0,
+      31.9995
+     ]
+    ],
+    [
+     [
+      15.0,
+      31.0,
+      31.9995
+     ],
+     [
+      19.286,
+      31.0,
+      31.9995
+     ],
+     [
+      23.571,
+      31.0,
+      31.9995
+     ],
+     [
+      27.857,
+      31.0,
+      31.9995
+     ],
+     [
+      32.143,
+      31.0,
+      31.9995
+     ],
+     [
+      36.429,
+      31.0,
+      31.9995
+     ],
+     [
+      40.714,
+      31.0,
+      31.9995
+     ],
+     [
+      45.0,
+      31.0,
+      31.9995
+     ],
+     [
+      49.286,
+      31.0,
+      31.9995
+     ],
+     [
+      53.571,
+      31.0,
+      31.9995
+     ],
+     [
+      57.857,
+      31.0,
+      31.9995
+     ],
+     [
+      2.143,
+      31.0,
+      31.9995
+     ],
+     [
+      6.429,
+      31.0,
+      31.9995
+     ],
+     [
+      10.714,
+      31.0,
+      31.9995
+     ]
+    ]
+   ]
+  }
+ }
+}

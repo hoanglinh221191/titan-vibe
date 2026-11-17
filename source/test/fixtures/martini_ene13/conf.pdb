@@ -1,0 +1,16 @@
+REMARK    written by test/fixtures/martini_ene13/make_fixture.py
+ATOM      1 BB   LYS A   1       0.000   0.000   0.000  1.00  0.00
+ATOM      2 SC1  LYS A   1       0.000   3.300   0.000  1.00  0.00
+ATOM      3 SC2  LYS A   1       0.000   6.200   0.500  1.00  0.00
+ATOM      4 BB   PHE A   2       3.500   0.000   0.000  1.00  0.00
+ATOM      5 SC1  PHE A   2       3.500   3.100   0.000  1.00  0.00
+ATOM      6 SC2  PHE A   2       3.500   5.000   2.100  1.00  0.00
+ATOM      7 SC3  PHE A   2       3.500   5.800  -0.500  1.00  0.00
+ATOM      8 BB   LYS B   1       8.000   0.500   1.000  1.00  0.00
+ATOM      9 SC1  LYS B   1       8.000   3.800   1.000  1.00  0.00
+ATOM     10 SC2  LYS B   1       8.000   6.700   1.500  1.00  0.00
+ATOM     11 BB   PHE B   2      11.500   0.500   1.000  1.00  0.00
+ATOM     12 SC1  PHE B   2      11.500   3.600   1.000  1.00  0.00
+ATOM     13 SC2  PHE B   2      11.500   5.500   3.100  1.00  0.00
+ATOM     14 SC3  PHE B   2      11.500   6.300   0.500  1.00  0.00
+END

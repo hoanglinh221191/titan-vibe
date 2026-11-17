@@ -197,10 +197,16 @@ int main() {
     unknowns[panels.size() + i] =
         0.05 * std::cos(0.019 * static_cast<double>(i));
   }
+  // vdW panels carry sphere-patch quadrature, so their coupled self and
+  // one-ring pairs take the curved kernel, which records no k1..k4 block
+  // decisions.  The guarded flat-triangle path checked here needs it off.
+  std::vector<TitanPBE::Tabi::Panel> flat_panels = panels;
+  for (TitanPBE::Tabi::Panel &panel : flat_panels)
+    panel.sphere_patch_quadrature.reset();
   std::vector<double> jcp_tree;
   TitanPBE::Tabi::TreecodeStats jcp_stats;
   TitanPBE::Tabi::apply_jcp_treecode_operator(
-      panels, unknowns, 0.0125, 0.12, 0.50625, 40.5, true, tree,
+      flat_panels, unknowns, 0.0125, 0.12, 0.50625, 40.5, true, tree,
       "duffy_adaptive", "off", executor, jcp_tree, &jcp_stats);
   require_true("jcp duffy near policy",
                jcp_stats.near_kernel_policy == "one_ring_cpv");
@@ -274,6 +280,7 @@ $compileArgs = @(
     '-DTITAN_RUNTIME_DISPATCH_HOTSPOTS=1',
     ("-I" + (Join-Path $RepoRoot "src")),
     (Join-Path $RepoRoot 'src\tabi\tabi_surface.cpp'),
+    (Get-PbeTabiSurfaceSources -RepoRoot $RepoRoot),
     (Join-Path $RepoRoot 'src\tabi\tabi_near.cpp'),
     (Get-PbeTabiTreecodeSources -RepoRoot $RepoRoot),
     (Join-Path $RepoRoot 'src\titan_surface.cpp'),

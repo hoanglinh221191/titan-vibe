@@ -78,6 +78,7 @@ $argsText = @"
 -ff=charmm36
 -f=$pdb
 -pbctopo=true
+-pbctopo-steric=filter
 -pbctopo-exact-component-limit=6
 -pbctopo-beam-width=64
 -g=0-0

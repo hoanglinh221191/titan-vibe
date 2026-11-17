@@ -7,11 +7,15 @@ param(
     [double[]]$SaltMolar = @(0.0, 0.15),
     [ValidateSet('off', 'channel-shadow')]
     [string]$ErrorAudit = 'off',
+    # node-patch builds curved dual cells, which main solves only with the
+    # classic treecode (curved_node_patch_requires_direct_or_classic_treecode);
+    # curved cells in the Cartesian FMM belong to the bie-ses route.
     [ValidateSet('centroid', 'node-patch')]
-    [string[]]$Discretizations = @('centroid', 'node-patch')
+    [string[]]$Discretizations = @('centroid')
 )
 
 $ErrorActionPreference = 'Stop'
+. (Join-Path $PSScriptRoot 'pbe_driver_topology.ps1')
 Set-StrictMode -Version Latest
 $InvariantCulture = [Globalization.CultureInfo]::InvariantCulture
 $RepoRoot = Split-Path -Parent $PSScriptRoot
@@ -130,6 +134,7 @@ foreach ($discretization in $Discretizations) {
     $argPath = Join-Path $runDir 'arg.in'
     @(
         "-f=$(Convert-ToTitanPath $pdbPath)",
+        "-common_topo=$(Convert-ToTitanPath (Write-PbeDriverTopology $pdbPath))",
         '-1pdb=true',
         '-ff=AMBER99SB',
         '-g=1&1',

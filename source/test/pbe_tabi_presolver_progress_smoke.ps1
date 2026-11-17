@@ -4,6 +4,7 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+. (Join-Path $PSScriptRoot 'pbe_driver_topology.ps1')
 Set-StrictMode -Version Latest
 
 $RepoRoot = Split-Path -Parent $PSScriptRoot
@@ -59,6 +60,7 @@ if (-not (Test-Path -LiteralPath $pqrPath)) {
 
 $argLines = @(
     "-f=$(Convert-ToTitanPath $pdbPath)",
+    "-common_topo=$(Convert-ToTitanPath (Write-PbeDriverTopology $pdbPath))",
     '-1pdb',
     '-ff=AMBER99SB',
     '-g=1&1',

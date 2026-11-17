@@ -49,19 +49,6 @@ function New-CleanDir([string]$Path) {
     New-Item -ItemType Directory -Path $Path -Force | Out-Null
 }
 
-function Write-SmokePdb([string]$Path) {
-    $lines = @(
-        'CRYST1   20.000   20.000   20.000  90.00  90.00  90.00 P 1           1',
-        'ATOM      1  N   ALA A   1       0.000   0.000   0.000  1.00  0.00           N',
-        'ATOM      2  CA  ALA A   1       1.450   0.000   0.000  1.00  0.00           C',
-        'ATOM      3  C   ALA A   1       2.050   1.350   0.000  1.00  0.00           C',
-        'ATOM      4  O   ALA A   1       1.450   2.350   0.000  1.00  0.00           O',
-        'ATOM      5  CB  ALA A   1       1.950  -0.750   1.250  1.00  0.00           C',
-        'END'
-    )
-    Set-Content -LiteralPath $Path -Value $lines -Encoding ASCII
-}
-
 function Convert-ToDouble([object]$Value) {
     return [double]::Parse([string]$Value, $InvariantCulture)
 }
@@ -87,8 +74,12 @@ function Require-File([string]$Path) {
 
 function Invoke-PbsaRun([string]$RunDir, [string]$Mode, [string[]]$ArgLines, [string[]]$CliArgs) {
     New-CleanDir $RunDir
-    $pdbPath = Join-Path $RunDir 'ala.pdb'
-    Write-SmokePdb $pdbPath
+    # Receptor chain A, ligand chain B, full topology: see the fixture notes in
+    # pbe_grid_fixture_helpers.ps1.
+    $pdbPath = Join-Path $RunDir 'ala2.pdb'
+    $topPath = Join-Path $RunDir 'ala2.top'
+    Write-PbsaTwoChainPdb $pdbPath
+    Write-PbsaTwoChainTopology $topPath
     $libPath = Convert-ToTitanPath (Resolve-PbsaLibFfRoot)
 
     Push-Location $RunDir
@@ -98,7 +89,8 @@ function Invoke-PbsaRun([string]$RunDir, [string]$Mode, [string[]]$ArgLines, [st
                 "-f=$(Convert-ToTitanPath $pdbPath)",
                 '-1pdb',
                 '-ff=AMBER99SB',
-                '-g=1&1',
+                "-g=$PbsaTwoChainGroups",
+                "-common_topo=$(Convert-ToTitanPath $topPath)",
                 "-path-a=$libPath",
                 "-path-n=$libPath",
                 '-pbsa=true',
@@ -122,7 +114,8 @@ function Invoke-PbsaRun([string]$RunDir, [string]$Mode, [string[]]$ArgLines, [st
                 '-f', $pdbPath,
                 '-1pdb',
                 '-ff', 'AMBER99SB',
-                '-g', '1&1',
+                '-g', $PbsaTwoChainGroups,
+                '-common_topo', $topPath,
                 '-path-a', $libPath,
                 '-path-n', $libPath,
                 '-pbsa', 'true',
@@ -256,8 +249,23 @@ function Invoke-ReuseCase(
             ([int64](Require-Key $perf 'grid_workspace_reuse_hits')) -le 0) {
             throw "Expected workspace reuse hits for $Name/$mode"
         }
-        if ($ExpectedEffective -eq 'auto' -and ([int64](Require-Key $perf 'grid_medium_cache_hits')) -le 0) {
-            throw "Expected exact medium/operator cache hits for $Name/$mode"
+        # The medium/operator cache holds one entry keyed on the exact atoms
+        # (coordinates, charges, radii), so it hits only when the same atom set
+        # is solved twice in a row. A receptor and a distinct ligand never do
+        # that (two identical frames give 0 hits as well); the hits this smoke
+        # used to require came from the old -g=1&1 fixture, where receptor and
+        # ligand were the same atoms. Check that the cache is consulted and
+        # that every miss stores its entry.
+        if ($ExpectedEffective -eq 'auto') {
+            $mediumHits = [int64](Require-Key $perf 'grid_medium_cache_hits')
+            $mediumMisses = [int64](Require-Key $perf 'grid_medium_cache_misses')
+            $mediumStores = [int64](Require-Key $perf 'grid_medium_cache_stores')
+            if ($mediumHits + $mediumMisses -le 0) {
+                throw "Expected the medium/operator cache to be consulted for $Name/$mode"
+            }
+            if ($mediumStores -ne $mediumMisses) {
+                throw "Expected one medium/operator cache store per miss for $Name/$mode, observed misses=$mediumMisses stores=$mediumStores"
+            }
         }
     }
 }

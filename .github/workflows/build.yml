@@ -1,12 +1,14 @@
-name: build-and-test
+name: build-host-and-replay
 
+# Builds the TITAN host under source/ with the toolchain of the release and runs the package checks
+# with the rebuilt executable. Started by hand (Actions > build-host-and-replay > Run workflow).
 on:
-  push:
-  pull_request:
+  workflow_dispatch:
 
 jobs:
   windows:
     runs-on: windows-latest
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@v4
       - uses: msys2/setup-msys2@v2
@@ -14,16 +16,29 @@ jobs:
           msystem: UCRT64
           update: true
           install: >-
-            mingw-w64-ucrt-x86_64-gcc
-            mingw-w64-ucrt-x86_64-cmake
-            mingw-w64-ucrt-x86_64-ninja
-      - name: Configure and build
+            make
+            mingw-w64-ucrt-x86_64-clang
+            mingw-w64-ucrt-x86_64-lld
+            mingw-w64-ucrt-x86_64-openmp
+            mingw-w64-ucrt-x86_64-python
+      - name: Build the host (portable profile)
         shell: msys2 {0}
         run: |
-          cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
-          cmake --build build --parallel 8
-      - name: Run core smoke tests
+          make -C source PROFILE=portable -j 4 all
+          ./source/titan.exe --version
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Package checksums
+        shell: pwsh
+        run: python ./verify_package.py
+      - name: Quick-start examples with the rebuilt executable
         shell: pwsh
         run: |
           $env:Path = "C:\msys64\ucrt64\bin;$env:Path"
-          ./test/run_core_smokes.ps1 -Compiler g++.exe
+          python ./run_quickstart.py --binary ./source/titan.exe --output ./ci_quickstart
+      - name: Held-out smoke replay with the rebuilt executable
+        shell: pwsh
+        run: |
+          $env:Path = "C:\msys64\ucrt64\bin;$env:Path"
+          python ./replay.py --binary ./source/titan.exe --output ./ci_smoke

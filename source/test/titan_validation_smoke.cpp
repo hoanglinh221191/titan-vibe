@@ -184,7 +184,8 @@ int main() {
     context.lag_frames = 1;
     context.n_replicas = 2;
     context.temps_k = {300.0, 320.0};
-    context.target_temp_k = 310.0;
+    // KIN-13: TRAM has a transition matrix only for a simulated temperature
+    context.target_temp_k = 300.0;
     context.max_iter = 256;
     context.tolerance = 1e-6;
     context.ensemble = "nvt";

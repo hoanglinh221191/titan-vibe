@@ -122,10 +122,13 @@ try {
 -cmap-scope=interface
 "@
   Run-TitanCase "interface" $interface
+  # md1_short_two_frames.pdb has two MODELs and both are analysed (a
+  # three-MODEL copy gives frames_seen: 3). This smoke expected 1 frame,
+  # written when the -nocal loop counted only one of the two.
   if (-not (Select-String -Path "contact_probability_summary.dat" -Pattern "scope: interface" -Quiet) -or
       -not (Select-String -Path "contact_probability_summary.dat" -Pattern "matrix_layout: rectangular" -Quiet) -or
-      -not (Select-String -Path "contact_probability_summary.dat" -Pattern "frames_seen: 1" -Quiet) -or
-      -not (Select-String -Path "contact_probability_summary.dat" -Pattern "valid_frames: 1" -Quiet) -or
+      -not (Select-String -Path "contact_probability_summary.dat" -Pattern "frames_seen: 2" -Quiet) -or
+      -not (Select-String -Path "contact_probability_summary.dat" -Pattern "valid_frames: 2" -Quiet) -or
       -not (Select-String -Path "contact_probability_summary.dat" -Pattern "skipped_incomplete_frames: 0" -Quiet)) {
     throw "interface: summary does not describe a populated rectangular output"
   }
@@ -152,7 +155,9 @@ try {
   }
 
   Expect-TitanReject "interface_domain_rejected" ($interface + "`r`n-cmap-domain=both") "CMap: -cmap-domain and -cmap-min-seqsep apply only to -cmap-scope=mol1."
-  Expect-TitanReject "mixed_alias_rejected" ($legacy + "`r`n-cmap") "CMap: do not mix deprecated -contact-map with -cmap options"
+  # The CLI validator (cli/option_validation.h) now rejects this pair before
+  # the CMap module's own "do not mix" check is reached.
+  Expect-TitanReject "mixed_alias_rejected" ($legacy + "`r`n-cmap") "CLI007: Conflicting options '-cmap' and '-contact-map'"
 
   $listFile = Join-Path $work "same_pdb_twice.txt"
   [System.IO.File]::WriteAllText(

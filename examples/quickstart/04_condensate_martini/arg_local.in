@@ -1,0 +1,13 @@
+-ff=martini
+-s=reference.pdb
+-traj=frames.xtc
+-n=index.ndx
+-g=0-0
+-common_topo=topol.top
+-pbctopo=true
+-1pdb=true
+-nocal=true
+-no-dssp=true
+-noprint-side_chain_contact=true
+-pbctopo-mode=llps-local
+-opdb=local.pdb

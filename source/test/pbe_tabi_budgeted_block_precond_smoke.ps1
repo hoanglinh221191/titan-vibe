@@ -5,6 +5,7 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+. (Join-Path $PSScriptRoot 'pbe_driver_topology.ps1')
 Set-StrictMode -Version Latest
 
 $RepoRoot = Split-Path -Parent $PSScriptRoot
@@ -49,6 +50,7 @@ $libPath = Convert-ToTitanPath ((Resolve-Path -LiteralPath (Join-Path $RepoRoot 
 $argPath = Join-Path $WorkRoot 'arg.in'
 Set-Content -LiteralPath $argPath -Value @(
     "-f=$(Convert-ToTitanPath $pdbPath)",
+    "-common_topo=$(Convert-ToTitanPath (Write-PbeDriverTopology $pdbPath))",
     '-1pdb',
     '-ff=AMBER99SB',
     '-g=1&1',
@@ -157,6 +159,7 @@ if ($IncludeBudgetFallback) {
     $fallbackArg = Join-Path $fallbackDir 'arg.in'
     Set-Content -LiteralPath $fallbackArg -Value @(
         "-f=$(Convert-ToTitanPath $fallbackPdb)",
+        "-common_topo=$(Convert-ToTitanPath (Write-PbeDriverTopology $fallbackPdb))",
         '-1pdb',
         '-ff=AMBER99SB',
         '-g=1&1',

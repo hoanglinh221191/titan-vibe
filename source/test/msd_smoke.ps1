@@ -128,10 +128,66 @@ try {
       throw "rotational: missing expected output $file"
     }
   }
-  if (-not (Select-String -Path "rotational_msd.dat" -Pattern "lag_index lag_time_ps rotational_msd_rad2 C1 C2 samples" -Quiet) -or
+  # Contract: C1/C2 are Legendre correlations, mean_cos_theta is the last
+  # column, and fit_window_ps is the window actually fitted. Two frames give
+  # one lag (1 ps), so the requested 1-3 ps window holds one point.
+  if (-not (Select-String -Path "rotational_msd.dat" -SimpleMatch -Pattern "lag_index lag_time_ps rotational_msd_rad2 C1 C2 samples mean_cos_theta" -Quiet) -or
       -not (Select-String -Path "rotational_diffusion_summary.dat" -Pattern "reference_note:" -Quiet) -or
-      -not (Select-String -Path "rotational_diffusion_summary.dat" -Pattern "fit_window_ps: 1.00000000,3.00000000" -Quiet)) {
+      -not (Select-String -Path "rotational_diffusion_summary.dat" -Pattern "correlation_note: C1 and C2 .* Legendre correlations" -Quiet) -or
+      -not (Select-String -Path "rotational_diffusion_summary.dat" -Pattern "fit_window_policy: explicit" -Quiet) -or
+      -not (Select-String -Path "rotational_diffusion_summary.dat" -Pattern "fit_window_ps: 1.00000000,1.00000000" -Quiet) -or
+      -not (Select-String -Path "rotational_diffusion_summary.dat" -Pattern "fit_points: 1" -Quiet) -or
+      -not (Select-String -Path "rotational_diffusion_summary.dat" -Pattern "fit_status: insufficient_points" -Quiet)) {
     throw "rotational: output does not match rotational MSD contract"
+  }
+
+  # Known rotation: frame 2 is frame 1 turned by 0.3 rad about z through the
+  # centroid. Lag 1 must give theta^2, C1 = (1 + 2 cos t)/3,
+  # C2 = (4 cos^2 t + 2 cos t - 1)/5 and <cos theta> = cos t.
+  $theta = 0.3
+  $culture = [System.Globalization.CultureInfo]::InvariantCulture
+  $sourceLines = [System.IO.File]::ReadAllLines($singleFramePdb)
+  $atomRows = @($sourceLines | Where-Object { $_.StartsWith("ATOM") -or $_.StartsWith("HETATM") })
+  $cx = 0.0; $cy = 0.0
+  foreach ($row in $atomRows) {
+    $cx += [double]::Parse($row.Substring(30, 8), $culture)
+    $cy += [double]::Parse($row.Substring(38, 8), $culture)
+  }
+  $cx /= $atomRows.Count; $cy /= $atomRows.Count
+  $cosT = [math]::Cos($theta); $sinT = [math]::Sin($theta)
+  $rotated = foreach ($row in $sourceLines) {
+    if ($row.StartsWith("ATOM") -or $row.StartsWith("HETATM")) {
+      $x = [double]::Parse($row.Substring(30, 8), $culture) - $cx
+      $y = [double]::Parse($row.Substring(38, 8), $culture) - $cy
+      $xr = ($cosT * $x - $sinT * $y + $cx).ToString("F3", $culture).PadLeft(8)
+      $yr = ($sinT * $x + $cosT * $y + $cy).ToString("F3", $culture).PadLeft(8)
+      $row.Substring(0, 30) + $xr + $yr + $row.Substring(46)
+    } else {
+      $row.Replace("MODEL        1", "MODEL        2").Replace("t= 100000.00000", "t= 100001.00000")
+    }
+  }
+  $rotatedPdb = Join-Path $work "md1_short_rotated.pdb"
+  [System.IO.File]::WriteAllLines($rotatedPdb, @($sourceLines + $rotated), [System.Text.Encoding]::ASCII)
+  Run-TitanCase "rotation_known" ($base.Replace("-f=md1_short_two_frames.pdb", "-f=md1_short_rotated.pdb") + "`r`n" + @"
+-msd=true
+-msd-rot=true
+"@)
+  $lag = @(Get-Content -LiteralPath "rotational_msd.dat" | Where-Object { $_ -match '^\s*1\s' })
+  if ($lag.Count -ne 1) {
+    throw "rotation_known: expected one lag-1 row in rotational_msd.dat"
+  }
+  $f = $lag[0].Trim() -split '\s+'
+  $expected = @{
+    2 = $theta * $theta
+    3 = (1.0 + 2.0 * $cosT) / 3.0
+    4 = (4.0 * $cosT * $cosT + 2.0 * $cosT - 1.0) / 5.0
+    6 = $cosT
+  }
+  foreach ($column in $expected.Keys) {
+    $observed = [double]::Parse($f[$column], $culture)
+    if ([math]::Abs($observed - $expected[$column]) -gt 1e-5) {
+      throw "rotation_known: column $column is $observed, expected $($expected[$column])"
+    }
   }
 
   $listFile = Join-Path $work "same_pdb_twice.txt"

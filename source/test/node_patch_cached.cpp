@@ -178,9 +178,9 @@ int main(int argc, char **argv) {
     for (auto &p : flat_triangles)
       p.sphere_patch_quadrature.reset();
     auto flat = build_node_patch_panels(flat_triangles);
-    require(!prepare_curved_node_patches(flat_triangles, flat, 78.5, kappa, 0,
-                                         executor),
-            "flat legacy surface preserved");
+    require(prepare_curved_node_patches(flat_triangles, flat, 78.5, kappa, 0,
+                                         executor) && flat.front().node_patch_geometry->curved->representation=="curved_pn",
+            "non-spherical metadata selects the current PN lift");
     Options alias = o;
     alias.discretization = "centroid";
     alias.formulation = "tabi2-nodepatch";

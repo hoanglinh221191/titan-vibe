@@ -113,11 +113,12 @@ $auditOffSummary = Get-Content -LiteralPath (
 if ($auditOffSummary -notmatch '(?m)^tabi_node_patch_operator_audit off\r?$') {
     throw 'Node-patch audit-off was not recorded in pbe_summary.dat.'
 }
-if ($node.profile.near_kernel_policy -ne 'packed-avx2-node-patch-self-flat-pv') {
+if ($node.profile.near_kernel_policy -notin @('packed-avx2-node-patch-curved',
+                                                'packed-avx2-node-patch-flat')) {
     throw "Node-patch AVX2/self policy drifted: $($node.profile.near_kernel_policy)"
 }
 if ([double]$node.profile.energy_projection_seconds -le 0.0 -or
-    $node.profile.energy_projection_kernel -notmatch '^dynamic-atom-tile4-(avx2-exact-exp|scalar)$') {
+    $node.profile.energy_projection_kernel -notmatch '^dynamic-atom-tile4-(avx2-exact-exp|scalar)(-cell-aggregate-eta[0-9.]+)?$') {
     throw "Node-patch energy projection telemetry mismatch: seconds=$($node.profile.energy_projection_seconds) kernel=$($node.profile.energy_projection_kernel)"
 }
 if ([int64]$node.profile.unknown_count -ge [int64]$centroid.profile.unknown_count) {
@@ -129,8 +130,13 @@ $energyRel = [math]::Abs(
 if ($energyRel -gt 8.0e-2) {
     throw "Node-patch energy drift exceeded 8%: $energyRel"
 }
-if ([double]$node.profile.total_seconds -ge [double]$centroid.profile.total_seconds) {
-    throw "Node-patch was not faster: node=$($node.profile.total_seconds) centroid=$($centroid.profile.total_seconds)"
+# The flat cell made node-patch faster than centroid outright.  The curved
+# cell, now the default on this route, integrates self, one-ring and near-zone
+# pairs over the curved surface at setup, which costs more than the halved
+# unknown count saves on a 37k-triangle mesh; in exchange it is first order no
+# longer (test/tabi_node_patch_kirkwood.py).  Bound the cost instead.
+if ([double]$node.profile.total_seconds -ge 2.0 * [double]$centroid.profile.total_seconds) {
+    throw "Node-patch took more than twice the centroid time: node=$($node.profile.total_seconds) centroid=$($centroid.profile.total_seconds)"
 }
 
 $summary = @(

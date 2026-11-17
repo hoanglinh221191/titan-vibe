@@ -14,13 +14,16 @@
 #include <string>
 #include <vector>
 
-std::string arguments::set_Buildnumber() { return "titan_s2_smoke"; }
+#ifndef TITAN_SMOKE_LINK_ENGINE  // engine objects define it (test/engine_linked_oracles.py)
 std::string arguments::get_build_number() const { return "titan_s2_smoke"; }
+#endif
 
+#ifndef TITAN_SMOKE_LINK_ENGINE  // engine objects define it (test/engine_linked_oracles.py)
 bool Multi_MOL::topology_matches_frame(std::size_t frame_index) const noexcept {
   return frame_index < m_mol.size() &&
          m_mol[frame_index].topology_consistent(info.size());
 }
+#endif
 
 namespace {
 

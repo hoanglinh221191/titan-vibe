@@ -181,10 +181,10 @@ Run-TitanCase "curvature" ($base + "`r`n" + @"
 "@)
 Assert-Exists "membrane_curvature_map.csv"
 Assert-Exists "membrane_proximity_coupling.csv"
-Assert-Contains "membrane_curvature_map.csv" "curvature_proxy_Ainv"
+Assert-Contains "membrane_curvature_map.csv" "height_dev_over_cell_edge"
 Assert-Contains "membrane_proximity_coupling.csv" "thickness_A"
-Assert-Contains "membrane_proximity_coupling.csv" "order_S"
-Assert-Contains "membrane_proximity_coupling.csv" "curvature_proxy_Ainv"
+Assert-Contains "membrane_proximity_coupling.csv" "order_P2_bond"
+Assert-Contains "membrane_proximity_coupling.csv" "height_dev_over_cell_edge"
 
 Run-TitanCase "off" $base
 Assert-NotExists "membrane_protein_lipid_contacts.csv"

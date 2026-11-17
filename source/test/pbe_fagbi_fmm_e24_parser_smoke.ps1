@@ -18,7 +18,8 @@ foreach ($path in @($typesPath, $parsePath, $argumentsPath, $solverPath)) {
 }
 
 $types = Get-Content -Raw -LiteralPath $typesPath
-$parse = Get-Content -Raw -LiteralPath $parsePath
+$parse = (Get-ChildItem -LiteralPath (Split-Path -Parent $parsePath) -File -Filter 'parse_*.cpp' |
+  Sort-Object Name | ForEach-Object { Get-Content -Raw -LiteralPath $_.FullName }) -join "`n"
 $arguments = Get-Content -Raw -LiteralPath $argumentsPath
 $solver = Get-Content -Raw -LiteralPath $solverPath
 

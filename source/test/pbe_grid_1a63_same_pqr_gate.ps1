@@ -12,6 +12,7 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+. (Join-Path $PSScriptRoot 'pbe_driver_topology.ps1')
 Set-StrictMode -Version Latest
 $Culture = [Globalization.CultureInfo]::InvariantCulture
 $RepoRoot = Split-Path -Parent $PSScriptRoot
@@ -178,7 +179,7 @@ foreach ($spacing in @($GridSpacings | Sort-Object -Descending)) {
     $lib = To-TitanPath ((Resolve-Path -LiteralPath $ffRoot).Path.TrimEnd('\') + '\')
     $arg = Join-Path $runDir 'arg.in'
     Set-Content -LiteralPath $arg -Encoding ASCII -Value @(
-        "-f=$(To-TitanPath $driver)", '-1pdb=true', '-ff=AMBER99SB', '-g=1&1',
+        "-f=$(To-TitanPath $driver)", "-common_topo=$(To-TitanPath (Write-PbeDriverTopology $driver))", '-1pdb=true', '-ff=AMBER99SB', '-g=1&1',
         "-path-a=$lib", "-path-n=$lib", '-pbe=grid',
         "-pbe-test-pqr=$(To-TitanPath $PqrPath)", '-pbe-dgsolv=true',
         '-pbe-model=linear', '-pbe-biomodel=pbe', '-pbe-dielectric=two-dielectric',

@@ -12,6 +12,7 @@ $InvariantCulture = [Globalization.CultureInfo]::InvariantCulture
 $RepoRoot = [IO.Path]::GetFullPath((Split-Path -Parent $PSScriptRoot))
 $TestRoot = [IO.Path]::GetFullPath($PSScriptRoot)
 $AllowedWorkRootBase = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot 'tmp'))
+. (Join-Path $PSScriptRoot 'pbe_driver_topology.ps1')
 if ([string]::IsNullOrWhiteSpace($TitanExe)) {
     $TitanExe = Join-Path $RepoRoot 'titan.exe'
 }
@@ -134,6 +135,7 @@ function Write-DriverPdb([string]$RunDir) {
         'ATOM      3  C   ALA A   1       0.000   1.450   0.000  1.00  0.00           C',
         'END'
     ) | Set-Content -LiteralPath (Join-Path $RunDir 'driver.pdb') -Encoding ASCII
+    [void](Write-PbeDriverTopology (Join-Path $RunDir 'driver.pdb'))
 }
 
 function Write-OneAtomPqr([string]$RunDir) {
@@ -155,12 +157,14 @@ function Get-BaseArgs(
     [int]$SurfacePoints = 96
 ) {
     $driver = Convert-ToTitanPath (Join-Path $RunDir 'driver.pdb')
+    $driverTopology = Convert-ToTitanPath (Join-Path $RunDir 'driver.top')
     $pqr = Convert-ToTitanPath $PqrPath
     $lib = Convert-ToTitanPath ((Resolve-Path -LiteralPath $script:LibRoot).Path.TrimEnd('\\') + '\\')
     $thetaText = $Theta.ToString('G17', $InvariantCulture)
     $lines = @(
         "-f=$driver",
         '-1pdb=true',
+        "-common_topo=$driverTopology",
         '-ff=AMBER99SB',
         '-g=1&1',
         "-path-a=$lib",
@@ -215,6 +219,12 @@ function Get-BaseArgs(
         "-pbe-bie-surface-points=$SurfacePoints",
         "-nt=$Threads"
     )
+    # The 1SH1 ladder was calibrated on the `current` analytic-SES engine.
+    # Since 1dafeb8d the default is patch-ray, whose 1SH1 mesh passes the
+    # theta=.20 solution audit, so A1 is accepted and A2 never runs.
+    if ($PrimarySurface -eq 'analytic-ses') {
+        $lines += '-pbe-bie-analytic-ses-engine=current'
+    }
     return ,$lines
 }
 
@@ -248,6 +258,9 @@ function Invoke-Case([string]$Name, [string[]]$ArgumentLines,
     $psi.RedirectStandardOutput = $true
     $psi.RedirectStandardError = $true
     $psi.Arguments = '-a "' + ($argPath -replace '"', '\"') + '"'
+    # Curved node-patch cells refuse fmm-m2l (since 497e0cad), and the
+    # Cartesian full-FMM route needs it; run the flat cell it was built for.
+    $psi.EnvironmentVariables['TITAN_CURVED_NODE_PATCH'] = 'off'
     $process = New-Object Diagnostics.Process
     $process.StartInfo = $psi
     [void]$process.Start()
@@ -489,8 +502,9 @@ foreach ($event in @('retry_triggered', 'cross_attempt_identity', 'attempt_accep
 
 # A valid retry scope with a deliberately insufficient GMRES budget must fail
 # closed after A1: no A2, no accepted energy, and retained diagnostics only.
+# A failed BIE frame also makes the run exit non-zero.
 $failureArgs = Get-BaseArgs $naturalTemplateDir $pqr1sh1 'channel-shadow-retry-global-theta015' 0.20 1 'analytic-ses' 96
-$failure = Invoke-Case '1sh1_retry_a1_invalid' $failureArgs
+$failure = Invoke-Case '1sh1_retry_a1_invalid' $failureArgs $false
 $failureProfile = Get-RunProfile $failure
 $failureEnergy = Get-RunEnergy $failure
 if ($failureEnergy.status -ne 'failed' -or

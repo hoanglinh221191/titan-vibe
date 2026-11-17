@@ -213,7 +213,7 @@ $compileArgs = @(
     $source,
     'src/pbctopo/local_graph.cpp',
     'src/pbctopo/lattice_math.cpp',
-    'src/mol_topology.cpp',
+    'src/topology/mol_topology.cpp',
     '-o',
     $exe
 )

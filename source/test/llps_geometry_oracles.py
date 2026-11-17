@@ -30,6 +30,6 @@ if a.with_engine:
  if os.name=='nt':cmd.insert(1,'-fuse-ld=lld')
  run('pipeline_build',cmd);run('pipeline_run',[str(exe)]);record['pipeline']='PASS'
  record['objects_sha256']={str(x.relative_to(root)):hashlib.sha256(x.read_bytes()).hexdigest() for x in objects}
-sources=list((root/'src').glob('titan_llps*.cpp'))+[root/'src/titan_llps.h',root/'src/titan_llps_geometry.h',root/'src/cli/parse_arguments.cpp',root/'src/arguments.h',root/'src/impl_engine.cpp',root/'src/pbctopo/lattice_math.cpp']
+sources=list((root/'src').glob('titan_llps*.cpp'))+[root/'src/titan_llps.h',root/'src/titan_llps_geometry.h',*sorted((root/'src/cli').glob('parse_*.cpp')),root/'src/arguments.h',*sorted((root/'src/engine').iterdir()),root/'src/pbctopo/lattice_math.cpp']
 record['sources_sha256']={str(x.relative_to(root)):hashlib.sha256(x.read_bytes()).hexdigest() for x in sources}
 (work/'verification.json').write_text(json.dumps(record,indent=2)+'\n',encoding='utf-8')

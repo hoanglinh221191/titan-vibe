@@ -13,6 +13,7 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+. (Join-Path $PSScriptRoot 'pbe_driver_topology.ps1')
 Set-StrictMode -Version Latest
 
 $InvariantCulture = [System.Globalization.CultureInfo]::InvariantCulture
@@ -66,15 +67,17 @@ function Write-BornPqr([string]$Path, [double]$Charge, [double]$RadiusA) {
     ) -Encoding ASCII
 }
 
-function Get-DebyeKappaInvA([double]$Salt, [double]$TempK) {
+# The same Debye kappa as TITAN (debye_kappa_inv_a), including its
+# sqrt(78.5 / eps_out) dielectric scaling.
+function Get-DebyeKappaInvA([double]$Salt, [double]$TempK, [double]$EpsOut = 78.5) {
     if ($Salt -le 0.0) { return 0.0 }
-    return 0.3291 * [math]::Sqrt($Salt) * [math]::Sqrt(298.15 / [math]::Max(1.0, $TempK))
+    return 0.3291 * [math]::Sqrt($Salt) * [math]::Sqrt(298.15 / [math]::Max(1.0, $TempK)) * [math]::Sqrt(78.5 / [math]::Max(1e-12, $EpsOut))
 }
 
 function Get-BornKirkwoodEnergyKJ([double]$Charge, [double]$RadiusA,
                                   [double]$EpsIn, [double]$EpsOut,
                                   [double]$Salt, [double]$TempK) {
-    $kappa = Get-DebyeKappaInvA -Salt $Salt -TempK $TempK
+    $kappa = Get-DebyeKappaInvA -Salt $Salt -TempK $TempK -EpsOut $EpsOut
     $outside = 1.0 / ($EpsOut * (1.0 + $kappa * $RadiusA))
     $inside = 1.0 / $EpsIn
     $kcal = 0.5 * 332.063713299 * $Charge * $Charge * ($outside - $inside) / $RadiusA
@@ -119,6 +122,7 @@ function New-ArgFile([string]$RunDir, [string]$Backend, [string]$PqrPath,
     $scaleText = $GridScale.ToString('G17', $InvariantCulture)
     $argLines = @(
         "-f=$(Convert-ToTitanPath $pdbPath)",
+        "-common_topo=$(Convert-ToTitanPath (Write-PbeDriverTopology $pdbPath))",
         '-1pdb',
         '-ff=AMBER99SB',
         '-g=1&1',
@@ -130,6 +134,8 @@ function New-ArgFile([string]$RunDir, [string]$Backend, [string]$PqrPath,
         '-pbe-probe=0.0',
         "-pbe-salt=$saltText",
         '-pbe-temp=298.15',
+        '-pbe-int-diel=1.0',
+        '-pbe-ext-diel=80.0',
         '-pbe-timing=summary',
         '-pbe-map=off',
         '-pbe-margin=2.0',
@@ -274,13 +280,20 @@ foreach ($radius in $RadiiA) {
                         if ($row.near_integration -ne $nearMode) {
                             throw "TABI Born ion matrix expected near=$nearMode, got $($row.near_integration)"
                         }
-                        if ($nearMode -eq 'analytic_singular' -and $row.near_kernel_policy -ne 'self_asi') {
-                            throw "TABI analytic_singular did not report self_asi policy: $($row.near_kernel_policy)"
+                        # The Born sphere's panels carry sphere-patch quadrature.
+                        # Without salt they take the curved Poisson self term
+                        # whatever the near mode (tabi_near.cpp poisson_policy).
+                        $expectedPolicy = if ($salt -le 0.0) { 'sphere_poisson_curved' }
+                                          elseif ($nearMode -eq 'analytic_singular') { 'self_asi' }
+                                          else { 'one_ring_cpv' }
+                        if ($row.near_kernel_policy -ne $expectedPolicy) {
+                            throw "TABI $nearMode did not report $expectedPolicy policy: $($row.near_kernel_policy)"
                         }
-                        if ($nearMode -eq 'duffy_adaptive' -and $row.near_kernel_policy -ne 'one_ring_cpv') {
-                            throw "TABI duffy_adaptive did not report one_ring_cpv policy: $($row.near_kernel_policy)"
-                        }
-                        if ($nearMode -eq 'duffy_adaptive' -and $salt -gt 0.0) {
+                        # Sphere-patch panels take the curved self/one-ring
+                        # kernel, which records no k1..k4 block decisions, so
+                        # the Duffy decision counts apply only to flat meshes.
+                        $sphereMesh = $meshMode -eq 'latlong'
+                        if ($nearMode -eq 'duffy_adaptive' -and $salt -gt 0.0 -and -not $sphereMesh) {
                             foreach ($block in @('k1','k2','k3','k4')) {
                                 $acceptedName = "near_${block}_accepted"
                                 $rejectedName = "near_${block}_rejected"

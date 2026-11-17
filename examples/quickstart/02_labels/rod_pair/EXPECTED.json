@@ -1,0 +1,165 @@
+{
+ "runs": {
+  "arg.in": {
+   "output_pdb": "placed.pdb",
+   "frames": [
+    {
+     "frame": "0",
+     "time_ps": "0",
+     "status": "weak_observation",
+     "evidence_state": "extended_periodic",
+     "fallback_reason": "evidence_periodic",
+     "component_count": "2",
+     "contact_cycle_rank": "1",
+     "contact_cycle_b0_x": "1",
+     "contact_cycle_b0_y": "0",
+     "contact_cycle_b0_z": "0",
+     "contact_cycle_b1_x": "0",
+     "contact_cycle_b1_y": "0",
+     "contact_cycle_b1_z": "0",
+     "contact_cycle_b2_x": "0",
+     "contact_cycle_b2_y": "0",
+     "contact_cycle_b2_z": "0",
+     "contact_graph_components": "1",
+     "contact_periodic_graph_components": "1",
+     "self_image_units": "0",
+     "input_overlap_pairs": "0",
+     "bonded_winding_rank": "0",
+     "topological_winding_rank": "0"
+    },
+    {
+     "frame": "1",
+     "time_ps": "1",
+     "status": "weak_observation",
+     "evidence_state": "extended_periodic",
+     "fallback_reason": "evidence_periodic",
+     "component_count": "2",
+     "contact_cycle_rank": "1",
+     "contact_cycle_b0_x": "1",
+     "contact_cycle_b0_y": "0",
+     "contact_cycle_b0_z": "0",
+     "contact_cycle_b1_x": "0",
+     "contact_cycle_b1_y": "0",
+     "contact_cycle_b1_z": "0",
+     "contact_cycle_b2_x": "0",
+     "contact_cycle_b2_y": "0",
+     "contact_cycle_b2_z": "0",
+     "contact_graph_components": "1",
+     "contact_periodic_graph_components": "1",
+     "self_image_units": "0",
+     "input_overlap_pairs": "0",
+     "bonded_winding_rank": "0",
+     "topological_winding_rank": "0"
+    },
+    {
+     "frame": "2",
+     "time_ps": "2",
+     "status": "weak_observation",
+     "evidence_state": "extended_periodic",
+     "fallback_reason": "evidence_periodic",
+     "component_count": "2",
+     "contact_cycle_rank": "1",
+     "contact_cycle_b0_x": "1",
+     "contact_cycle_b0_y": "0",
+     "contact_cycle_b0_z": "0",
+     "contact_cycle_b1_x": "0",
+     "contact_cycle_b1_y": "0",
+     "contact_cycle_b1_z": "0",
+     "contact_cycle_b2_x": "0",
+     "contact_cycle_b2_y": "0",
+     "contact_cycle_b2_z": "0",
+     "contact_graph_components": "1",
+     "contact_periodic_graph_components": "1",
+     "self_image_units": "0",
+     "input_overlap_pairs": "0",
+     "bonded_winding_rank": "0",
+     "topological_winding_rank": "0"
+    },
+    {
+     "frame": "3",
+     "time_ps": "3",
+     "status": "weak_observation",
+     "evidence_state": "extended_periodic",
+     "fallback_reason": "evidence_periodic",
+     "component_count": "2",
+     "contact_cycle_rank": "1",
+     "contact_cycle_b0_x": "1",
+     "contact_cycle_b0_y": "0",
+     "contact_cycle_b0_z": "0",
+     "contact_cycle_b1_x": "0",
+     "contact_cycle_b1_y": "0",
+     "contact_cycle_b1_z": "0",
+     "contact_cycle_b2_x": "0",
+     "contact_cycle_b2_y": "0",
+     "contact_cycle_b2_z": "0",
+     "contact_graph_components": "1",
+     "contact_periodic_graph_components": "1",
+     "self_image_units": "0",
+     "input_overlap_pairs": "0",
+     "bonded_winding_rank": "0",
+     "topological_winding_rank": "0"
+    }
+   ],
+   "molecule_ranges": [
+    [
+     0,
+     18
+    ],
+    [
+     18,
+     36
+    ]
+   ],
+   "centroids_A": [
+    [
+     [
+      45.0004,
+      20.0,
+      20.0
+     ],
+     [
+      15.0004,
+      20.0,
+      20.0
+     ]
+    ],
+    [
+     [
+      15.0002,
+      20.0,
+      20.0
+     ],
+     [
+      45.0002,
+      20.0,
+      20.0
+     ]
+    ],
+    [
+     [
+      15.0002,
+      20.0,
+      20.0
+     ],
+     [
+      45.0002,
+      20.0,
+      20.0
+     ]
+    ],
+    [
+     [
+      15.0001,
+      20.0,
+      20.0
+     ],
+     [
+      45.0001,
+      20.0,
+      20.0
+     ]
+    ]
+   ]
+  }
+ }
+}

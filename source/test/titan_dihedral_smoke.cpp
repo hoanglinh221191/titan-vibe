@@ -12,10 +12,11 @@
 #include <string>
 #include <vector>
 
-std::string arguments::set_Buildnumber() { return "titan_dihedral_smoke"; }
+#ifndef TITAN_SMOKE_LINK_ENGINE  // engine objects define it (test/engine_linked_oracles.py)
 std::string arguments::get_build_number() const {
   return "titan_dihedral_smoke";
 }
+#endif
 
 namespace {
 

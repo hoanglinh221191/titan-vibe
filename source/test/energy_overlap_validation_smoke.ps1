@@ -72,6 +72,29 @@ $lines = @($header + $referenceModel + $secondHeader + $overlapModel)
 [System.IO.File]::WriteAllLines(
     $fixturePdb, $lines, [System.Text.Encoding]::ASCII)
 
+# example/2/md1_short.pdb holds only the three protein chains of
+# example/2/topol.top (PROA, PROB, PROC: 6788 atoms), not its ions or OPC
+# water, and OPC.itp has a [ virtual_sites3 ] section, which the nonbonded
+# topology reader rejects (unsupported_topology_self_energy). Use a topology
+# of the same force field and molecule files with the protein chains only.
+$toppar = (Join-Path $repo "example\2\toppar") -replace '\\', '/'
+$proteinTop = Join-Path $work "md1_short_protein.top"
+[System.IO.File]::WriteAllLines($proteinTop, @(
+    '; Protein chains of example/2/topol.top, matching md1_short.pdb',
+    "#include `"$toppar/forcefield.itp`"",
+    "#include `"$toppar/PROA.itp`"",
+    "#include `"$toppar/PROB.itp`"",
+    "#include `"$toppar/PROC.itp`"",
+    '',
+    '[ system ]',
+    'md1_short protein chains A, B, C',
+    '',
+    '[ molecules ]',
+    'PROA 1',
+    'PROB 1',
+    'PROC 1'
+), [System.Text.Encoding]::ASCII)
+
 function New-ArgumentText([string]$PdbPath) {
   return @"
 -ff=AMBER14SB
@@ -80,7 +103,7 @@ function New-ArgumentText([string]$PdbPath) {
 -g=4-3
 -nt=1
 -n=$(Join-Path $repo "example\2\index.ndx")
--common_topo=$(Join-Path $repo "example\2\topol.top")
+-common_topo=$proteinTop
 -path-a=$(Join-Path $repo "lib_ff")
 -path-n=$(Join-Path $repo "lib_ff")
 "@

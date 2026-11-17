@@ -1,3 +1,4 @@
+. (Join-Path $PSScriptRoot 'pbe_driver_topology.ps1')
 $script:FmmCliInvariantCulture = [System.Globalization.CultureInfo]::InvariantCulture
 
 function Convert-FmmCliToTitanPath([string]$Path) {
@@ -360,6 +361,7 @@ function Write-FmmCliArgFile(
     }
     $argLines = @(
         "-f=$(Convert-FmmCliToTitanPath $pdbPath)",
+        "-common_topo=$(Convert-FmmCliToTitanPath (Write-PbeDriverTopology $pdbPath))",
         '-1pdb=true',
         '-ff=AMBER99SB',
         '-g=1&1',

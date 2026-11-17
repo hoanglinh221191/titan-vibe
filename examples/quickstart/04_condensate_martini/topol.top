@@ -1,0 +1,8 @@
+#include "martini_types.itp"
+#include "molecule_0.itp"
+
+[ system ]
+128 peptides, Martini 3 (water and ions removed)
+
+[ molecules ]
+molecule_0 128

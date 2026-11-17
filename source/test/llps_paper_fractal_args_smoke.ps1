@@ -13,8 +13,9 @@ New-Item -ItemType Directory -Force -Path $WorkRoot | Out-Null
 $exe = Join-Path $WorkRoot "llps_paper_fractal_args_smoke.exe"
 $registry = Join-Path $WorkRoot "titan_cli_registry_generated.h"
 $Compiler = if ($env:CXX) { $env:CXX } else { "g++" }
-python "$repo\tools\generate_cli_registry.py" `
-  --parser "$repo\src\cli\parse_arguments.cpp" `
+$parserArgs = Get-ChildItem -LiteralPath "$repo\src\cli" -File -Filter "parse_*.cpp" |
+  Sort-Object Name | ForEach-Object { "--parser"; $_.FullName }
+python "$repo\tools\generate_cli_registry.py" @parserArgs `
   --output $registry
 if ($LASTEXITCODE -ne 0) { throw "Failed to generate CLI registry" }
 & $Compiler -std=c++23 -O2 -I $WorkRoot -I "$repo\src" `

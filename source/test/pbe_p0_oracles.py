@@ -1,4 +1,17 @@
-"""Compile production PB kernels and run independent P0 oracles on Linux/Windows."""
+"""Compile production PB kernels and run independent oracles on Linux/Windows.
+
+screen and k4 are the P0 oracles (with --verify-regression, the original
+formula must be rejected). far is the treecode far-field oracle: the radial
+Taylor kernels against a long-double reference, the fast and four-lane far
+kernels against both, timing skipped. ses is the SES self-intersection
+regression: true overlaps still found, shared-vertex-only contacts no longer
+counted. near is the curved-cell near quadrature across narrow gaps against
+an order-256 reference. p1 is the degree of the p1 far field: the error of
+every kernel K1-K4 falls as h^2 when a source cell shrinks by h. parity is
+the FMM near-field branches on a small PN sphere under a leaf-1 tree: p1
+packed and scalar, p4 packed and scalar agree to rounding, converge with
+theta in every block, and reproduce the direct operator when every pair is
+direct."""
 import argparse
 import hashlib
 import json
@@ -11,7 +24,8 @@ ROOT = Path(__file__).resolve().parents[1]
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--compiler', default='clang++' if os.name == 'nt' else 'g++')
 parser.add_argument('--work-root', type=Path, default=ROOT / 'test/tmp/pbe_p0_oracles')
-parser.add_argument('--case', choices=['screen', 'k4'])
+parser.add_argument('--case', choices=['screen', 'k4', 'far', 'ses', 'near',
+                                       'p1', 'parity'])
 parser.add_argument('--objects-root', type=Path, default=ROOT / 'build/native/src')
 parser.add_argument('--verify-regression', action='store_true',
                     help='Also verify each oracle rejects the original P0 formula')
@@ -32,14 +46,29 @@ sources = {
     'k4': ['src/tabi/' + name + '.cpp' for name in (
         'tabi_near', 'tabi_treecode_series', 'tabi_treecode_internal',
         'tabi_treecode_leaf', 'tabi_fmm_m2l_cartesian', 'tabi_fmm_m2l_local',
-        'tabi_fmm_m2l_prototype', 'tabi_preconditioner')]
+        'tabi_fmm_m2l_prototype', 'tabi_preconditioner')],
+    'far': ['src/tabi/tabi_treecode_series.cpp'],
+    'ses': ['src/tabi/tabi_calderon_aux_surface.cpp'],
+    'near': ['src/tabi/tabi_node_patch_curved.cpp'],
+    'p1': [],
+    'parity': [],
 }
+drivers = {'far': 'test/tabi_treecode_radial_oracle.cpp',
+           'ses': 'test/bie_surface_intersection_regression.cpp',
+           'near': 'test/bie_curved_near_quadrature.cpp',
+           'p1': 'test/tabi_fmm_p1_degree_probe.cpp',
+           'parity': 'test/tabi_fmm_branch_parity.cpp'}
+# A driver that includes an engine source links without that source's object.
+included = {'p1': ['tabi/tabi_fmm_m2l_prototype.o']}
+run_args = {'far': ['--no-timing']}
 for name, files in sources.items():
     if args.case and args.case != name:
         continue
     exe = args.work_root.resolve() / (name + ('.exe' if os.name == 'nt' else ''))
-    cmd = common + ['test/titan_pbe_' + name + '_oracle.cpp'] + files
+    driver = drivers.get(name, 'test/titan_pbe_' + name + '_oracle.cpp')
+    cmd = common + [driver] + files
     replaced = {str(Path(f).with_suffix('.o').relative_to('src')).lower() for f in files}
+    replaced |= {str(Path(o)).lower() for o in included.get(name, [])}
     objects = [p.resolve() for p in args.objects_root.rglob('*.o')
                if p.name.lower() != 'main.o' and
                str(p.relative_to(args.objects_root)).lower() not in replaced]
@@ -49,11 +78,12 @@ for name, files in sources.items():
     rsp.write_text('\n'.join('"' + p.as_posix() + '"' for p in objects))
     cmd += ['@' + str(rsp), '-fopenmp', '-o', str(exe)]
     subprocess.run(cmd, cwd=ROOT, check=True)
-    result = subprocess.run([str(exe)], cwd=args.work_root, capture_output=True, text=True)
+    result = subprocess.run([str(exe)] + run_args.get(name, []), cwd=args.work_root,
+                            capture_output=True, text=True)
     (args.work_root / (name + '.log')).write_text(result.stdout + result.stderr)
     print(result.stdout + result.stderr, end='', flush=True)
     result.check_returncode()
-    if args.verify_regression:
+    if args.verify_regression and name in ('screen', 'k4'):
         source = files[0]
         text = (ROOT / source).read_text()
         old, new = (
@@ -78,10 +108,9 @@ for name, files in sources.items():
     record = {
         'status': 'PASS', 'command': cmd,
         'compiler': subprocess.check_output([args.compiler, '--version'], text=True),
-        'compiled_sources_sha256': {f: sha256(ROOT / f) for f in files +
-                                   ['test/titan_pbe_' + name + '_oracle.cpp']},
+        'compiled_sources_sha256': {f: sha256(ROOT / f) for f in files + [driver]},
         'linked_objects_sha256': {p.as_posix(): sha256(p) for p in objects},
         'binary_sha256': sha256(exe),
-        'original_formula_rejected': args.verify_regression,
+        'original_formula_rejected': args.verify_regression and name in ('screen', 'k4'),
     }
     (args.work_root / (name + '_verification.json')).write_text(json.dumps(record, indent=2))

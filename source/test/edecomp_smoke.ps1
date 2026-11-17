@@ -93,12 +93,44 @@ function Run-TitanCase([string]$Name, [string]$ArgText) {
 $fixture = Join-Path $repo "example\2\md1_short.pdb"
 $ffRoot = Join-Path $repo "lib_ff"
 
+# Groups (-1pdb): 1 protein, 2 ligand, 3 chain_A, 4 chain_B, 5 chain_C.
+# The smoke used to pair 1-2 for MM/GBSA and 1&1 for MM/PBSA:
+# - "ligand" is the glycan and glycosylated-ASN (NLN) residues of chain C,
+#   peptide-bonded to "protein", so 1-2 evaluated LJ across covalent bonds
+#   with no exclusions (E_vdw about +3.8e5 kJ/mol);
+# - 1&1 makes receptor and ligand the same atoms (no binding cycle), and since
+#   ENE-02 it stops with unsupported_topology_self_energy.
+# Chain A against chain C is an antibody-antigen interface of two separate
+# molecules. Its topology: the protein chains of example/2/topol.top, without
+# the ions and OPC water (OPC.itp has [ virtual_sites3 ], which the
+# nonbonded topology reader rejects); md1_short.pdb holds exactly those
+# 6788 atoms. TITAN then takes charges and LJ from the topology, and its
+# exclusions and [ pairs ] are complete.
+$toppar = (Join-Path $repo "example\2\toppar") -replace '\\', '/'
+$proteinTop = Join-Path $work "md1_short_protein.top"
+[System.IO.File]::WriteAllLines($proteinTop, @(
+    '; Protein chains of example/2/topol.top, matching md1_short.pdb',
+    "#include `"$toppar/forcefield.itp`"",
+    "#include `"$toppar/PROA.itp`"",
+    "#include `"$toppar/PROB.itp`"",
+    "#include `"$toppar/PROC.itp`"",
+    '',
+    '[ system ]',
+    'md1_short protein chains A, B, C',
+    '',
+    '[ molecules ]',
+    'PROA 1',
+    'PROB 1',
+    'PROC 1'
+), [System.Text.Encoding]::ASCII)
+
 $base = @"
 -f=$fixture
 -1pdb=true
 -path-a=$ffRoot
 -path-n=$ffRoot
--g=1-2
+-g=3-5
+-common_topo=$proteinTop
 -edecomp=true
 -edecomp-source=mm
 -edecomp-level=both
@@ -165,7 +197,7 @@ finally {
   Pop-Location
 }
 
-$pbsaBase = $base.Replace("-edecomp-source=mm", "-edecomp-source=pbsa").Replace("-g=1-2", "-g=1&1") + "`r`n" + @"
+$pbsaBase = $base.Replace("-edecomp-source=mm", "-edecomp-source=pbsa") + "`r`n" + @"
 -pbsa=true
 -pbsa-components=complex,receptor,ligand
 -pbsa-ie-min-samples=1
@@ -226,7 +258,7 @@ finally {
   Pop-Location
 }
 
-$allPbsa = $base.Replace("-edecomp-source=mm", "-edecomp-source=all").Replace("-g=1-2", "-g=1&1") + "`r`n" + @"
+$allPbsa = $base.Replace("-edecomp-source=mm", "-edecomp-source=all") + "`r`n" + @"
 -gbsa=true
 -pbsa=true
 -pbsa-components=complex,receptor,ligand

@@ -4,6 +4,7 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+. (Join-Path $PSScriptRoot 'pbe_driver_topology.ps1')
 Set-StrictMode -Version Latest
 
 $InvariantCulture = [System.Globalization.CultureInfo]::InvariantCulture
@@ -57,6 +58,7 @@ function Run-Case([int]$SurfacePoints, [int]$Threads) {
     $argPath = Join-Path $runDir 'arg.in'
     $argLines = @(
         "-f=$(Convert-ToTitanPath $pdbPath)",
+        "-common_topo=$(Convert-ToTitanPath (Write-PbeDriverTopology $pdbPath))",
         '-1pdb',
         '-ff=AMBER99SB',
         '-g=1&1',

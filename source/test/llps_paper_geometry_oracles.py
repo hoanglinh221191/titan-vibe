@@ -22,6 +22,6 @@ if a.with_engine:
  cmd=[a.compiler]+flags+['-DTITAN_TEST_ENGINE','-fno-access-control','-Isrc/gmxtraj/include',*engine_arch_flags(a.objects_root),'-fopenmp','-pthread','test/titan_llps_paper_geometry_oracle.cpp','@'+str(rsp),'-o',str(exe)]
  if os.name=='nt':cmd.insert(1,'-fuse-ld=lld')
  run('pipeline_build',cmd);run('pipeline_run',[str(exe)])
-sources=['src/titan_llps_profile_geometry.h','src/titan_llps_paper.cpp','src/titan_llps_cluster.cpp','src/titan_llps_cluster.h','src/impl_engine.cpp','test/titan_llps_paper_geometry_oracle.cpp','test/llps_paper_geometry_oracles.py']
+sources=['src/titan_llps_profile_geometry.h','src/titan_llps_paper.cpp','src/titan_llps_cluster.cpp','src/titan_llps_cluster.h',*sorted(p.relative_to(root).as_posix() for p in (root/'src/engine').iterdir()),'test/titan_llps_paper_geometry_oracle.cpp','test/llps_paper_geometry_oracles.py']
 sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
 (w/'verification.json').write_text(json.dumps({'status':'PASS','sanitizer':a.sanitize,'with_engine':a.with_engine,'source_sha256':{p:sha(root/p) for p in sources},'object_sha256':{str(p.relative_to(root)):sha(p) for p in objects}},indent=2)+'\n')

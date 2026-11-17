@@ -122,10 +122,10 @@ int main() {
   TitanPBE::Tabi::TreecodeStats masked_stats;
   TitanPBE::Tabi::apply_jcp_treecode_operator(
       panels, unknowns, 0.0125, 0.12, 0.50625, 40.5, true, exact_tree,
-      "centroid", executor1, exact_out, &exact_stats);
+      "centroid", "off", executor1, exact_out, &exact_stats);
   TitanPBE::Tabi::apply_jcp_treecode_operator(
       panels, unknowns, 0.0125, 0.12, 0.50625, 40.5, true, masked_tree,
-      "centroid", executor1, masked_out, &masked_stats);
+      "centroid", "off", executor1, masked_out, &masked_stats);
   require_true("masked stats policy",
                masked_stats.leaf_near_policy == "large-protein");
   require_true("masked exact agreement",
@@ -144,7 +144,7 @@ int main() {
   TitanPBE::Tabi::TreecodeStats large_stats4;
   TitanPBE::Tabi::apply_jcp_treecode_operator(
       panels, unknowns, 0.0125, 0.12, 0.50625, 40.5, true, large_tree4,
-      "centroid", executor4, large_out4, &large_stats4);
+      "centroid", "off", executor4, large_out4, &large_stats4);
   require_true("large nt deterministic",
                relative_rms(masked_out, large_out4) < 1.0e-14);
 
@@ -170,6 +170,7 @@ $compileArgs = @(
     '-DTITAN_RUNTIME_DISPATCH_HOTSPOTS=1',
     ("-I" + (Join-Path $RepoRoot "src")),
     (Join-Path $RepoRoot 'src\tabi\tabi_surface.cpp'),
+    (Get-PbeTabiSurfaceSources -RepoRoot $RepoRoot),
     (Join-Path $RepoRoot 'src\tabi\tabi_near.cpp'),
     (Get-PbeTabiTreecodeSources -RepoRoot $RepoRoot),
     (Join-Path $RepoRoot 'src\titan_surface.cpp'),

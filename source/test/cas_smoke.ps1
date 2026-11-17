@@ -51,13 +51,29 @@ function Write-CasFixture([string]$Path) {
     ) | Set-Content -LiteralPath $Path -Encoding ASCII
 }
 
+# Receptor = LYS A1 (atoms 1-9), ligand = ALA B2 (atoms 10-14). MM/GBSA
+# rejects the same group on both sides (invalid_gbsa_identical_selections).
+function Write-CasIndex([string]$Path) {
+    @(
+        '[ System ]',
+        '    1     2     3     4     5     6     7     8     9    10    11    12    13    14',
+        '[ receptor_A ]',
+        '    1     2     3     4     5     6     7     8     9',
+        '[ ligand_B ]',
+        '   10    11    12    13    14'
+    ) | Set-Content -LiteralPath $Path -Encoding ASCII
+}
+
 function Write-ArgFile([string]$Path, [string]$Pdb, [string]$Mol2Type, [string[]]$ExtraLines) {
     $lib = Convert-ToTitanPath ((Resolve-Path -LiteralPath $LibRoot).Path.TrimEnd('\') + '\')
+    $index = Join-Path (Split-Path -Parent $Pdb) 'cas_groups.ndx'
+    Write-CasIndex $index
     @(
         "-f=$(Convert-ToTitanPath $Pdb)",
         '-1pdb=true',
         '-ff=AMBER99SB',
-        '-g=1&1',
+        "-n=$(Convert-ToTitanPath $index)",
+        '-g=1-2',
         '-mol-1-type=protein',
         "-mol-2-type=$Mol2Type",
         "-path-a=$lib",
@@ -92,6 +108,11 @@ if (-not (Test-Path -LiteralPath $TitanExe)) {
 }
 if (-not (Test-Path -LiteralPath $LibRoot)) {
     throw "Missing TITAN force-field library directory: $LibRoot"
+}
+foreach ($file in @('AMBER99SB_aminoacids.rtp', 'ffAMBER99SBnonbonded.dat')) {
+    if (-not (Test-Path -LiteralPath (Join-Path $LibRoot $file))) {
+        throw "-LibRoot $LibRoot lacks $file; pass a populated force-field library"
+    }
 }
 $TitanExe = (Resolve-Path -LiteralPath $TitanExe).Path
 $WorkRoot = [System.IO.Path]::GetFullPath($WorkRoot)
@@ -130,8 +151,8 @@ if (-not (Select-String -Path (Join-Path $caseOn 'cas_receptor.dat') -Pattern 'r
 if (-not (Select-String -Path (Join-Path $caseOn 'cas_receptor.dat') -Pattern 'valid_mutation' -Quiet)) {
     throw 'cas=true: receptor output lacks valid mutation rows'
 }
-if (-not (Select-String -Path (Join-Path $caseOn 'cas_receptor.dat') -Pattern 'noop_alanine' -Quiet)) {
-    throw 'cas=true: receptor output lacks ALA noop policy rows'
+if (-not (Select-String -Path (Join-Path $caseOn 'cas_ligand.dat') -Pattern 'noop_alanine' -Quiet)) {
+    throw 'cas=true: ligand output lacks ALA noop policy rows'
 }
 if (-not (Select-String -Path (Join-Path $caseOn 'cas_summary.dat') -Pattern 'GBSA alanine-like side-chain neutralization scan' -Quiet)) {
     throw 'cas=true: summary does not document CAS method'

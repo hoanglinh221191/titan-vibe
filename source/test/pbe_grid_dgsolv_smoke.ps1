@@ -4,6 +4,7 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+. (Join-Path $PSScriptRoot 'pbe_driver_topology.ps1')
 Set-StrictMode -Version Latest
 $Culture = [System.Globalization.CultureInfo]::InvariantCulture
 . (Join-Path $PSScriptRoot 'pbe_grid_fixture_helpers.ps1')
@@ -38,6 +39,7 @@ $lib = Convert-ToTitanPath ((Resolve-Path -LiteralPath $ffRoot).Path.TrimEnd('\'
 $arg = Join-Path $WorkRoot 'arg.in'
 Set-Content -LiteralPath $arg -Encoding ASCII -Value @(
     "-f=$(Convert-ToTitanPath $driver)",
+    "-common_topo=$(Convert-ToTitanPath (Write-PbeDriverTopology $driver))",
     '-1pdb=true',
     '-ff=AMBER99SB',
     '-g=1&1',

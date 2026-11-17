@@ -1,0 +1,14 @@
+-ff=charmm36
+-path-a=../../../../forcefields
+-path-n=../../../../forcefields
+-f=case.pdb
+-1pdb=true
+-n=index.ndx
+-g=0-0
+-common_topo=topol.top
+-pbctopo=true
+-pbctopo-beam-width=256
+-nocal=true
+-no-dssp=true
+-noprint-side_chain_contact=true
+-opdb=placed.pdb

@@ -62,8 +62,14 @@ try {
     Pop-Location
 }
 
-$solver = Join-Path $repo 'src\solv_pbc_pbctopo.cpp'
-$solverText = Get-Content -LiteralPath $solver -Raw
+# The solver's timing keys live in src/pbctopo/solve/ (split out of
+# src/solv_pbc_pbctopo.cpp, PBC-01).
+$solverFiles = @(Get-ChildItem -LiteralPath (Join-Path $repo 'src\pbctopo\solve') -File |
+    Where-Object { $_.Extension -in '.cpp', '.h' } | Sort-Object Name)
+if ($solverFiles.Count -eq 0) {
+    throw 'pbctopo logging smoke: no solver sources under src\pbctopo\solve'
+}
+$solverText = ($solverFiles | ForEach-Object { Get-Content -LiteralPath $_.FullName -Raw }) -join "`n"
 $requiredTimingKeys = @(
     'pbctopo_kinematic_seed_candidates',
     'pbctopo_kinematic_seed_evaluated',

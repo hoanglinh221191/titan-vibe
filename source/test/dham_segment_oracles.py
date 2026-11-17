@@ -29,7 +29,7 @@ if a.with_engine:
  if os.name=='nt':linkflags+=['-fuse-ld=lld']
  pipeline=w/('pipeline'+suffix);run('pipeline_build',[a.compiler]+flags+linkflags+['test/titan_dham_segments_pipeline.cpp','@'+str(rsp),'-o',str(pipeline)],root)
  case=w/'pipeline_run';case.mkdir();run('pipeline',[str(pipeline)],case)
-sources=['src/titan_dham_segments.h','src/engine_postproc.cpp','src/arguments.h','src/arguments.cpp','src/cli/parse_arguments.cpp','test/titan_dham_segments_oracle.cpp','test/titan_dham_segments_pipeline.cpp',str(Path(__file__).relative_to(root))]
+sources=['src/titan_dham_segments.h','src/postproc/dham.cpp','src/arguments.h','src/arguments.cpp',*sorted(p.relative_to(root).as_posix() for p in (root/'src/cli').glob('parse_*.cpp')),'test/titan_dham_segments_oracle.cpp','test/titan_dham_segments_pipeline.cpp',str(Path(__file__).relative_to(root))]
 record={'status':'PASS','mutation':'EXPECTED_FAIL','with_engine':a.with_engine,'sanitizer':a.sanitize,'source_sha256':{p:sha(root/p) for p in sources},'object_sha256':{str(p.relative_to(root)):sha(p) for p in objects},'oracle_sha256':sha(exe)}
 if a.real_metadata:record['real_metadata_sha256']=sha(a.real_metadata)
 (w/'verification.json').write_text(json.dumps(record,indent=2)+'\n')

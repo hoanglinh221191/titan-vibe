@@ -15,6 +15,7 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+. (Join-Path $PSScriptRoot 'pbe_driver_topology.ps1')
 Set-StrictMode -Version Latest
 . (Join-Path $PSScriptRoot 'pbe_fmm_m2l_cli_helpers.ps1')
 $RepoRoot = Split-Path -Parent $PSScriptRoot
@@ -39,7 +40,7 @@ function Invoke-Engine([string]$Engine) {
     $spacing = $SesGridSpacing.ToString('G15',$culture)
     $lib = (TP ((Resolve-Path -LiteralPath $LibRoot).Path.TrimEnd('\'))) + '/'
     $args = @(
-        "-f=$(TP $pdb)", '-1pdb=true', '-ff=AMBER99SB', '-g=1&1',
+        "-f=$(TP $pdb)", "-common_topo=$(TP (Write-PbeDriverTopology $pdb))", '-1pdb=true', '-ff=AMBER99SB', '-g=1&1',
         "-path-a=$lib", "-path-n=$lib", '-pbe=bie',
         "-pbe-test-pqr=$(TP $Fixture)", '-pbe-surface=vdw',
         '-pbe-bie-primary-surface=analytic-ses',

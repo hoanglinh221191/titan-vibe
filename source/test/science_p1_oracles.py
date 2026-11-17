@@ -21,7 +21,8 @@ exe = a.work_root.resolve() / ('science_p1.exe' if os.name == 'nt' else 'science
 cmd = [a.compiler, '-std=c++23', '-O2', '-mavx2', '-mfma',
        '-Isrc', '-Isrc/eigen', '-pthread',
        'test/titan_science_p1_oracle.cpp', str(root / 'src/titan_kinetics.cpp'),
-       str(root / 'src/titan_dham.cpp'), '-o', str(exe)]
+       str(root / 'src/titan_dham.cpp'), str(root / 'src/titan_tram.cpp'),
+       str(root / 'src/titan_executor.cpp'), '-o', str(exe)]
 subprocess.run(cmd, cwd=root, check=True)
 result = subprocess.run([str(exe), a.case], cwd=a.work_root, capture_output=True, text=True)
 (a.work_root / 'result.log').write_text(result.stdout + result.stderr, encoding='utf-8')
@@ -34,12 +35,24 @@ subprocess.run([a.compiler,'-std=c++23','-O2','-mavx2','-mfma','-pthread','-Isrc
 mapping=subprocess.run([str(mapping_exe)],cwd=a.work_root,capture_output=True,text=True)
 (a.work_root/'dham_mapping.log').write_text(mapping.stdout+mapping.stderr,encoding='utf-8')
 print(mapping.stdout+mapping.stderr,end='');mapping.check_returncode()
+# KIN-13: TRAM, the -dham estimator (exact multi-temperature data, sampled
+# data, invariances, refusals)
+tram_exe=a.work_root.resolve()/('tram.exe' if os.name=='nt' else 'tram')
+subprocess.run([a.compiler,'-std=c++23','-O2','-pthread','-Isrc','-Isrc/eigen',
+                'test/titan_tram_oracle.cpp','src/titan_tram.cpp','src/titan_executor.cpp',
+                '-o',str(tram_exe)],cwd=root,check=True)
+tram=subprocess.run([str(tram_exe)],cwd=a.work_root,capture_output=True,text=True)
+(a.work_root/'tram.log').write_text(tram.stdout+tram.stderr,encoding='utf-8')
+print(tram.stdout+tram.stderr,end='');tram.check_returncode()
 def sha(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 record={'core_binary_sha256':sha(exe),'core_status':'PASS',
         'dham_mapping_status':'PASS','dham_mapping_binary_sha256':sha(mapping_exe),
+        'tram_status':'PASS','tram_binary_sha256':sha(tram_exe),
         'source_sha256':{str(f.relative_to(root)):sha(f) for f in
           [root/'src/titan_kinetics.cpp',root/'src/titan_dham.cpp',
+           root/'src/titan_tram.cpp',root/'src/titan_tram.h',
+           root/'test/titan_tram_oracle.cpp',
            root/'src/titan_markov_estimator.h',root/'src/titan_qha_model.h',
            root/'src/box_type.h',root/'src/titan_neighbor_grid.h',
            root/'test/titan_science_p1_oracle.cpp']}}

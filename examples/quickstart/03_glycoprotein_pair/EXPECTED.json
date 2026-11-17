@@ -1,0 +1,201 @@
+{
+ "runs": {
+  "arg.in": {
+   "output_pdb": "placed.pdb",
+   "frames": [
+    {
+     "frame": "0",
+     "time_ps": "0",
+     "status": "certified",
+     "evidence_state": "supported_connected",
+     "fallback_reason": "none",
+     "component_count": "2",
+     "contact_cycle_rank": "0",
+     "contact_cycle_b0_x": "0",
+     "contact_cycle_b0_y": "0",
+     "contact_cycle_b0_z": "0",
+     "contact_cycle_b1_x": "0",
+     "contact_cycle_b1_y": "0",
+     "contact_cycle_b1_z": "0",
+     "contact_cycle_b2_x": "0",
+     "contact_cycle_b2_y": "0",
+     "contact_cycle_b2_z": "0",
+     "contact_graph_components": "1",
+     "contact_periodic_graph_components": "0",
+     "self_image_units": "0",
+     "input_overlap_pairs": "0",
+     "bonded_winding_rank": "0",
+     "topological_winding_rank": "0"
+    },
+    {
+     "frame": "1",
+     "time_ps": "10000",
+     "status": "certified",
+     "evidence_state": "supported_connected",
+     "fallback_reason": "none",
+     "component_count": "2",
+     "contact_cycle_rank": "0",
+     "contact_cycle_b0_x": "0",
+     "contact_cycle_b0_y": "0",
+     "contact_cycle_b0_z": "0",
+     "contact_cycle_b1_x": "0",
+     "contact_cycle_b1_y": "0",
+     "contact_cycle_b1_z": "0",
+     "contact_cycle_b2_x": "0",
+     "contact_cycle_b2_y": "0",
+     "contact_cycle_b2_z": "0",
+     "contact_graph_components": "1",
+     "contact_periodic_graph_components": "0",
+     "self_image_units": "0",
+     "input_overlap_pairs": "0",
+     "bonded_winding_rank": "0",
+     "topological_winding_rank": "0"
+    },
+    {
+     "frame": "2",
+     "time_ps": "20000",
+     "status": "certified",
+     "evidence_state": "supported_connected",
+     "fallback_reason": "none",
+     "component_count": "2",
+     "contact_cycle_rank": "0",
+     "contact_cycle_b0_x": "0",
+     "contact_cycle_b0_y": "0",
+     "contact_cycle_b0_z": "0",
+     "contact_cycle_b1_x": "0",
+     "contact_cycle_b1_y": "0",
+     "contact_cycle_b1_z": "0",
+     "contact_cycle_b2_x": "0",
+     "contact_cycle_b2_y": "0",
+     "contact_cycle_b2_z": "0",
+     "contact_graph_components": "1",
+     "contact_periodic_graph_components": "0",
+     "self_image_units": "0",
+     "input_overlap_pairs": "0",
+     "bonded_winding_rank": "0",
+     "topological_winding_rank": "0"
+    },
+    {
+     "frame": "3",
+     "time_ps": "30000",
+     "status": "certified",
+     "evidence_state": "supported_connected",
+     "fallback_reason": "none",
+     "component_count": "2",
+     "contact_cycle_rank": "0",
+     "contact_cycle_b0_x": "0",
+     "contact_cycle_b0_y": "0",
+     "contact_cycle_b0_z": "0",
+     "contact_cycle_b1_x": "0",
+     "contact_cycle_b1_y": "0",
+     "contact_cycle_b1_z": "0",
+     "contact_cycle_b2_x": "0",
+     "contact_cycle_b2_y": "0",
+     "contact_cycle_b2_z": "0",
+     "contact_graph_components": "1",
+     "contact_periodic_graph_components": "0",
+     "self_image_units": "0",
+     "input_overlap_pairs": "0",
+     "bonded_winding_rank": "0",
+     "topological_winding_rank": "0"
+    },
+    {
+     "frame": "4",
+     "time_ps": "40000",
+     "status": "certified",
+     "evidence_state": "supported_connected",
+     "fallback_reason": "none",
+     "component_count": "2",
+     "contact_cycle_rank": "0",
+     "contact_cycle_b0_x": "0",
+     "contact_cycle_b0_y": "0",
+     "contact_cycle_b0_z": "0",
+     "contact_cycle_b1_x": "0",
+     "contact_cycle_b1_y": "0",
+     "contact_cycle_b1_z": "0",
+     "contact_cycle_b2_x": "0",
+     "contact_cycle_b2_y": "0",
+     "contact_cycle_b2_z": "0",
+     "contact_graph_components": "1",
+     "contact_periodic_graph_components": "0",
+     "self_image_units": "0",
+     "input_overlap_pairs": "0",
+     "bonded_winding_rank": "0",
+     "topological_winding_rank": "0"
+    }
+   ],
+   "molecule_ranges": [
+    [
+     0,
+     11109
+    ],
+    [
+     11109,
+     14393
+    ]
+   ],
+   "centroids_A": [
+    [
+     [
+      77.3286,
+      66.5437,
+      66.857
+     ],
+     [
+      30.2008,
+      66.6822,
+      65.6214
+     ]
+    ],
+    [
+     [
+      76.4462,
+      71.0329,
+      67.3291
+     ],
+     [
+      32.7939,
+      51.106,
+      63.6316
+     ]
+    ],
+    [
+     [
+      74.9448,
+      72.3507,
+      70.4536
+     ],
+     [
+      38.0155,
+      46.7918,
+      53.2084
+     ]
+    ],
+    [
+     [
+      71.9915,
+      70.5889,
+      75.0379
+     ],
+     [
+      47.9236,
+      52.6656,
+      37.6187
+     ]
+    ],
+    [
+     [
+      72.137,
+      72.9944,
+      73.0572
+     ],
+     [
+      47.5447,
+      44.6465,
+      44.4322
+     ]
+    ]
+   ]
+  }
+ }
+}

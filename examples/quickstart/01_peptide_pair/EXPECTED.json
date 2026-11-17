@@ -1,0 +1,1137 @@
+{
+ "runs": {
+  "arg.in": {
+   "output_pdb": "placed.pdb",
+   "frames": [
+    {
+     "frame": "0",
+     "time_ps": "0",
+     "status": "weak_observation",
+     "evidence_state": "extended_periodic",
+     "fallback_reason": "evidence_periodic",
+     "component_count": "2",
+     "contact_cycle_rank": "1",
+     "contact_cycle_b0_x": "0",
+     "contact_cycle_b0_y": "0",
+     "contact_cycle_b0_z": "1",
+     "contact_cycle_b1_x": "0",
+     "contact_cycle_b1_y": "0",
+     "contact_cycle_b1_z": "0",
+     "contact_cycle_b2_x": "0",
+     "contact_cycle_b2_y": "0",
+     "contact_cycle_b2_z": "0",
+     "contact_graph_components": "1",
+     "contact_periodic_graph_components": "1",
+     "self_image_units": "0",
+     "input_overlap_pairs": "0",
+     "bonded_winding_rank": "0",
+     "topological_winding_rank": "0"
+    },
+    {
+     "frame": "1",
+     "time_ps": "400",
+     "status": "certified",
+     "evidence_state": "supported_connected",
+     "fallback_reason": "none",
+     "component_count": "2",
+     "contact_cycle_rank": "0",
+     "contact_cycle_b0_x": "0",
+     "contact_cycle_b0_y": "0",
+     "contact_cycle_b0_z": "0",
+     "contact_cycle_b1_x": "0",
+     "contact_cycle_b1_y": "0",
+     "contact_cycle_b1_z": "0",
+     "contact_cycle_b2_x": "0",
+     "contact_cycle_b2_y": "0",
+     "contact_cycle_b2_z": "0",
+     "contact_graph_components": "1",
+     "contact_periodic_graph_components": "0",
+     "self_image_units": "0",
+     "input_overlap_pairs": "0",
+     "bonded_winding_rank": "0",
+     "topological_winding_rank": "0"
+    },
+    {
+     "frame": "2",
+     "time_ps": "800",
+     "status": "certified",
+     "evidence_state": "supported_connected",
+     "fallback_reason": "none",
+     "component_count": "2",
+     "contact_cycle_rank": "0",
+     "contact_cycle_b0_x": "0",
+     "contact_cycle_b0_y": "0",
+     "contact_cycle_b0_z": "0",
+     "contact_cycle_b1_x": "0",
+     "contact_cycle_b1_y": "0",
+     "contact_cycle_b1_z": "0",
+     "contact_cycle_b2_x": "0",
+     "contact_cycle_b2_y": "0",
+     "contact_cycle_b2_z": "0",
+     "contact_graph_components": "1",
+     "contact_periodic_graph_components": "0",
+     "self_image_units": "0",
+     "input_overlap_pairs": "0",
+     "bonded_winding_rank": "0",
+     "topological_winding_rank": "0"
+    },
+    {
+     "frame": "3",
+     "time_ps": "1200",
+     "status": "certified",
+     "evidence_state": "supported_connected",
+     "fallback_reason": "none",
+     "component_count": "2",
+     "contact_cycle_rank": "0",
+     "contact_cycle_b0_x": "0",
+     "contact_cycle_b0_y": "0",
+     "contact_cycle_b0_z": "0",
+     "contact_cycle_b1_x": "0",
+     "contact_cycle_b1_y": "0",
+     "contact_cycle_b1_z": "0",
+     "contact_cycle_b2_x": "0",
+     "contact_cycle_b2_y": "0",
+     "contact_cycle_b2_z": "0",
+     "contact_graph_components": "1",
+     "contact_periodic_graph_components": "0",
+     "self_image_units": "0",
+     "input_overlap_pairs": "0",
+     "bonded_winding_rank": "0",
+     "topological_winding_rank": "0"
+    },
+    {
+     "frame": "4",
+     "time_ps": "1600",
+     "status": "weak_observation",
+     "evidence_state": "extended_periodic",
+     "fallback_reason": "evidence_periodic",
+     "component_count": "2",
+     "contact_cycle_rank": "1",
+     "contact_cycle_b0_x": "0",
+     "contact_cycle_b0_y": "0",
+     "contact_cycle_b0_z": "1",
+     "contact_cycle_b1_x": "0",
+     "contact_cycle_b1_y": "0",
+     "contact_cycle_b1_z": "0",
+     "contact_cycle_b2_x": "0",
+     "contact_cycle_b2_y": "0",
+     "contact_cycle_b2_z": "0",
+     "contact_graph_components": "1",
+     "contact_periodic_graph_components": "1",
+     "self_image_units": "0",
+     "input_overlap_pairs": "0",
+     "bonded_winding_rank": "0",
+     "topological_winding_rank": "0"
+    },
+    {
+     "frame": "5",
+     "time_ps": "2000",
+     "status": "certified",
+     "evidence_state": "supported_connected",
+     "fallback_reason": "none",
+     "component_count": "2",
+     "contact_cycle_rank": "0",
+     "contact_cycle_b0_x": "0",
+     "contact_cycle_b0_y": "0",
+     "contact_cycle_b0_z": "0",
+     "contact_cycle_b1_x": "0",
+     "contact_cycle_b1_y": "0",
+     "contact_cycle_b1_z": "0",
+     "contact_cycle_b2_x": "0",
+     "contact_cycle_b2_y": "0",
+     "contact_cycle_b2_z": "0",
+     "contact_graph_components": "1",
+     "contact_periodic_graph_components": "0",
+     "self_image_units": "0",
+     "input_overlap_pairs": "0",
+     "bonded_winding_rank": "0",
+     "topological_winding_rank": "0"
+    },
+    {
+     "frame": "6",
+     "time_ps": "2400",
+     "status": "certified",
+     "evidence_state": "supported_connected",
+     "fallback_reason": "none",
+     "component_count": "2",
+     "contact_cycle_rank": "0",
+     "contact_cycle_b0_x": "0",
+     "contact_cycle_b0_y": "0",
+     "contact_cycle_b0_z": "0",
+     "contact_cycle_b1_x": "0",
+     "contact_cycle_b1_y": "0",
+     "contact_cycle_b1_z": "0",
+     "contact_cycle_b2_x": "0",
+     "contact_cycle_b2_y": "0",
+     "contact_cycle_b2_z": "0",
+     "contact_graph_components": "1",
+     "contact_periodic_graph_components": "0",
+     "self_image_units": "0",
+     "input_overlap_pairs": "0",
+     "bonded_winding_rank": "0",
+     "topological_winding_rank": "0"
+    },
+    {
+     "frame": "7",
+     "time_ps": "2800",
+     "status": "certified",
+     "evidence_state": "supported_connected",
+     "fallback_reason": "none",
+     "component_count": "2",
+     "contact_cycle_rank": "0",
+     "contact_cycle_b0_x": "0",
+     "contact_cycle_b0_y": "0",
+     "contact_cycle_b0_z": "0",
+     "contact_cycle_b1_x": "0",
+     "contact_cycle_b1_y": "0",
+     "contact_cycle_b1_z": "0",
+     "contact_cycle_b2_x": "0",
+     "contact_cycle_b2_y": "0",
+     "contact_cycle_b2_z": "0",
+     "contact_graph_components": "1",
+     "contact_periodic_graph_components": "0",
+     "self_image_units": "0",
+     "input_overlap_pairs": "0",
+     "bonded_winding_rank": "0",
+     "topological_winding_rank": "0"
+    },
+    {
+     "frame": "8",
+     "time_ps": "3200",
+     "status": "certified",
+     "evidence_state": "supported_connected",
+     "fallback_reason": "none",
+     "component_count": "2",
+     "contact_cycle_rank": "0",
+     "contact_cycle_b0_x": "0",
+     "contact_cycle_b0_y": "0",
+     "contact_cycle_b0_z": "0",
+     "contact_cycle_b1_x": "0",
+     "contact_cycle_b1_y": "0",
+     "contact_cycle_b1_z": "0",
+     "contact_cycle_b2_x": "0",
+     "contact_cycle_b2_y": "0",
+     "contact_cycle_b2_z": "0",
+     "contact_graph_components": "1",
+     "contact_periodic_graph_components": "0",
+     "self_image_units": "0",
+     "input_overlap_pairs": "0",
+     "bonded_winding_rank": "0",
+     "topological_winding_rank": "0"
+    },
+    {
+     "frame": "9",
+     "time_ps": "3600",
+     "status": "certified",
+     "evidence_state": "supported_connected",
+     "fallback_reason": "none",
+     "component_count": "2",
+     "contact_cycle_rank": "0",
+     "contact_cycle_b0_x": "0",
+     "contact_cycle_b0_y": "0",
+     "contact_cycle_b0_z": "0",
+     "contact_cycle_b1_x": "0",
+     "contact_cycle_b1_y": "0",
+     "contact_cycle_b1_z": "0",
+     "contact_cycle_b2_x": "0",
+     "contact_cycle_b2_y": "0",
+     "contact_cycle_b2_z": "0",
+     "contact_graph_components": "1",
+     "contact_periodic_graph_components": "0",
+     "self_image_units": "0",
+     "input_overlap_pairs": "0",
+     "bonded_winding_rank": "0",
+     "topological_winding_rank": "0"
+    },
+    {
+     "frame": "10",
+     "time_ps": "4000",
+     "status": "certified",
+     "evidence_state": "supported_connected",
+     "fallback_reason": "none",
+     "component_count": "2",
+     "contact_cycle_rank": "0",
+     "contact_cycle_b0_x": "0",
+     "contact_cycle_b0_y": "0",
+     "contact_cycle_b0_z": "0",
+     "contact_cycle_b1_x": "0",
+     "contact_cycle_b1_y": "0",
+     "contact_cycle_b1_z": "0",
+     "contact_cycle_b2_x": "0",
+     "contact_cycle_b2_y": "0",
+     "contact_cycle_b2_z": "0",
+     "contact_graph_components": "1",
+     "contact_periodic_graph_components": "0",
+     "self_image_units": "0",
+     "input_overlap_pairs": "0",
+     "bonded_winding_rank": "0",
+     "topological_winding_rank": "0"
+    },
+    {
+     "frame": "11",
+     "time_ps": "4400",
+     "status": "certified",
+     "evidence_state": "supported_connected",
+     "fallback_reason": "none",
+     "component_count": "2",
+     "contact_cycle_rank": "0",
+     "contact_cycle_b0_x": "0",
+     "contact_cycle_b0_y": "0",
+     "contact_cycle_b0_z": "0",
+     "contact_cycle_b1_x": "0",
+     "contact_cycle_b1_y": "0",
+     "contact_cycle_b1_z": "0",
+     "contact_cycle_b2_x": "0",
+     "contact_cycle_b2_y": "0",
+     "contact_cycle_b2_z": "0",
+     "contact_graph_components": "1",
+     "contact_periodic_graph_components": "0",
+     "self_image_units": "0",
+     "input_overlap_pairs": "0",
+     "bonded_winding_rank": "0",
+     "topological_winding_rank": "0"
+    },
+    {
+     "frame": "12",
+     "time_ps": "4800",
+     "status": "certified",
+     "evidence_state": "supported_connected",
+     "fallback_reason": "none",
+     "component_count": "2",
+     "contact_cycle_rank": "0",
+     "contact_cycle_b0_x": "0",
+     "contact_cycle_b0_y": "0",
+     "contact_cycle_b0_z": "0",
+     "contact_cycle_b1_x": "0",
+     "contact_cycle_b1_y": "0",
+     "contact_cycle_b1_z": "0",
+     "contact_cycle_b2_x": "0",
+     "contact_cycle_b2_y": "0",
+     "contact_cycle_b2_z": "0",
+     "contact_graph_components": "1",
+     "contact_periodic_graph_components": "0",
+     "self_image_units": "0",
+     "input_overlap_pairs": "0",
+     "bonded_winding_rank": "0",
+     "topological_winding_rank": "0"
+    },
+    {
+     "frame": "13",
+     "time_ps": "5200",
+     "status": "certified",
+     "evidence_state": "supported_connected",
+     "fallback_reason": "none",
+     "component_count": "2",
+     "contact_cycle_rank": "0",
+     "contact_cycle_b0_x": "0",
+     "contact_cycle_b0_y": "0",
+     "contact_cycle_b0_z": "0",
+     "contact_cycle_b1_x": "0",
+     "contact_cycle_b1_y": "0",
+     "contact_cycle_b1_z": "0",
+     "contact_cycle_b2_x": "0",
+     "contact_cycle_b2_y": "0",
+     "contact_cycle_b2_z": "0",
+     "contact_graph_components": "1",
+     "contact_periodic_graph_components": "0",
+     "self_image_units": "0",
+     "input_overlap_pairs": "0",
+     "bonded_winding_rank": "0",
+     "topological_winding_rank": "0"
+    },
+    {
+     "frame": "14",
+     "time_ps": "5600",
+     "status": "certified",
+     "evidence_state": "supported_connected",
+     "fallback_reason": "none",
+     "component_count": "2",
+     "contact_cycle_rank": "0",
+     "contact_cycle_b0_x": "0",
+     "contact_cycle_b0_y": "0",
+     "contact_cycle_b0_z": "0",
+     "contact_cycle_b1_x": "0",
+     "contact_cycle_b1_y": "0",
+     "contact_cycle_b1_z": "0",
+     "contact_cycle_b2_x": "0",
+     "contact_cycle_b2_y": "0",
+     "contact_cycle_b2_z": "0",
+     "contact_graph_components": "1",
+     "contact_periodic_graph_components": "0",
+     "self_image_units": "0",
+     "input_overlap_pairs": "0",
+     "bonded_winding_rank": "0",
+     "topological_winding_rank": "0"
+    },
+    {
+     "frame": "15",
+     "time_ps": "6000",
+     "status": "certified",
+     "evidence_state": "supported_connected",
+     "fallback_reason": "none",
+     "component_count": "2",
+     "contact_cycle_rank": "0",
+     "contact_cycle_b0_x": "0",
+     "contact_cycle_b0_y": "0",
+     "contact_cycle_b0_z": "0",
+     "contact_cycle_b1_x": "0",
+     "contact_cycle_b1_y": "0",
+     "contact_cycle_b1_z": "0",
+     "contact_cycle_b2_x": "0",
+     "contact_cycle_b2_y": "0",
+     "contact_cycle_b2_z": "0",
+     "contact_graph_components": "1",
+     "contact_periodic_graph_components": "0",
+     "self_image_units": "0",
+     "input_overlap_pairs": "0",
+     "bonded_winding_rank": "0",
+     "topological_winding_rank": "0"
+    },
+    {
+     "frame": "16",
+     "time_ps": "6400",
+     "status": "certified",
+     "evidence_state": "supported_connected",
+     "fallback_reason": "none",
+     "component_count": "2",
+     "contact_cycle_rank": "0",
+     "contact_cycle_b0_x": "0",
+     "contact_cycle_b0_y": "0",
+     "contact_cycle_b0_z": "0",
+     "contact_cycle_b1_x": "0",
+     "contact_cycle_b1_y": "0",
+     "contact_cycle_b1_z": "0",
+     "contact_cycle_b2_x": "0",
+     "contact_cycle_b2_y": "0",
+     "contact_cycle_b2_z": "0",
+     "contact_graph_components": "1",
+     "contact_periodic_graph_components": "0",
+     "self_image_units": "0",
+     "input_overlap_pairs": "0",
+     "bonded_winding_rank": "0",
+     "topological_winding_rank": "0"
+    },
+    {
+     "frame": "17",
+     "time_ps": "6800",
+     "status": "certified",
+     "evidence_state": "supported_connected",
+     "fallback_reason": "none",
+     "component_count": "2",
+     "contact_cycle_rank": "0",
+     "contact_cycle_b0_x": "0",
+     "contact_cycle_b0_y": "0",
+     "contact_cycle_b0_z": "0",
+     "contact_cycle_b1_x": "0",
+     "contact_cycle_b1_y": "0",
+     "contact_cycle_b1_z": "0",
+     "contact_cycle_b2_x": "0",
+     "contact_cycle_b2_y": "0",
+     "contact_cycle_b2_z": "0",
+     "contact_graph_components": "1",
+     "contact_periodic_graph_components": "0",
+     "self_image_units": "0",
+     "input_overlap_pairs": "0",
+     "bonded_winding_rank": "0",
+     "topological_winding_rank": "0"
+    },
+    {
+     "frame": "18",
+     "time_ps": "7200",
+     "status": "certified",
+     "evidence_state": "supported_connected",
+     "fallback_reason": "none",
+     "component_count": "2",
+     "contact_cycle_rank": "0",
+     "contact_cycle_b0_x": "0",
+     "contact_cycle_b0_y": "0",
+     "contact_cycle_b0_z": "0",
+     "contact_cycle_b1_x": "0",
+     "contact_cycle_b1_y": "0",
+     "contact_cycle_b1_z": "0",
+     "contact_cycle_b2_x": "0",
+     "contact_cycle_b2_y": "0",
+     "contact_cycle_b2_z": "0",
+     "contact_graph_components": "1",
+     "contact_periodic_graph_components": "0",
+     "self_image_units": "0",
+     "input_overlap_pairs": "0",
+     "bonded_winding_rank": "0",
+     "topological_winding_rank": "0"
+    },
+    {
+     "frame": "19",
+     "time_ps": "7600",
+     "status": "certified",
+     "evidence_state": "supported_connected",
+     "fallback_reason": "none",
+     "component_count": "2",
+     "contact_cycle_rank": "0",
+     "contact_cycle_b0_x": "0",
+     "contact_cycle_b0_y": "0",
+     "contact_cycle_b0_z": "0",
+     "contact_cycle_b1_x": "0",
+     "contact_cycle_b1_y": "0",
+     "contact_cycle_b1_z": "0",
+     "contact_cycle_b2_x": "0",
+     "contact_cycle_b2_y": "0",
+     "contact_cycle_b2_z": "0",
+     "contact_graph_components": "1",
+     "contact_periodic_graph_components": "0",
+     "self_image_units": "0",
+     "input_overlap_pairs": "0",
+     "bonded_winding_rank": "0",
+     "topological_winding_rank": "0"
+    },
+    {
+     "frame": "20",
+     "time_ps": "8000",
+     "status": "certified",
+     "evidence_state": "supported_connected",
+     "fallback_reason": "none",
+     "component_count": "2",
+     "contact_cycle_rank": "0",
+     "contact_cycle_b0_x": "0",
+     "contact_cycle_b0_y": "0",
+     "contact_cycle_b0_z": "0",
+     "contact_cycle_b1_x": "0",
+     "contact_cycle_b1_y": "0",
+     "contact_cycle_b1_z": "0",
+     "contact_cycle_b2_x": "0",
+     "contact_cycle_b2_y": "0",
+     "contact_cycle_b2_z": "0",
+     "contact_graph_components": "1",
+     "contact_periodic_graph_components": "0",
+     "self_image_units": "0",
+     "input_overlap_pairs": "0",
+     "bonded_winding_rank": "0",
+     "topological_winding_rank": "0"
+    },
+    {
+     "frame": "21",
+     "time_ps": "8400",
+     "status": "certified",
+     "evidence_state": "supported_connected",
+     "fallback_reason": "none",
+     "component_count": "2",
+     "contact_cycle_rank": "0",
+     "contact_cycle_b0_x": "0",
+     "contact_cycle_b0_y": "0",
+     "contact_cycle_b0_z": "0",
+     "contact_cycle_b1_x": "0",
+     "contact_cycle_b1_y": "0",
+     "contact_cycle_b1_z": "0",
+     "contact_cycle_b2_x": "0",
+     "contact_cycle_b2_y": "0",
+     "contact_cycle_b2_z": "0",
+     "contact_graph_components": "1",
+     "contact_periodic_graph_components": "0",
+     "self_image_units": "0",
+     "input_overlap_pairs": "0",
+     "bonded_winding_rank": "0",
+     "topological_winding_rank": "0"
+    },
+    {
+     "frame": "22",
+     "time_ps": "8800",
+     "status": "certified",
+     "evidence_state": "supported_connected",
+     "fallback_reason": "none",
+     "component_count": "2",
+     "contact_cycle_rank": "0",
+     "contact_cycle_b0_x": "0",
+     "contact_cycle_b0_y": "0",
+     "contact_cycle_b0_z": "0",
+     "contact_cycle_b1_x": "0",
+     "contact_cycle_b1_y": "0",
+     "contact_cycle_b1_z": "0",
+     "contact_cycle_b2_x": "0",
+     "contact_cycle_b2_y": "0",
+     "contact_cycle_b2_z": "0",
+     "contact_graph_components": "1",
+     "contact_periodic_graph_components": "0",
+     "self_image_units": "0",
+     "input_overlap_pairs": "0",
+     "bonded_winding_rank": "0",
+     "topological_winding_rank": "0"
+    },
+    {
+     "frame": "23",
+     "time_ps": "9200",
+     "status": "certified",
+     "evidence_state": "supported_connected",
+     "fallback_reason": "none",
+     "component_count": "2",
+     "contact_cycle_rank": "0",
+     "contact_cycle_b0_x": "0",
+     "contact_cycle_b0_y": "0",
+     "contact_cycle_b0_z": "0",
+     "contact_cycle_b1_x": "0",
+     "contact_cycle_b1_y": "0",
+     "contact_cycle_b1_z": "0",
+     "contact_cycle_b2_x": "0",
+     "contact_cycle_b2_y": "0",
+     "contact_cycle_b2_z": "0",
+     "contact_graph_components": "1",
+     "contact_periodic_graph_components": "0",
+     "self_image_units": "0",
+     "input_overlap_pairs": "0",
+     "bonded_winding_rank": "0",
+     "topological_winding_rank": "0"
+    },
+    {
+     "frame": "24",
+     "time_ps": "9600",
+     "status": "certified",
+     "evidence_state": "supported_connected",
+     "fallback_reason": "none",
+     "component_count": "2",
+     "contact_cycle_rank": "0",
+     "contact_cycle_b0_x": "0",
+     "contact_cycle_b0_y": "0",
+     "contact_cycle_b0_z": "0",
+     "contact_cycle_b1_x": "0",
+     "contact_cycle_b1_y": "0",
+     "contact_cycle_b1_z": "0",
+     "contact_cycle_b2_x": "0",
+     "contact_cycle_b2_y": "0",
+     "contact_cycle_b2_z": "0",
+     "contact_graph_components": "1",
+     "contact_periodic_graph_components": "0",
+     "self_image_units": "0",
+     "input_overlap_pairs": "0",
+     "bonded_winding_rank": "0",
+     "topological_winding_rank": "0"
+    },
+    {
+     "frame": "25",
+     "time_ps": "10000",
+     "status": "certified",
+     "evidence_state": "supported_connected",
+     "fallback_reason": "none",
+     "component_count": "2",
+     "contact_cycle_rank": "0",
+     "contact_cycle_b0_x": "0",
+     "contact_cycle_b0_y": "0",
+     "contact_cycle_b0_z": "0",
+     "contact_cycle_b1_x": "0",
+     "contact_cycle_b1_y": "0",
+     "contact_cycle_b1_z": "0",
+     "contact_cycle_b2_x": "0",
+     "contact_cycle_b2_y": "0",
+     "contact_cycle_b2_z": "0",
+     "contact_graph_components": "1",
+     "contact_periodic_graph_components": "0",
+     "self_image_units": "0",
+     "input_overlap_pairs": "0",
+     "bonded_winding_rank": "0",
+     "topological_winding_rank": "0"
+    },
+    {
+     "frame": "26",
+     "time_ps": "10400",
+     "status": "certified",
+     "evidence_state": "supported_connected",
+     "fallback_reason": "none",
+     "component_count": "2",
+     "contact_cycle_rank": "0",
+     "contact_cycle_b0_x": "0",
+     "contact_cycle_b0_y": "0",
+     "contact_cycle_b0_z": "0",
+     "contact_cycle_b1_x": "0",
+     "contact_cycle_b1_y": "0",
+     "contact_cycle_b1_z": "0",
+     "contact_cycle_b2_x": "0",
+     "contact_cycle_b2_y": "0",
+     "contact_cycle_b2_z": "0",
+     "contact_graph_components": "1",
+     "contact_periodic_graph_components": "0",
+     "self_image_units": "0",
+     "input_overlap_pairs": "0",
+     "bonded_winding_rank": "0",
+     "topological_winding_rank": "0"
+    },
+    {
+     "frame": "27",
+     "time_ps": "10800",
+     "status": "certified",
+     "evidence_state": "supported_connected",
+     "fallback_reason": "none",
+     "component_count": "2",
+     "contact_cycle_rank": "0",
+     "contact_cycle_b0_x": "0",
+     "contact_cycle_b0_y": "0",
+     "contact_cycle_b0_z": "0",
+     "contact_cycle_b1_x": "0",
+     "contact_cycle_b1_y": "0",
+     "contact_cycle_b1_z": "0",
+     "contact_cycle_b2_x": "0",
+     "contact_cycle_b2_y": "0",
+     "contact_cycle_b2_z": "0",
+     "contact_graph_components": "1",
+     "contact_periodic_graph_components": "0",
+     "self_image_units": "0",
+     "input_overlap_pairs": "0",
+     "bonded_winding_rank": "0",
+     "topological_winding_rank": "0"
+    },
+    {
+     "frame": "28",
+     "time_ps": "11200",
+     "status": "weak_observation",
+     "evidence_state": "extended_periodic",
+     "fallback_reason": "evidence_periodic",
+     "component_count": "2",
+     "contact_cycle_rank": "1",
+     "contact_cycle_b0_x": "1",
+     "contact_cycle_b0_y": "1",
+     "contact_cycle_b0_z": "-1",
+     "contact_cycle_b1_x": "0",
+     "contact_cycle_b1_y": "0",
+     "contact_cycle_b1_z": "0",
+     "contact_cycle_b2_x": "0",
+     "contact_cycle_b2_y": "0",
+     "contact_cycle_b2_z": "0",
+     "contact_graph_components": "1",
+     "contact_periodic_graph_components": "1",
+     "self_image_units": "1",
+     "input_overlap_pairs": "0",
+     "bonded_winding_rank": "0",
+     "topological_winding_rank": "0"
+    },
+    {
+     "frame": "29",
+     "time_ps": "11600",
+     "status": "certified",
+     "evidence_state": "supported_connected",
+     "fallback_reason": "none",
+     "component_count": "2",
+     "contact_cycle_rank": "0",
+     "contact_cycle_b0_x": "0",
+     "contact_cycle_b0_y": "0",
+     "contact_cycle_b0_z": "0",
+     "contact_cycle_b1_x": "0",
+     "contact_cycle_b1_y": "0",
+     "contact_cycle_b1_z": "0",
+     "contact_cycle_b2_x": "0",
+     "contact_cycle_b2_y": "0",
+     "contact_cycle_b2_z": "0",
+     "contact_graph_components": "1",
+     "contact_periodic_graph_components": "0",
+     "self_image_units": "0",
+     "input_overlap_pairs": "0",
+     "bonded_winding_rank": "0",
+     "topological_winding_rank": "0"
+    },
+    {
+     "frame": "30",
+     "time_ps": "12000",
+     "status": "certified",
+     "evidence_state": "supported_connected",
+     "fallback_reason": "none",
+     "component_count": "2",
+     "contact_cycle_rank": "0",
+     "contact_cycle_b0_x": "0",
+     "contact_cycle_b0_y": "0",
+     "contact_cycle_b0_z": "0",
+     "contact_cycle_b1_x": "0",
+     "contact_cycle_b1_y": "0",
+     "contact_cycle_b1_z": "0",
+     "contact_cycle_b2_x": "0",
+     "contact_cycle_b2_y": "0",
+     "contact_cycle_b2_z": "0",
+     "contact_graph_components": "1",
+     "contact_periodic_graph_components": "0",
+     "self_image_units": "0",
+     "input_overlap_pairs": "0",
+     "bonded_winding_rank": "0",
+     "topological_winding_rank": "0"
+    }
+   ],
+   "molecule_ranges": [
+    [
+     0,
+     627
+    ],
+    [
+     627,
+     1254
+    ]
+   ],
+   "centroids_A": [
+    [
+     [
+      29.0111,
+      30.0261,
+      14.3216
+     ],
+     [
+      44.8237,
+      43.8085,
+      37.8881
+     ]
+    ],
+    [
+     [
+      41.6649,
+      35.5487,
+      22.0661
+     ],
+     [
+      32.2703,
+      38.3861,
+      30.2141
+     ]
+    ],
+    [
+     [
+      42.8934,
+      35.1134,
+      23.4237
+     ],
+     [
+      31.0009,
+      38.7807,
+      28.8277
+     ]
+    ],
+    [
+     [
+      35.9301,
+      32.2402,
+      25.6656
+     ],
+     [
+      37.963,
+      41.6527,
+      26.5849
+     ]
+    ],
+    [
+     [
+      45.7383,
+      50.2599,
+      38.258
+     ],
+     [
+      28.1332,
+      23.6117,
+      13.9763
+     ]
+    ],
+    [
+     [
+      40.6418,
+      37.6865,
+      30.2349
+     ],
+     [
+      33.171,
+      36.1271,
+      21.9584
+     ]
+    ],
+    [
+     [
+      34.2328,
+      38.0487,
+      32.0119
+     ],
+     [
+      39.7174,
+      35.9019,
+      20.2787
+     ]
+    ],
+    [
+     [
+      37.3815,
+      36.7664,
+      27.2976
+     ],
+     [
+      36.6631,
+      37.2792,
+      25.0608
+     ]
+    ],
+    [
+     [
+      32.1743,
+      36.9823,
+      29.8921
+     ],
+     [
+      41.7553,
+      36.9463,
+      22.3844
+     ]
+    ],
+    [
+     [
+      42.6768,
+      38.4625,
+      25.1478
+     ],
+     [
+      31.3341,
+      35.5486,
+      27.1854
+     ]
+    ],
+    [
+     [
+      35.1479,
+      36.0719,
+      23.475
+     ],
+     [
+      38.6967,
+      37.7733,
+      28.7411
+     ]
+    ],
+    [
+     [
+      38.0094,
+      36.8118,
+      31.9713
+     ],
+     [
+      35.8987,
+      37.0956,
+      20.2903
+     ]
+    ],
+    [
+     [
+      41.4715,
+      37.2479,
+      32.0216
+     ],
+     [
+      32.3463,
+      36.5699,
+      20.1763
+     ]
+    ],
+    [
+     [
+      37.9327,
+      34.5744,
+      23.0977
+     ],
+     [
+      36.1326,
+      39.4924,
+      29.2746
+     ]
+    ],
+    [
+     [
+      34.7259,
+      35.9133,
+      24.1274
+     ],
+     [
+      39.294,
+      38.1067,
+      28.2119
+     ]
+    ],
+    [
+     [
+      34.3798,
+      37.3578,
+      23.4696
+     ],
+     [
+      39.5076,
+      36.5295,
+      28.7763
+     ]
+    ],
+    [
+     [
+      41.8739,
+      38.8934,
+      21.279
+     ],
+     [
+      32.1652,
+      35.1456,
+      31.074
+     ]
+    ],
+    [
+     [
+      34.7329,
+      41.7692,
+      20.6905
+     ],
+     [
+      39.2076,
+      32.1715,
+      31.5943
+     ]
+    ],
+    [
+     [
+      34.9946,
+      41.5707,
+      20.7773
+     ],
+     [
+      38.994,
+      32.4191,
+      31.5405
+     ]
+    ],
+    [
+     [
+      34.1282,
+      42.4268,
+      23.4318
+     ],
+     [
+      39.9761,
+      31.6778,
+      28.9679
+     ]
+    ],
+    [
+     [
+      34.656,
+      42.3171,
+      25.2923
+     ],
+     [
+      39.4346,
+      31.7734,
+      27.0979
+     ]
+    ],
+    [
+     [
+      33.8822,
+      42.6492,
+      23.4291
+     ],
+     [
+      40.0453,
+      31.2793,
+      28.847
+     ]
+    ],
+    [
+     [
+      40.6318,
+      43.3232,
+      30.854
+     ],
+     [
+      33.3062,
+      30.6144,
+      21.4276
+     ]
+    ],
+    [
+     [
+      40.5494,
+      34.8868,
+      25.9651
+     ],
+     [
+      33.4479,
+      39.1106,
+      26.3589
+     ]
+    ],
+    [
+     [
+      37.0451,
+      37.1452,
+      20.1503
+     ],
+     [
+      36.9182,
+      36.8193,
+      32.1499
+     ]
+    ],
+    [
+     [
+      37.74,
+      42.599,
+      26.3433
+     ],
+     [
+      36.0356,
+      31.1772,
+      25.8242
+     ]
+    ],
+    [
+     [
+      37.0577,
+      36.5808,
+      30.9201
+     ],
+     [
+      36.9256,
+      37.402,
+      21.3951
+     ]
+    ],
+    [
+     [
+      35.7333,
+      42.3982,
+      26.5802
+     ],
+     [
+      38.2434,
+      31.5783,
+      25.7298
+     ]
+    ],
+    [
+     [
+      31.6994,
+      28.0719,
+      38.6019
+     ],
+     [
+      42.2769,
+      45.9049,
+      13.7073
+     ]
+    ],
+    [
+     [
+      37.8415,
+      32.9273,
+      26.0175
+     ],
+     [
+      35.9619,
+      40.8766,
+      26.17
+     ]
+    ],
+    [
+     [
+      38.0349,
+      34.0603,
+      29.9495
+     ],
+     [
+      35.956,
+      39.9307,
+      22.3697
+     ]
+    ]
+   ]
+  }
+ }
+}

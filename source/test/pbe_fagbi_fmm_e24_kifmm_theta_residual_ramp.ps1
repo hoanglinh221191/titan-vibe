@@ -92,7 +92,8 @@ function Assert-E24StaticContract {
   foreach ($needle in @('kifmm_theta_allowed','0.75','0.8','pbe-bie-kifmm-ilu-graph')) {
     if (-not $args.Contains($needle)) { throw "Missing E24 arguments marker: $needle" }
   }
-  $parse = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'src\cli\parse_arguments.cpp')
+  $parse = (Get-ChildItem -LiteralPath (Join-Path $RepoRoot 'src\cli') -File -Filter 'parse_*.cpp' |
+    Sort-Object Name | ForEach-Object { Get-Content -Raw -LiteralPath $_.FullName }) -join "`n"
   foreach ($needle in @('pbe-bie-kifmm-ilu-graph','kifmm-fallback-capped')) {
     if (-not $parse.Contains($needle)) { throw "Missing E24 parser marker: $needle" }
   }
