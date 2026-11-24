@@ -1,15 +1,20 @@
 {
   "purpose": "Implementation replay against archived coordinates and scientific report fields; not a new independent truth assessment",
-  "binary_sha256": "85101deb864d288911204c3ec6903e018a76d051e249546c17f1fa33186b8918",
+  "binary_sha256": "5d9540eef4442b7bad98fbb1f59fc3c123e45166b702bf6b7af057e2e0cf1ec6",
+  "coordinate_tolerance_A": 0.0,
   "all_pass": true,
   "completed": 480,
   "expected": 480,
+  "summary": {
+    "byte_identical_pdbs": 480
+  },
   "results": [
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0001",
       "exit_code": 0,
-      "elapsed_s": 0.21439470001496375,
+      "elapsed_s": 0.4097533000167459,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -20,8 +25,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0002",
       "exit_code": 0,
-      "elapsed_s": 0.21391920000314713,
+      "elapsed_s": 0.41425110001000576,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -32,8 +38,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0003",
       "exit_code": 0,
-      "elapsed_s": 0.2128804000094533,
+      "elapsed_s": 0.4116393000003882,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -44,8 +51,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0004",
       "exit_code": 0,
-      "elapsed_s": 0.215256399998907,
+      "elapsed_s": 0.41436789999715984,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -56,8 +64,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0005",
       "exit_code": 0,
-      "elapsed_s": 0.19587150000734255,
+      "elapsed_s": 0.3539795000106096,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -68,8 +77,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0006",
       "exit_code": 0,
-      "elapsed_s": 0.21002220001537353,
+      "elapsed_s": 0.34474719999707304,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -80,8 +90,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0007",
       "exit_code": 0,
-      "elapsed_s": 0.1939970999956131,
+      "elapsed_s": 0.33733730000676587,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -92,8 +103,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0008",
       "exit_code": 0,
-      "elapsed_s": 0.19363090000115335,
+      "elapsed_s": 0.37609259999589995,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -104,8 +116,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0009",
       "exit_code": 0,
-      "elapsed_s": 0.19732869998551905,
+      "elapsed_s": 0.27615180000429973,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -116,8 +129,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0010",
       "exit_code": 0,
-      "elapsed_s": 0.20103689999086782,
+      "elapsed_s": 0.3188104000000749,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -128,8 +142,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0011",
       "exit_code": 0,
-      "elapsed_s": 0.19875379995210096,
+      "elapsed_s": 0.3256503000156954,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -140,8 +155,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0012",
       "exit_code": 0,
-      "elapsed_s": 0.1926637000287883,
+      "elapsed_s": 0.30547500000102445,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -152,8 +168,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0013",
       "exit_code": 0,
-      "elapsed_s": 0.20221680001122877,
+      "elapsed_s": 0.34289450000505894,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -164,8 +181,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0014",
       "exit_code": 0,
-      "elapsed_s": 0.19961190002504736,
+      "elapsed_s": 0.3196409000083804,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -176,8 +194,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0015",
       "exit_code": 0,
-      "elapsed_s": 0.19613370002480224,
+      "elapsed_s": 0.3167546000040602,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -188,8 +207,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0016",
       "exit_code": 0,
-      "elapsed_s": 0.20264919998589903,
+      "elapsed_s": 0.3340559999924153,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -200,8 +220,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0017",
       "exit_code": 0,
-      "elapsed_s": 0.19608520000474527,
+      "elapsed_s": 0.30852459999732673,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -212,8 +233,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0018",
       "exit_code": 0,
-      "elapsed_s": 0.19372139999177307,
+      "elapsed_s": 0.2999898999987636,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -224,8 +246,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0019",
       "exit_code": 0,
-      "elapsed_s": 0.19642489997204393,
+      "elapsed_s": 0.2932714000053238,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -236,8 +259,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0020",
       "exit_code": 0,
-      "elapsed_s": 0.19991379999555647,
+      "elapsed_s": 0.29919210000662133,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -248,8 +272,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0021",
       "exit_code": 0,
-      "elapsed_s": 0.20485460001509637,
+      "elapsed_s": 0.34923380002146587,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -260,8 +285,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0022",
       "exit_code": 0,
-      "elapsed_s": 0.20833329996094108,
+      "elapsed_s": 0.34309310000389814,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -272,8 +298,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0023",
       "exit_code": 0,
-      "elapsed_s": 0.20164999994449317,
+      "elapsed_s": 0.36114229998202063,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -284,8 +311,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0024",
       "exit_code": 0,
-      "elapsed_s": 0.20160740002756938,
+      "elapsed_s": 0.344789499999024,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -296,8 +324,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0025",
       "exit_code": 0,
-      "elapsed_s": 0.2034861000138335,
+      "elapsed_s": 0.33625719998963177,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -308,8 +337,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0026",
       "exit_code": 0,
-      "elapsed_s": 0.19324470002902672,
+      "elapsed_s": 0.3264797999872826,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -320,8 +350,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0027",
       "exit_code": 0,
-      "elapsed_s": 0.19138989999191836,
+      "elapsed_s": 0.3016041000082623,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -332,8 +363,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0028",
       "exit_code": 0,
-      "elapsed_s": 0.19290130003355443,
+      "elapsed_s": 0.34003049999591894,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -344,8 +376,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0029",
       "exit_code": 0,
-      "elapsed_s": 0.20056000002659857,
+      "elapsed_s": 0.31368920000386424,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -356,8 +389,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0030",
       "exit_code": 0,
-      "elapsed_s": 0.20252110000001267,
+      "elapsed_s": 0.32634269999107346,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -368,8 +402,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0031",
       "exit_code": 0,
-      "elapsed_s": 0.19455840002046898,
+      "elapsed_s": 0.2993170999980066,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -380,8 +415,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0032",
       "exit_code": 0,
-      "elapsed_s": 0.20687930000713095,
+      "elapsed_s": 0.2896928999980446,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -392,8 +428,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0033",
       "exit_code": 0,
-      "elapsed_s": 0.22085449995938689,
+      "elapsed_s": 0.31723370001418516,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -404,8 +441,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0034",
       "exit_code": 0,
-      "elapsed_s": 0.21919949998846278,
+      "elapsed_s": 0.3117017999757081,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -416,8 +454,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0035",
       "exit_code": 0,
-      "elapsed_s": 0.22527870000340044,
+      "elapsed_s": 0.3008132000104524,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -428,8 +467,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0036",
       "exit_code": 0,
-      "elapsed_s": 0.20927779999328777,
+      "elapsed_s": 0.31041359997470863,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -440,8 +480,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0037",
       "exit_code": 0,
-      "elapsed_s": 0.19718830002238974,
+      "elapsed_s": 0.32181920000584796,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -452,8 +493,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0038",
       "exit_code": 0,
-      "elapsed_s": 0.18930850003380328,
+      "elapsed_s": 0.27339620000566356,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -464,8 +506,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0039",
       "exit_code": 0,
-      "elapsed_s": 0.18527600000379607,
+      "elapsed_s": 0.33363459998508915,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -476,8 +519,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0040",
       "exit_code": 0,
-      "elapsed_s": 0.19055460003437474,
+      "elapsed_s": 0.322964300023159,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -488,8 +532,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0041",
       "exit_code": 0,
-      "elapsed_s": 0.19891629996709526,
+      "elapsed_s": 0.3058307000028435,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -500,8 +545,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0042",
       "exit_code": 0,
-      "elapsed_s": 0.19354299997212365,
+      "elapsed_s": 0.31993909997981973,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -512,8 +558,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0043",
       "exit_code": 0,
-      "elapsed_s": 0.20549819996813312,
+      "elapsed_s": 0.2961187000037171,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -524,8 +571,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0044",
       "exit_code": 0,
-      "elapsed_s": 0.19684810005128384,
+      "elapsed_s": 0.3302218000171706,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -536,8 +584,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0045",
       "exit_code": 0,
-      "elapsed_s": 0.20558469998650253,
+      "elapsed_s": 0.34470519999740645,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -548,8 +597,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0046",
       "exit_code": 0,
-      "elapsed_s": 0.20499560004100204,
+      "elapsed_s": 0.38520859999698587,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -560,8 +610,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0047",
       "exit_code": 0,
-      "elapsed_s": 0.19742219999898225,
+      "elapsed_s": 0.38848729999153875,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -572,8 +623,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0048",
       "exit_code": 0,
-      "elapsed_s": 0.20305469998857006,
+      "elapsed_s": 0.3953765999758616,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -584,8 +636,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0049",
       "exit_code": 0,
-      "elapsed_s": 0.22923440003069118,
+      "elapsed_s": 0.3506020000204444,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -596,8 +649,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0050",
       "exit_code": 0,
-      "elapsed_s": 0.23076700000092387,
+      "elapsed_s": 0.3757107999990694,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -608,8 +662,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0051",
       "exit_code": 0,
-      "elapsed_s": 0.22630399995250627,
+      "elapsed_s": 0.34278019997873344,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -620,8 +675,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0052",
       "exit_code": 0,
-      "elapsed_s": 0.2340629999525845,
+      "elapsed_s": 0.3291070999985095,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -632,8 +688,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0053",
       "exit_code": 0,
-      "elapsed_s": 0.21510370000032708,
+      "elapsed_s": 0.33091869999771006,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -644,8 +701,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0054",
       "exit_code": 0,
-      "elapsed_s": 0.2164043000084348,
+      "elapsed_s": 0.3171585999953095,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -656,8 +714,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0055",
       "exit_code": 0,
-      "elapsed_s": 0.21268029999919236,
+      "elapsed_s": 0.3120270000072196,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -668,8 +727,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0056",
       "exit_code": 0,
-      "elapsed_s": 0.2071009999490343,
+      "elapsed_s": 0.31631819999893196,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -680,8 +740,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0057",
       "exit_code": 0,
-      "elapsed_s": 0.2067446000291966,
+      "elapsed_s": 0.3449177000147756,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -692,8 +753,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0058",
       "exit_code": 0,
-      "elapsed_s": 0.19915660005062819,
+      "elapsed_s": 0.3083782000176143,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -704,8 +766,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0059",
       "exit_code": 0,
-      "elapsed_s": 0.19725750002544373,
+      "elapsed_s": 0.3613967999990564,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -716,8 +779,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0060",
       "exit_code": 0,
-      "elapsed_s": 0.1965926000266336,
+      "elapsed_s": 0.3347284000192303,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -728,8 +792,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0061",
       "exit_code": 0,
-      "elapsed_s": 0.22394180000992492,
+      "elapsed_s": 0.3879208999860566,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -740,8 +805,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0062",
       "exit_code": 0,
-      "elapsed_s": 0.22894210001686588,
+      "elapsed_s": 0.361306600010721,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -752,8 +818,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0063",
       "exit_code": 0,
-      "elapsed_s": 0.22325680003268644,
+      "elapsed_s": 0.3500097000214737,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -764,8 +831,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0064",
       "exit_code": 0,
-      "elapsed_s": 0.22623580001527444,
+      "elapsed_s": 0.35598880000179633,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -776,8 +844,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0065",
       "exit_code": 0,
-      "elapsed_s": 0.22624059999361634,
+      "elapsed_s": 0.30273070000112057,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -788,8 +857,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0066",
       "exit_code": 0,
-      "elapsed_s": 0.22261789999902248,
+      "elapsed_s": 0.3493200000084471,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -800,8 +870,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0067",
       "exit_code": 0,
-      "elapsed_s": 0.23845390003407374,
+      "elapsed_s": 0.32744009999441914,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -812,8 +883,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0068",
       "exit_code": 0,
-      "elapsed_s": 0.23128930001985282,
+      "elapsed_s": 0.308141199988313,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -824,8 +896,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0069",
       "exit_code": 0,
-      "elapsed_s": 0.23843440000200644,
+      "elapsed_s": 0.33385520000592805,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -836,8 +909,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0070",
       "exit_code": 0,
-      "elapsed_s": 0.23566919995937496,
+      "elapsed_s": 0.3264634999795817,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -848,8 +922,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0071",
       "exit_code": 0,
-      "elapsed_s": 0.23059140000259504,
+      "elapsed_s": 0.3137309000012465,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -860,8 +935,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0072",
       "exit_code": 0,
-      "elapsed_s": 0.23527940001804382,
+      "elapsed_s": 0.3607396000006702,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -872,8 +948,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0073",
       "exit_code": 0,
-      "elapsed_s": 0.2583821999724023,
+      "elapsed_s": 0.3877781000046525,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -884,8 +961,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0074",
       "exit_code": 0,
-      "elapsed_s": 0.2572389999986626,
+      "elapsed_s": 0.3754289000062272,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -896,8 +974,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0075",
       "exit_code": 0,
-      "elapsed_s": 0.2508403999963775,
+      "elapsed_s": 0.37609039997914806,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -908,8 +987,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0076",
       "exit_code": 0,
-      "elapsed_s": 0.24216050002723932,
+      "elapsed_s": 0.3578181000193581,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -920,8 +1000,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0077",
       "exit_code": 0,
-      "elapsed_s": 0.23857059999136254,
+      "elapsed_s": 0.31030250000185333,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -932,8 +1013,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0078",
       "exit_code": 0,
-      "elapsed_s": 0.2370937000378035,
+      "elapsed_s": 0.3194884000113234,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -944,8 +1026,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0079",
       "exit_code": 0,
-      "elapsed_s": 0.23601519997464493,
+      "elapsed_s": 0.34610150000662543,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -956,8 +1039,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0080",
       "exit_code": 0,
-      "elapsed_s": 0.2389104000176303,
+      "elapsed_s": 0.31827940000221133,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -968,8 +1052,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0081",
       "exit_code": 0,
-      "elapsed_s": 0.23149700002977625,
+      "elapsed_s": 0.41277609998360276,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -980,8 +1065,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0082",
       "exit_code": 0,
-      "elapsed_s": 0.2380346999852918,
+      "elapsed_s": 0.41005229999427684,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -992,8 +1078,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0083",
       "exit_code": 0,
-      "elapsed_s": 0.23567199998069555,
+      "elapsed_s": 0.3994766999967396,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -1004,8 +1091,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0084",
       "exit_code": 0,
-      "elapsed_s": 0.24240379995899275,
+      "elapsed_s": 0.40649590000975877,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -1016,8 +1104,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0085",
       "exit_code": 0,
-      "elapsed_s": 0.22791929997038096,
+      "elapsed_s": 0.3286266000068281,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -1028,8 +1117,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0086",
       "exit_code": 0,
-      "elapsed_s": 0.2340140999876894,
+      "elapsed_s": 0.3284032999945339,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -1040,8 +1130,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0087",
       "exit_code": 0,
-      "elapsed_s": 0.24043030000757426,
+      "elapsed_s": 0.35115490001044236,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -1052,8 +1143,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0088",
       "exit_code": 0,
-      "elapsed_s": 0.244061800010968,
+      "elapsed_s": 0.3834544999990612,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -1064,8 +1156,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0089",
       "exit_code": 0,
-      "elapsed_s": 0.23828719998709857,
+      "elapsed_s": 0.3121910000045318,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -1076,8 +1169,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0090",
       "exit_code": 0,
-      "elapsed_s": 0.22721880004974082,
+      "elapsed_s": 0.3148046999995131,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -1088,8 +1182,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0091",
       "exit_code": 0,
-      "elapsed_s": 0.1954799000523053,
+      "elapsed_s": 0.2526314999850001,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -1100,8 +1195,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0092",
       "exit_code": 0,
-      "elapsed_s": 0.1959206000319682,
+      "elapsed_s": 0.20620299997972324,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -1112,8 +1208,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0093",
       "exit_code": 0,
-      "elapsed_s": 0.19572759995935485,
+      "elapsed_s": 0.20782409998355433,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -1124,8 +1221,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0094",
       "exit_code": 0,
-      "elapsed_s": 0.19777530001010746,
+      "elapsed_s": 0.20377589997951873,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -1136,8 +1234,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0095",
       "exit_code": 0,
-      "elapsed_s": 0.19726929999887943,
+      "elapsed_s": 0.21554519998608157,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -1148,8 +1247,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0096",
       "exit_code": 0,
-      "elapsed_s": 0.2015817000064999,
+      "elapsed_s": 0.2076099000114482,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -1160,8 +1260,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0097",
       "exit_code": 0,
-      "elapsed_s": 0.19772420002846047,
+      "elapsed_s": 0.2524859999830369,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -1172,8 +1273,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0098",
       "exit_code": 0,
-      "elapsed_s": 0.1994931999943219,
+      "elapsed_s": 0.2254452999914065,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -1184,8 +1286,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0099",
       "exit_code": 0,
-      "elapsed_s": 0.19236019998788834,
+      "elapsed_s": 0.23651359998621047,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -1196,8 +1299,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c02/frame_0100",
       "exit_code": 0,
-      "elapsed_s": 0.19332900003064424,
+      "elapsed_s": 0.25440430000890046,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -1208,8 +1312,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0001",
       "exit_code": 0,
-      "elapsed_s": 0.18251800001598895,
+      "elapsed_s": 0.21849669999210164,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -1220,8 +1325,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0002",
       "exit_code": 0,
-      "elapsed_s": 0.17823219997808337,
+      "elapsed_s": 0.21698319999268278,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -1232,8 +1338,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0003",
       "exit_code": 0,
-      "elapsed_s": 0.17948589997831732,
+      "elapsed_s": 0.21219090002705343,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -1244,8 +1351,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0004",
       "exit_code": 0,
-      "elapsed_s": 0.1838761999970302,
+      "elapsed_s": 0.22351239999989048,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -1256,8 +1364,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0005",
       "exit_code": 0,
-      "elapsed_s": 0.18222139996942133,
+      "elapsed_s": 0.23897110001416877,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -1268,8 +1377,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0006",
       "exit_code": 0,
-      "elapsed_s": 0.18094999995082617,
+      "elapsed_s": 0.2265643999853637,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -1280,8 +1390,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0007",
       "exit_code": 0,
-      "elapsed_s": 0.1915152999572456,
+      "elapsed_s": 0.23818650000612251,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -1292,8 +1403,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0008",
       "exit_code": 0,
-      "elapsed_s": 0.1839344000327401,
+      "elapsed_s": 0.21895449998555705,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -1304,8 +1416,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0009",
       "exit_code": 0,
-      "elapsed_s": 0.18966490001184866,
+      "elapsed_s": 0.22933740000007674,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -1316,8 +1429,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0010",
       "exit_code": 0,
-      "elapsed_s": 0.17957829998340458,
+      "elapsed_s": 0.22709160001249984,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -1328,8 +1442,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0011",
       "exit_code": 0,
-      "elapsed_s": 0.18032869999296963,
+      "elapsed_s": 0.23014969998621382,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -1340,8 +1455,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0012",
       "exit_code": 0,
-      "elapsed_s": 0.18054690002463758,
+      "elapsed_s": 0.24720160002470948,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -1352,8 +1468,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0013",
       "exit_code": 0,
-      "elapsed_s": 0.21348029997898266,
+      "elapsed_s": 0.26581420001457445,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -1364,8 +1481,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0014",
       "exit_code": 0,
-      "elapsed_s": 0.20866019994718954,
+      "elapsed_s": 0.252563200017903,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -1376,8 +1494,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0015",
       "exit_code": 0,
-      "elapsed_s": 0.1976204999955371,
+      "elapsed_s": 0.22637560000293888,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -1388,8 +1507,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0016",
       "exit_code": 0,
-      "elapsed_s": 0.19213330000638962,
+      "elapsed_s": 0.27013170000282116,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -1400,8 +1520,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0017",
       "exit_code": 0,
-      "elapsed_s": 0.1869163999799639,
+      "elapsed_s": 0.23645620001479983,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -1412,8 +1533,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0018",
       "exit_code": 0,
-      "elapsed_s": 0.18853939999826252,
+      "elapsed_s": 0.23530270002083853,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -1424,8 +1546,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0019",
       "exit_code": 0,
-      "elapsed_s": 0.18486059998394921,
+      "elapsed_s": 0.2460879999853205,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -1436,8 +1559,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0020",
       "exit_code": 0,
-      "elapsed_s": 0.18898890004493296,
+      "elapsed_s": 0.24687550001544878,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -1448,8 +1572,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0021",
       "exit_code": 0,
-      "elapsed_s": 0.1821474000462331,
+      "elapsed_s": 0.3037717000115663,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -1460,8 +1585,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0022",
       "exit_code": 0,
-      "elapsed_s": 0.18548039998859167,
+      "elapsed_s": 0.2852192999853287,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -1472,8 +1598,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0023",
       "exit_code": 0,
-      "elapsed_s": 0.17626460001338273,
+      "elapsed_s": 0.2879751000145916,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -1484,8 +1611,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0024",
       "exit_code": 0,
-      "elapsed_s": 0.1754934000200592,
+      "elapsed_s": 0.27179009999963455,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -1496,8 +1624,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0025",
       "exit_code": 0,
-      "elapsed_s": 0.184693299990613,
+      "elapsed_s": 0.24596860000747256,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -1508,8 +1637,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0026",
       "exit_code": 0,
-      "elapsed_s": 0.18526230001589283,
+      "elapsed_s": 0.23577599998679943,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -1520,8 +1650,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0027",
       "exit_code": 0,
-      "elapsed_s": 0.17848789994604886,
+      "elapsed_s": 0.2232003999815788,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -1532,8 +1663,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0028",
       "exit_code": 0,
-      "elapsed_s": 0.17393769999034703,
+      "elapsed_s": 0.2630416000029072,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -1544,8 +1676,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0029",
       "exit_code": 0,
-      "elapsed_s": 0.18178819998865947,
+      "elapsed_s": 0.32927500002551824,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -1556,8 +1689,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0030",
       "exit_code": 0,
-      "elapsed_s": 0.18186000001151115,
+      "elapsed_s": 0.31493270001374185,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -1568,8 +1702,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0031",
       "exit_code": 0,
-      "elapsed_s": 0.1801034999662079,
+      "elapsed_s": 0.332631399971433,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -1580,8 +1715,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0032",
       "exit_code": 0,
-      "elapsed_s": 0.18627430003834888,
+      "elapsed_s": 0.2863745999929961,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -1592,8 +1728,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0033",
       "exit_code": 0,
-      "elapsed_s": 0.18690610001794994,
+      "elapsed_s": 0.22695500002009794,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -1604,8 +1741,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0034",
       "exit_code": 0,
-      "elapsed_s": 0.18343809997895733,
+      "elapsed_s": 0.24623499999870546,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -1616,8 +1754,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0035",
       "exit_code": 0,
-      "elapsed_s": 0.1813139000441879,
+      "elapsed_s": 0.22207909999997355,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -1628,8 +1767,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0036",
       "exit_code": 0,
-      "elapsed_s": 0.17423830000916496,
+      "elapsed_s": 0.248010700015584,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -1640,8 +1780,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0037",
       "exit_code": 0,
-      "elapsed_s": 0.1782518999534659,
+      "elapsed_s": 0.25197629997273907,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -1652,8 +1793,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0038",
       "exit_code": 0,
-      "elapsed_s": 0.17957929999101907,
+      "elapsed_s": 0.23281829999177717,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -1664,8 +1806,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0039",
       "exit_code": 0,
-      "elapsed_s": 0.17705450003268197,
+      "elapsed_s": 0.25000529998214915,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -1676,8 +1819,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0040",
       "exit_code": 0,
-      "elapsed_s": 0.18451690004440024,
+      "elapsed_s": 0.2324300000036601,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -1688,8 +1832,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0041",
       "exit_code": 0,
-      "elapsed_s": 0.20892850001109764,
+      "elapsed_s": 0.24623950000386685,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -1700,8 +1845,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0042",
       "exit_code": 0,
-      "elapsed_s": 0.21046349999960512,
+      "elapsed_s": 0.2773184000106994,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -1712,8 +1858,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0043",
       "exit_code": 0,
-      "elapsed_s": 0.21002340002451092,
+      "elapsed_s": 0.26146790001075715,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -1724,8 +1871,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0044",
       "exit_code": 0,
-      "elapsed_s": 0.20719010004540905,
+      "elapsed_s": 0.25864159999764524,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -1736,8 +1884,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0045",
       "exit_code": 0,
-      "elapsed_s": 0.21672229998512194,
+      "elapsed_s": 0.28646530001424253,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -1748,8 +1897,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0046",
       "exit_code": 0,
-      "elapsed_s": 0.21209809998981655,
+      "elapsed_s": 0.29372159999911673,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -1760,8 +1910,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0047",
       "exit_code": 0,
-      "elapsed_s": 0.2168033000198193,
+      "elapsed_s": 0.2942975999903865,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -1772,8 +1923,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0048",
       "exit_code": 0,
-      "elapsed_s": 0.2027824000106193,
+      "elapsed_s": 0.274813299998641,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -1784,8 +1936,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0049",
       "exit_code": 0,
-      "elapsed_s": 0.2221758000086993,
+      "elapsed_s": 0.2824077999975998,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -1796,8 +1949,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0050",
       "exit_code": 0,
-      "elapsed_s": 0.2106474000029266,
+      "elapsed_s": 0.2744146999903023,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -1808,8 +1962,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0051",
       "exit_code": 0,
-      "elapsed_s": 0.21023710002191365,
+      "elapsed_s": 0.2630405999952927,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -1820,8 +1975,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0052",
       "exit_code": 0,
-      "elapsed_s": 0.2130802000174299,
+      "elapsed_s": 0.2739609999989625,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -1832,8 +1988,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0053",
       "exit_code": 0,
-      "elapsed_s": 0.23681149998446926,
+      "elapsed_s": 0.35034469998208806,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -1844,8 +2001,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0054",
       "exit_code": 0,
-      "elapsed_s": 0.2380492999800481,
+      "elapsed_s": 0.3146683000086341,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -1856,8 +2014,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0055",
       "exit_code": 0,
-      "elapsed_s": 0.23172869998961687,
+      "elapsed_s": 0.3207844999851659,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -1868,8 +2027,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0056",
       "exit_code": 0,
-      "elapsed_s": 0.2309053000062704,
+      "elapsed_s": 0.32589810001081787,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -1880,8 +2040,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0057",
       "exit_code": 0,
-      "elapsed_s": 0.21213209995767102,
+      "elapsed_s": 0.37341749999905005,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -1892,8 +2053,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0058",
       "exit_code": 0,
-      "elapsed_s": 0.21432450000429526,
+      "elapsed_s": 0.32690369998454116,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -1904,8 +2066,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0059",
       "exit_code": 0,
-      "elapsed_s": 0.21193330001551658,
+      "elapsed_s": 0.3669736000010744,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -1916,8 +2079,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0060",
       "exit_code": 0,
-      "elapsed_s": 0.21595530002377927,
+      "elapsed_s": 0.34807639999780804,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -1928,8 +2092,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0061",
       "exit_code": 0,
-      "elapsed_s": 0.1873626000015065,
+      "elapsed_s": 0.34521970001515,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -1940,8 +2105,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0062",
       "exit_code": 0,
-      "elapsed_s": 0.18380110000725836,
+      "elapsed_s": 0.3314366999838967,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -1952,8 +2118,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0063",
       "exit_code": 0,
-      "elapsed_s": 0.18213319999631494,
+      "elapsed_s": 0.3206032000016421,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -1964,8 +2131,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0064",
       "exit_code": 0,
-      "elapsed_s": 0.18302779999794438,
+      "elapsed_s": 0.32644790000631474,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -1976,8 +2144,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0065",
       "exit_code": 0,
-      "elapsed_s": 0.18365610000910237,
+      "elapsed_s": 0.3499874999979511,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -1988,8 +2157,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0066",
       "exit_code": 0,
-      "elapsed_s": 0.1865832000039518,
+      "elapsed_s": 0.29626059997826815,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -2000,8 +2170,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0067",
       "exit_code": 0,
-      "elapsed_s": 0.18266170000424609,
+      "elapsed_s": 0.30831510000280105,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -2012,8 +2183,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0068",
       "exit_code": 0,
-      "elapsed_s": 0.18404919997556135,
+      "elapsed_s": 0.2902897000021767,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -2024,8 +2196,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0069",
       "exit_code": 0,
-      "elapsed_s": 0.18322750000515953,
+      "elapsed_s": 0.27144910002243705,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -2036,8 +2209,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c04/frame_0070",
       "exit_code": 0,
-      "elapsed_s": 0.18618070002412423,
+      "elapsed_s": 0.3004129000182729,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -2048,8 +2222,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0001",
       "exit_code": 0,
-      "elapsed_s": 0.20877359999576584,
+      "elapsed_s": 0.3094809000031091,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -2060,8 +2235,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0002",
       "exit_code": 0,
-      "elapsed_s": 0.1954189999960363,
+      "elapsed_s": 0.29517840000335127,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -2072,8 +2248,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0003",
       "exit_code": 0,
-      "elapsed_s": 0.19895479996921495,
+      "elapsed_s": 0.36220430000685155,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -2084,8 +2261,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0004",
       "exit_code": 0,
-      "elapsed_s": 0.18845810001948848,
+      "elapsed_s": 0.34049319999758154,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -2096,8 +2274,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0005",
       "exit_code": 0,
-      "elapsed_s": 0.19432709994725883,
+      "elapsed_s": 0.3445508000149857,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -2108,8 +2287,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0006",
       "exit_code": 0,
-      "elapsed_s": 0.19447789998957887,
+      "elapsed_s": 0.32984880000003614,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -2120,8 +2300,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0007",
       "exit_code": 0,
-      "elapsed_s": 0.19968429999426007,
+      "elapsed_s": 0.2595463000179734,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -2132,8 +2313,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0008",
       "exit_code": 0,
-      "elapsed_s": 0.19143100001383573,
+      "elapsed_s": 0.24849249998806044,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -2144,8 +2326,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0009",
       "exit_code": 0,
-      "elapsed_s": 0.19924589997390285,
+      "elapsed_s": 0.2549674000183586,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -2156,8 +2339,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0010",
       "exit_code": 0,
-      "elapsed_s": 0.18843069998547435,
+      "elapsed_s": 0.26998040001490153,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -2168,8 +2352,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0011",
       "exit_code": 0,
-      "elapsed_s": 0.19328179996227846,
+      "elapsed_s": 0.23543960001552477,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -2180,8 +2365,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0012",
       "exit_code": 0,
-      "elapsed_s": 0.19497439998667687,
+      "elapsed_s": 0.24114599998574704,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -2192,8 +2378,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0013",
       "exit_code": 0,
-      "elapsed_s": 0.19331300002522767,
+      "elapsed_s": 0.24270690002595074,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -2204,8 +2391,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0014",
       "exit_code": 0,
-      "elapsed_s": 0.19516549998661503,
+      "elapsed_s": 0.2663421999895945,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -2216,8 +2404,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0015",
       "exit_code": 0,
-      "elapsed_s": 0.20106120000127703,
+      "elapsed_s": 0.2547449999838136,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -2228,8 +2417,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0016",
       "exit_code": 0,
-      "elapsed_s": 0.18983340001432225,
+      "elapsed_s": 0.25205549999373034,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -2240,8 +2430,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0017",
       "exit_code": 0,
-      "elapsed_s": 0.19709979998879135,
+      "elapsed_s": 0.246045799984131,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -2252,8 +2443,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0018",
       "exit_code": 0,
-      "elapsed_s": 0.18915569997625425,
+      "elapsed_s": 0.22427279999828897,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -2264,8 +2456,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0019",
       "exit_code": 0,
-      "elapsed_s": 0.2223012000322342,
+      "elapsed_s": 0.22811820000060834,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -2276,8 +2469,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0020",
       "exit_code": 0,
-      "elapsed_s": 0.23069409996969625,
+      "elapsed_s": 0.259551700000884,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -2288,8 +2482,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0021",
       "exit_code": 0,
-      "elapsed_s": 0.22164689999772236,
+      "elapsed_s": 0.22891320000053383,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -2300,8 +2495,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0022",
       "exit_code": 0,
-      "elapsed_s": 0.21585869998671114,
+      "elapsed_s": 0.22370110001065768,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -2312,8 +2508,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0023",
       "exit_code": 0,
-      "elapsed_s": 0.20075790002010763,
+      "elapsed_s": 0.26541189997806214,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -2324,8 +2521,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0024",
       "exit_code": 0,
-      "elapsed_s": 0.20498819998465478,
+      "elapsed_s": 0.2857015000190586,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -2336,8 +2534,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0025",
       "exit_code": 0,
-      "elapsed_s": 0.2177326999953948,
+      "elapsed_s": 0.233449199993629,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -2348,8 +2547,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0026",
       "exit_code": 0,
-      "elapsed_s": 0.2191336999530904,
+      "elapsed_s": 0.23185160002321936,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -2360,8 +2560,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0027",
       "exit_code": 0,
-      "elapsed_s": 0.19918890000553802,
+      "elapsed_s": 0.3112132000096608,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -2372,8 +2573,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0028",
       "exit_code": 0,
-      "elapsed_s": 0.20119140000315383,
+      "elapsed_s": 0.31295600000885315,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -2384,8 +2586,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0029",
       "exit_code": 0,
-      "elapsed_s": 0.19308950001141056,
+      "elapsed_s": 0.3003422999754548,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -2396,8 +2599,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0030",
       "exit_code": 0,
-      "elapsed_s": 0.19301809999160469,
+      "elapsed_s": 0.3219771000149194,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -2408,8 +2612,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0031",
       "exit_code": 0,
-      "elapsed_s": 0.19232900004135445,
+      "elapsed_s": 0.28661599999759346,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -2420,8 +2625,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0032",
       "exit_code": 0,
-      "elapsed_s": 0.19241860002512112,
+      "elapsed_s": 0.30473149998579174,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -2432,8 +2638,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0033",
       "exit_code": 0,
-      "elapsed_s": 0.18923329998506233,
+      "elapsed_s": 0.2891030999890063,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -2444,8 +2651,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0034",
       "exit_code": 0,
-      "elapsed_s": 0.19159790000412613,
+      "elapsed_s": 0.265565699985018,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -2456,8 +2664,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0035",
       "exit_code": 0,
-      "elapsed_s": 0.20540059998165816,
+      "elapsed_s": 0.25616900000022724,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -2468,8 +2677,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0036",
       "exit_code": 0,
-      "elapsed_s": 0.1967760000261478,
+      "elapsed_s": 0.2317752999952063,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -2480,8 +2690,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0037",
       "exit_code": 0,
-      "elapsed_s": 0.2059601999935694,
+      "elapsed_s": 0.23807449999731034,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -2492,8 +2703,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0038",
       "exit_code": 0,
-      "elapsed_s": 0.18898699997225776,
+      "elapsed_s": 0.22329520000494085,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -2504,8 +2716,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0039",
       "exit_code": 0,
-      "elapsed_s": 0.18702139996457845,
+      "elapsed_s": 0.22682300000451505,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -2516,8 +2729,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0040",
       "exit_code": 0,
-      "elapsed_s": 0.1907381999772042,
+      "elapsed_s": 0.2804712999786716,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -2528,8 +2742,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0041",
       "exit_code": 0,
-      "elapsed_s": 0.23975090001476929,
+      "elapsed_s": 0.3328639999963343,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -2540,8 +2755,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0042",
       "exit_code": 0,
-      "elapsed_s": 0.23926780000329018,
+      "elapsed_s": 0.3269948000088334,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -2552,8 +2768,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0043",
       "exit_code": 0,
-      "elapsed_s": 0.2305151000036858,
+      "elapsed_s": 0.3267997000075411,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -2564,8 +2781,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0044",
       "exit_code": 0,
-      "elapsed_s": 0.23786399996606633,
+      "elapsed_s": 0.29048699999111705,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -2576,8 +2794,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0045",
       "exit_code": 0,
-      "elapsed_s": 0.2422251999960281,
+      "elapsed_s": 0.30619919998571277,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -2588,8 +2807,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0046",
       "exit_code": 0,
-      "elapsed_s": 0.24441729998216033,
+      "elapsed_s": 0.33102820001658984,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -2600,8 +2820,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0047",
       "exit_code": 0,
-      "elapsed_s": 0.26033279998227954,
+      "elapsed_s": 0.3507011999899987,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -2612,8 +2833,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0048",
       "exit_code": 0,
-      "elapsed_s": 0.2546365999733098,
+      "elapsed_s": 0.3304902999952901,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -2624,8 +2846,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0049",
       "exit_code": 0,
-      "elapsed_s": 0.2672168000135571,
+      "elapsed_s": 0.30798389998381026,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -2636,8 +2859,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0050",
       "exit_code": 0,
-      "elapsed_s": 0.26217140001244843,
+      "elapsed_s": 0.33201980000012554,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -2648,8 +2872,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0051",
       "exit_code": 0,
-      "elapsed_s": 0.2801331999944523,
+      "elapsed_s": 0.3017173999978695,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -2660,8 +2885,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0052",
       "exit_code": 0,
-      "elapsed_s": 0.2999110000091605,
+      "elapsed_s": 0.2929584000085015,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -2672,8 +2898,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0053",
       "exit_code": 0,
-      "elapsed_s": 0.2932157999603078,
+      "elapsed_s": 0.31823679999797605,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -2684,8 +2911,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0054",
       "exit_code": 0,
-      "elapsed_s": 0.29380119999404997,
+      "elapsed_s": 0.3040239000110887,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -2696,8 +2924,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0055",
       "exit_code": 0,
-      "elapsed_s": 0.2769955999683589,
+      "elapsed_s": 0.30505200001061894,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -2708,8 +2937,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0056",
       "exit_code": 0,
-      "elapsed_s": 0.29244889999972656,
+      "elapsed_s": 0.3370798000250943,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -2720,8 +2950,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0057",
       "exit_code": 0,
-      "elapsed_s": 0.2633732000249438,
+      "elapsed_s": 0.2852827000024263,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -2732,8 +2963,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0058",
       "exit_code": 0,
-      "elapsed_s": 0.26339069998357445,
+      "elapsed_s": 0.2883524000062607,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -2744,8 +2976,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0059",
       "exit_code": 0,
-      "elapsed_s": 0.251695099985227,
+      "elapsed_s": 0.327006799983792,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -2756,8 +2989,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0060",
       "exit_code": 0,
-      "elapsed_s": 0.25534209999023005,
+      "elapsed_s": 0.36050030001206324,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -2768,8 +3002,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0061",
       "exit_code": 0,
-      "elapsed_s": 0.20724439999321476,
+      "elapsed_s": 0.2883901000022888,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -2780,8 +3015,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0062",
       "exit_code": 0,
-      "elapsed_s": 0.20572640001773834,
+      "elapsed_s": 0.2727040999743622,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -2792,8 +3028,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0063",
       "exit_code": 0,
-      "elapsed_s": 0.2217086000018753,
+      "elapsed_s": 0.2298683999979403,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -2804,8 +3041,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0064",
       "exit_code": 0,
-      "elapsed_s": 0.2104395999922417,
+      "elapsed_s": 0.26540340000065044,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -2816,8 +3054,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0065",
       "exit_code": 0,
-      "elapsed_s": 0.21348160004708916,
+      "elapsed_s": 0.25547989999176934,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -2828,8 +3067,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0066",
       "exit_code": 0,
-      "elapsed_s": 0.21152860001893714,
+      "elapsed_s": 0.26295800000661984,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -2840,8 +3080,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0067",
       "exit_code": 0,
-      "elapsed_s": 0.2119035999639891,
+      "elapsed_s": 0.27052410002215765,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -2852,8 +3093,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0068",
       "exit_code": 0,
-      "elapsed_s": 0.20884159998968244,
+      "elapsed_s": 0.2645245000021532,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -2864,8 +3106,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0069",
       "exit_code": 0,
-      "elapsed_s": 0.20314649998908862,
+      "elapsed_s": 0.2630893000168726,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -2876,8 +3119,9 @@
     {
       "case_id": "gromacs_topology_triclinic_oblique_holdout_c06/frame_0070",
       "exit_code": 0,
-      "elapsed_s": 0.20914409996476024,
+      "elapsed_s": 0.23848920001182705,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -2888,8 +3132,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0001",
       "exit_code": 0,
-      "elapsed_s": 0.22041789995273575,
+      "elapsed_s": 0.23417729997891001,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -2900,8 +3145,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0002",
       "exit_code": 0,
-      "elapsed_s": 0.22747019998496398,
+      "elapsed_s": 0.23582509998232126,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -2912,8 +3158,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0003",
       "exit_code": 0,
-      "elapsed_s": 0.21108159999130294,
+      "elapsed_s": 0.23220149998087436,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -2924,8 +3171,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0004",
       "exit_code": 0,
-      "elapsed_s": 0.21879010001430288,
+      "elapsed_s": 0.23638170000049286,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -2936,8 +3184,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0005",
       "exit_code": 0,
-      "elapsed_s": 0.22738409996964037,
+      "elapsed_s": 0.2344738999963738,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -2948,8 +3197,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0006",
       "exit_code": 0,
-      "elapsed_s": 0.23393159999977797,
+      "elapsed_s": 0.23705500000505708,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -2960,8 +3210,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0007",
       "exit_code": 0,
-      "elapsed_s": 0.22485479997703806,
+      "elapsed_s": 0.23456670000450686,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -2972,8 +3223,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0008",
       "exit_code": 0,
-      "elapsed_s": 0.23271750001003966,
+      "elapsed_s": 0.2405058000003919,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -2984,8 +3236,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0009",
       "exit_code": 0,
-      "elapsed_s": 0.21414629998616874,
+      "elapsed_s": 0.24759940002695657,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -2996,8 +3249,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0010",
       "exit_code": 0,
-      "elapsed_s": 0.2056220000376925,
+      "elapsed_s": 0.2534336999815423,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -3008,8 +3262,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0011",
       "exit_code": 0,
-      "elapsed_s": 0.2179384999908507,
+      "elapsed_s": 0.24554090001038276,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -3020,8 +3275,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0012",
       "exit_code": 0,
-      "elapsed_s": 0.2046555999550037,
+      "elapsed_s": 0.2493432000046596,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -3032,8 +3288,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0013",
       "exit_code": 0,
-      "elapsed_s": 0.1991736000054516,
+      "elapsed_s": 0.25236579999909736,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -3044,8 +3301,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0014",
       "exit_code": 0,
-      "elapsed_s": 0.2282744999974966,
+      "elapsed_s": 0.2507412999984808,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -3056,8 +3314,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0015",
       "exit_code": 0,
-      "elapsed_s": 0.2140913000330329,
+      "elapsed_s": 0.2483080000092741,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -3068,8 +3327,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0016",
       "exit_code": 0,
-      "elapsed_s": 0.20114229997852817,
+      "elapsed_s": 0.24407650000648573,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -3080,8 +3340,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0017",
       "exit_code": 0,
-      "elapsed_s": 0.2115779999876395,
+      "elapsed_s": 0.24732890000450425,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -3092,8 +3353,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0018",
       "exit_code": 0,
-      "elapsed_s": 0.2113969999481924,
+      "elapsed_s": 0.25746710001840256,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -3104,8 +3366,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0019",
       "exit_code": 0,
-      "elapsed_s": 0.21021590003510937,
+      "elapsed_s": 0.2569110000040382,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -3116,8 +3379,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0020",
       "exit_code": 0,
-      "elapsed_s": 0.21189269999740645,
+      "elapsed_s": 0.25368320001871325,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -3128,8 +3392,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0021",
       "exit_code": 0,
-      "elapsed_s": 0.20687410002574325,
+      "elapsed_s": 0.2555532999977004,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -3140,8 +3405,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0022",
       "exit_code": 0,
-      "elapsed_s": 0.22083320003002882,
+      "elapsed_s": 0.2516546999977436,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -3152,8 +3418,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0023",
       "exit_code": 0,
-      "elapsed_s": 0.19960940000601113,
+      "elapsed_s": 0.24874320000526495,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -3164,8 +3431,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0024",
       "exit_code": 0,
-      "elapsed_s": 0.20595490001142025,
+      "elapsed_s": 0.244954299996607,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -3176,8 +3444,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0025",
       "exit_code": 0,
-      "elapsed_s": 0.2101511000073515,
+      "elapsed_s": 0.2415686000022106,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -3188,8 +3457,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0026",
       "exit_code": 0,
-      "elapsed_s": 0.21230429998831823,
+      "elapsed_s": 0.243806799990125,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -3200,8 +3470,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0027",
       "exit_code": 0,
-      "elapsed_s": 0.2120553000131622,
+      "elapsed_s": 0.24576180000440218,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -3212,8 +3483,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0028",
       "exit_code": 0,
-      "elapsed_s": 0.20048999995924532,
+      "elapsed_s": 0.24298919999273494,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -3224,8 +3496,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0029",
       "exit_code": 0,
-      "elapsed_s": 0.21239060000516474,
+      "elapsed_s": 0.24960800001281314,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -3236,8 +3509,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0030",
       "exit_code": 0,
-      "elapsed_s": 0.22334470000350848,
+      "elapsed_s": 0.23833739999099635,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -3248,8 +3522,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0031",
       "exit_code": 0,
-      "elapsed_s": 0.20872809999855235,
+      "elapsed_s": 0.24355360001209192,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -3260,8 +3535,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0032",
       "exit_code": 0,
-      "elapsed_s": 0.20533300004899502,
+      "elapsed_s": 0.241422799997963,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -3272,8 +3548,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0033",
       "exit_code": 0,
-      "elapsed_s": 0.21017129998654127,
+      "elapsed_s": 0.23958159997710027,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -3284,8 +3561,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0034",
       "exit_code": 0,
-      "elapsed_s": 0.20955019997199997,
+      "elapsed_s": 0.2420212999859359,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -3296,8 +3574,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0035",
       "exit_code": 0,
-      "elapsed_s": 0.20087410003179684,
+      "elapsed_s": 0.2396479999879375,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -3308,8 +3587,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0036",
       "exit_code": 0,
-      "elapsed_s": 0.1960117999697104,
+      "elapsed_s": 0.2333982999844011,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -3320,8 +3600,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0037",
       "exit_code": 0,
-      "elapsed_s": 0.2121127000427805,
+      "elapsed_s": 0.2399775999947451,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -3332,8 +3613,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0038",
       "exit_code": 0,
-      "elapsed_s": 0.2048738999874331,
+      "elapsed_s": 0.23251719999825582,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -3344,8 +3626,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0039",
       "exit_code": 0,
-      "elapsed_s": 0.2036219000001438,
+      "elapsed_s": 0.23281950000091456,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -3356,8 +3639,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0040",
       "exit_code": 0,
-      "elapsed_s": 0.20258550002472475,
+      "elapsed_s": 0.2304885000048671,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -3368,8 +3652,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0041",
       "exit_code": 0,
-      "elapsed_s": 0.22149730002274737,
+      "elapsed_s": 0.23821889999089763,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -3380,8 +3665,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0042",
       "exit_code": 0,
-      "elapsed_s": 0.21803240000735968,
+      "elapsed_s": 0.23486930000944994,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -3392,8 +3678,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0043",
       "exit_code": 0,
-      "elapsed_s": 0.22669719997793436,
+      "elapsed_s": 0.24046510001062416,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -3404,8 +3691,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0044",
       "exit_code": 0,
-      "elapsed_s": 0.2199026999878697,
+      "elapsed_s": 0.23785050000878982,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -3416,8 +3704,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0045",
       "exit_code": 0,
-      "elapsed_s": 0.21570140001131222,
+      "elapsed_s": 0.24209260000498034,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -3428,8 +3717,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0046",
       "exit_code": 0,
-      "elapsed_s": 0.21550150000257418,
+      "elapsed_s": 0.24169700001948513,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -3440,8 +3730,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0047",
       "exit_code": 0,
-      "elapsed_s": 0.21189580002101138,
+      "elapsed_s": 0.24282800001674332,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -3452,8 +3743,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0048",
       "exit_code": 0,
-      "elapsed_s": 0.2122728000395,
+      "elapsed_s": 0.24150720000034198,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -3464,8 +3756,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0049",
       "exit_code": 0,
-      "elapsed_s": 0.2032566000125371,
+      "elapsed_s": 0.24649990000762045,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -3476,8 +3769,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0050",
       "exit_code": 0,
-      "elapsed_s": 0.2126060000155121,
+      "elapsed_s": 0.2412303000164684,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -3488,8 +3782,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0051",
       "exit_code": 0,
-      "elapsed_s": 0.23054030002094805,
+      "elapsed_s": 0.24691129999700934,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -3500,8 +3795,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0052",
       "exit_code": 0,
-      "elapsed_s": 0.22733389999484643,
+      "elapsed_s": 0.24406609998550266,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -3512,8 +3808,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0053",
       "exit_code": 0,
-      "elapsed_s": 0.21889080002438277,
+      "elapsed_s": 0.2512820000119973,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -3524,8 +3821,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0054",
       "exit_code": 0,
-      "elapsed_s": 0.2155481000081636,
+      "elapsed_s": 0.24849040000117384,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -3536,8 +3834,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0055",
       "exit_code": 0,
-      "elapsed_s": 0.20913640002254397,
+      "elapsed_s": 0.24279980000574142,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -3548,8 +3847,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0056",
       "exit_code": 0,
-      "elapsed_s": 0.21231249999254942,
+      "elapsed_s": 0.245087399991462,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -3560,8 +3860,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0057",
       "exit_code": 0,
-      "elapsed_s": 0.2380360999959521,
+      "elapsed_s": 0.2495712999952957,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -3572,8 +3873,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0058",
       "exit_code": 0,
-      "elapsed_s": 0.22169310000026599,
+      "elapsed_s": 0.2579242000065278,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -3584,8 +3886,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0059",
       "exit_code": 0,
-      "elapsed_s": 0.21547580003971234,
+      "elapsed_s": 0.2601014999963809,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -3596,8 +3899,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0060",
       "exit_code": 0,
-      "elapsed_s": 0.21337240003049374,
+      "elapsed_s": 0.2467635000066366,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -3608,8 +3912,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0061",
       "exit_code": 0,
-      "elapsed_s": 0.2513679999974556,
+      "elapsed_s": 0.2875575999787543,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -3620,8 +3925,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0062",
       "exit_code": 0,
-      "elapsed_s": 0.2548584000323899,
+      "elapsed_s": 0.2979506000119727,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -3632,8 +3938,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0063",
       "exit_code": 0,
-      "elapsed_s": 0.24397700000554323,
+      "elapsed_s": 0.28693649999331683,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -3644,8 +3951,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0064",
       "exit_code": 0,
-      "elapsed_s": 0.24838429997907951,
+      "elapsed_s": 0.28321629998390563,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -3656,8 +3964,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0065",
       "exit_code": 0,
-      "elapsed_s": 0.23582320002606139,
+      "elapsed_s": 0.29974630000651814,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -3668,8 +3977,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0066",
       "exit_code": 0,
-      "elapsed_s": 0.25247149995993823,
+      "elapsed_s": 0.29562900000019,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -3680,8 +3990,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0067",
       "exit_code": 0,
-      "elapsed_s": 0.23041930003091693,
+      "elapsed_s": 0.29190700000617653,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -3692,8 +4003,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0068",
       "exit_code": 0,
-      "elapsed_s": 0.2254889000323601,
+      "elapsed_s": 0.28646370000205934,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -3704,8 +4016,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0069",
       "exit_code": 0,
-      "elapsed_s": 0.23894489998929203,
+      "elapsed_s": 0.2869217999977991,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -3716,8 +4029,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0070",
       "exit_code": 0,
-      "elapsed_s": 0.24975359998643398,
+      "elapsed_s": 0.28561079999781214,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -3728,8 +4042,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0071",
       "exit_code": 0,
-      "elapsed_s": 0.2301689999876544,
+      "elapsed_s": 0.28641510001034476,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -3740,8 +4055,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0072",
       "exit_code": 0,
-      "elapsed_s": 0.22963120002532378,
+      "elapsed_s": 0.2828402000013739,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -3752,8 +4068,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0073",
       "exit_code": 0,
-      "elapsed_s": 0.2513215000508353,
+      "elapsed_s": 0.2960998000053223,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -3764,8 +4081,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0074",
       "exit_code": 0,
-      "elapsed_s": 0.24693459999980405,
+      "elapsed_s": 0.28654920001281425,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -3776,8 +4094,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0075",
       "exit_code": 0,
-      "elapsed_s": 0.25211400003172457,
+      "elapsed_s": 0.2836925000010524,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -3788,8 +4107,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0076",
       "exit_code": 0,
-      "elapsed_s": 0.2541540000238456,
+      "elapsed_s": 0.28570809998200275,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -3800,8 +4120,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0077",
       "exit_code": 0,
-      "elapsed_s": 0.2537787000183016,
+      "elapsed_s": 0.2908824000041932,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -3812,8 +4133,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0078",
       "exit_code": 0,
-      "elapsed_s": 0.2536126999766566,
+      "elapsed_s": 0.29145879999850877,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -3824,8 +4146,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0079",
       "exit_code": 0,
-      "elapsed_s": 0.25104649999411777,
+      "elapsed_s": 0.28793739998945966,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -3836,8 +4159,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0080",
       "exit_code": 0,
-      "elapsed_s": 0.2516398999723606,
+      "elapsed_s": 0.29114129999652505,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -3848,8 +4172,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0081",
       "exit_code": 0,
-      "elapsed_s": 0.25322930002585053,
+      "elapsed_s": 0.28846270000212826,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -3860,8 +4185,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0082",
       "exit_code": 0,
-      "elapsed_s": 0.25082069996278733,
+      "elapsed_s": 0.2865775999962352,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -3872,8 +4198,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0083",
       "exit_code": 0,
-      "elapsed_s": 0.24137030000565574,
+      "elapsed_s": 0.28967670002020895,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -3884,8 +4211,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0084",
       "exit_code": 0,
-      "elapsed_s": 0.24010890000499785,
+      "elapsed_s": 0.28319570000167005,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -3896,8 +4224,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0085",
       "exit_code": 0,
-      "elapsed_s": 0.24329539999598637,
+      "elapsed_s": 0.27591229998506606,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -3908,8 +4237,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0086",
       "exit_code": 0,
-      "elapsed_s": 0.24883459997363389,
+      "elapsed_s": 0.276650099986,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -3920,8 +4250,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0087",
       "exit_code": 0,
-      "elapsed_s": 0.2554165000328794,
+      "elapsed_s": 0.27742440000292845,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -3932,8 +4263,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0088",
       "exit_code": 0,
-      "elapsed_s": 0.2545780999935232,
+      "elapsed_s": 0.27726740000071004,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -3944,8 +4276,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0089",
       "exit_code": 0,
-      "elapsed_s": 0.24677949998294935,
+      "elapsed_s": 0.2862787999911234,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -3956,8 +4289,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0090",
       "exit_code": 0,
-      "elapsed_s": 0.27593900001375005,
+      "elapsed_s": 0.2864677000034135,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -3968,8 +4302,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0091",
       "exit_code": 0,
-      "elapsed_s": 0.22179889999097213,
+      "elapsed_s": 0.23997110000345856,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -3980,8 +4315,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0092",
       "exit_code": 0,
-      "elapsed_s": 0.22146339999744669,
+      "elapsed_s": 0.23393389998818748,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -3992,8 +4328,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0093",
       "exit_code": 0,
-      "elapsed_s": 0.21630259999074042,
+      "elapsed_s": 0.23932359999162145,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -4004,8 +4341,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0094",
       "exit_code": 0,
-      "elapsed_s": 0.21733580000000075,
+      "elapsed_s": 0.23801090000779368,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -4016,8 +4354,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0095",
       "exit_code": 0,
-      "elapsed_s": 0.20806990005075932,
+      "elapsed_s": 0.23532129998784512,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -4028,8 +4367,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0096",
       "exit_code": 0,
-      "elapsed_s": 0.1999364999937825,
+      "elapsed_s": 0.242019800003618,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -4040,8 +4380,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0097",
       "exit_code": 0,
-      "elapsed_s": 0.20656669995514676,
+      "elapsed_s": 0.236783700005617,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -4052,8 +4393,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0098",
       "exit_code": 0,
-      "elapsed_s": 0.20850720000453293,
+      "elapsed_s": 0.2364330999844242,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -4064,8 +4406,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0099",
       "exit_code": 0,
-      "elapsed_s": 0.203187600011006,
+      "elapsed_s": 0.23158960000728257,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -4076,8 +4419,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c02/frame_0100",
       "exit_code": 0,
-      "elapsed_s": 0.20991459995275363,
+      "elapsed_s": 0.2352895000076387,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_exact",
@@ -4088,8 +4432,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0001",
       "exit_code": 0,
-      "elapsed_s": 0.1897216999786906,
+      "elapsed_s": 0.20974079999723472,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -4100,8 +4445,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0002",
       "exit_code": 0,
-      "elapsed_s": 0.18483439995907247,
+      "elapsed_s": 0.20969580000382848,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -4112,8 +4458,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0003",
       "exit_code": 0,
-      "elapsed_s": 0.1823613999877125,
+      "elapsed_s": 0.20500270000775345,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -4124,8 +4471,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0004",
       "exit_code": 0,
-      "elapsed_s": 0.19127609999850392,
+      "elapsed_s": 0.21058059998904355,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -4136,8 +4484,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0005",
       "exit_code": 0,
-      "elapsed_s": 0.1901443999959156,
+      "elapsed_s": 0.21067620001849718,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -4148,8 +4497,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0006",
       "exit_code": 0,
-      "elapsed_s": 0.1868306000251323,
+      "elapsed_s": 0.21041249998961575,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -4160,8 +4510,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0007",
       "exit_code": 0,
-      "elapsed_s": 0.1818224000162445,
+      "elapsed_s": 0.2057724999904167,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -4172,8 +4523,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0008",
       "exit_code": 0,
-      "elapsed_s": 0.18212419998599216,
+      "elapsed_s": 0.20897680000052787,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -4184,8 +4536,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0009",
       "exit_code": 0,
-      "elapsed_s": 0.18775240000104532,
+      "elapsed_s": 0.21896129997912794,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -4196,8 +4549,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0010",
       "exit_code": 0,
-      "elapsed_s": 0.18855249998159707,
+      "elapsed_s": 0.21652670000912622,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -4208,8 +4562,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0011",
       "exit_code": 0,
-      "elapsed_s": 0.19323450000956655,
+      "elapsed_s": 0.2163859999855049,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -4220,8 +4575,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0012",
       "exit_code": 0,
-      "elapsed_s": 0.1923506999737583,
+      "elapsed_s": 0.21350309997797012,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -4232,8 +4588,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0013",
       "exit_code": 0,
-      "elapsed_s": 0.1830496999900788,
+      "elapsed_s": 0.2236912999942433,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -4244,8 +4601,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0014",
       "exit_code": 0,
-      "elapsed_s": 0.19413370004622266,
+      "elapsed_s": 0.22133919998304918,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -4256,8 +4614,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0015",
       "exit_code": 0,
-      "elapsed_s": 0.18539930001134053,
+      "elapsed_s": 0.20643999997992069,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -4268,8 +4627,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0016",
       "exit_code": 0,
-      "elapsed_s": 0.19223470002179965,
+      "elapsed_s": 0.19643019998329692,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -4280,8 +4640,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0017",
       "exit_code": 0,
-      "elapsed_s": 0.18816780002089217,
+      "elapsed_s": 0.2117257000063546,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -4292,8 +4653,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0018",
       "exit_code": 0,
-      "elapsed_s": 0.18400050001218915,
+      "elapsed_s": 0.21543130002100952,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -4304,8 +4666,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0019",
       "exit_code": 0,
-      "elapsed_s": 0.1847696999902837,
+      "elapsed_s": 0.19858909997856244,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -4316,8 +4679,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0020",
       "exit_code": 0,
-      "elapsed_s": 0.19797630002722144,
+      "elapsed_s": 0.21725690001039766,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -4328,8 +4692,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0021",
       "exit_code": 0,
-      "elapsed_s": 0.1825416999636218,
+      "elapsed_s": 0.21742249999078922,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -4340,8 +4705,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0022",
       "exit_code": 0,
-      "elapsed_s": 0.17934199998853728,
+      "elapsed_s": 0.21122460000333376,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -4352,8 +4718,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0023",
       "exit_code": 0,
-      "elapsed_s": 0.1833928000414744,
+      "elapsed_s": 0.22430989998974837,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -4364,8 +4731,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0024",
       "exit_code": 0,
-      "elapsed_s": 0.17993829998886213,
+      "elapsed_s": 0.2175969000090845,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -4376,8 +4744,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0025",
       "exit_code": 0,
-      "elapsed_s": 0.18670770002063364,
+      "elapsed_s": 0.2677267999970354,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -4388,8 +4757,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0026",
       "exit_code": 0,
-      "elapsed_s": 0.1914099999703467,
+      "elapsed_s": 0.2574630999879446,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -4400,8 +4770,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0027",
       "exit_code": 0,
-      "elapsed_s": 0.18174159998307005,
+      "elapsed_s": 0.2643973999947775,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -4412,8 +4783,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0028",
       "exit_code": 0,
-      "elapsed_s": 0.18326510000042617,
+      "elapsed_s": 0.26684060000116006,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -4424,8 +4796,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0029",
       "exit_code": 0,
-      "elapsed_s": 0.21303039998747408,
+      "elapsed_s": 0.25982530001783744,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -4436,8 +4809,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0030",
       "exit_code": 0,
-      "elapsed_s": 0.21410550002474338,
+      "elapsed_s": 0.25807710000663064,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -4448,8 +4822,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0031",
       "exit_code": 0,
-      "elapsed_s": 0.20897590002277866,
+      "elapsed_s": 0.2598303999984637,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -4460,8 +4835,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0032",
       "exit_code": 0,
-      "elapsed_s": 0.18908410001313314,
+      "elapsed_s": 0.2575699999870267,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -4472,8 +4848,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0033",
       "exit_code": 0,
-      "elapsed_s": 0.1943075000308454,
+      "elapsed_s": 0.24897990000317805,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -4484,8 +4861,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0034",
       "exit_code": 0,
-      "elapsed_s": 0.20138919999590144,
+      "elapsed_s": 0.24259350000647828,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -4496,8 +4874,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0035",
       "exit_code": 0,
-      "elapsed_s": 0.1892070999601856,
+      "elapsed_s": 0.2406706000037957,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -4508,8 +4887,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0036",
       "exit_code": 0,
-      "elapsed_s": 0.18661700002849102,
+      "elapsed_s": 0.23704349997569807,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -4520,8 +4900,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0037",
       "exit_code": 0,
-      "elapsed_s": 0.19325740000931546,
+      "elapsed_s": 0.22821299999486655,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -4532,8 +4913,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0038",
       "exit_code": 0,
-      "elapsed_s": 0.18349720002152026,
+      "elapsed_s": 0.22607000000425614,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -4544,8 +4926,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0039",
       "exit_code": 0,
-      "elapsed_s": 0.18598469998687506,
+      "elapsed_s": 0.22577219997765496,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -4556,8 +4939,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0040",
       "exit_code": 0,
-      "elapsed_s": 0.18907110003056005,
+      "elapsed_s": 0.2211173000105191,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -4568,8 +4952,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0041",
       "exit_code": 0,
-      "elapsed_s": 0.22771629999624565,
+      "elapsed_s": 0.2574949999980163,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -4580,8 +4965,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0042",
       "exit_code": 0,
-      "elapsed_s": 0.22014789999229833,
+      "elapsed_s": 0.25483900000108406,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -4592,8 +4978,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0043",
       "exit_code": 0,
-      "elapsed_s": 0.21283740003127605,
+      "elapsed_s": 0.24880700002540834,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -4604,8 +4991,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0044",
       "exit_code": 0,
-      "elapsed_s": 0.20812719996320084,
+      "elapsed_s": 0.25215439999010414,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -4616,8 +5004,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0045",
       "exit_code": 0,
-      "elapsed_s": 0.21643649996258318,
+      "elapsed_s": 0.25527169997803867,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -4628,8 +5017,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0046",
       "exit_code": 0,
-      "elapsed_s": 0.22389289998682216,
+      "elapsed_s": 0.2501142999972217,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -4640,8 +5030,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0047",
       "exit_code": 0,
-      "elapsed_s": 0.22415179997915402,
+      "elapsed_s": 0.24085770000237972,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -4652,8 +5043,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0048",
       "exit_code": 0,
-      "elapsed_s": 0.21830040001077577,
+      "elapsed_s": 0.24362249998375773,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -4664,8 +5056,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0049",
       "exit_code": 0,
-      "elapsed_s": 0.20902559999376535,
+      "elapsed_s": 0.23728290002327412,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -4676,8 +5069,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0050",
       "exit_code": 0,
-      "elapsed_s": 0.20510409999405965,
+      "elapsed_s": 0.24477350001689047,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -4688,8 +5082,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0051",
       "exit_code": 0,
-      "elapsed_s": 0.216374600015115,
+      "elapsed_s": 0.24768590001622215,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -4700,8 +5095,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0052",
       "exit_code": 0,
-      "elapsed_s": 0.22206499997992069,
+      "elapsed_s": 0.24333550001028925,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -4712,8 +5108,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0053",
       "exit_code": 0,
-      "elapsed_s": 0.22012330003781244,
+      "elapsed_s": 0.2316694000037387,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -4724,8 +5121,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0054",
       "exit_code": 0,
-      "elapsed_s": 0.21454730001278222,
+      "elapsed_s": 0.2352307999972254,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -4736,8 +5134,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0055",
       "exit_code": 0,
-      "elapsed_s": 0.21546189999207854,
+      "elapsed_s": 0.24063850002130494,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -4748,8 +5147,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0056",
       "exit_code": 0,
-      "elapsed_s": 0.2127438999596052,
+      "elapsed_s": 0.23816580002312548,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -4760,8 +5160,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0057",
       "exit_code": 0,
-      "elapsed_s": 0.22163139999611303,
+      "elapsed_s": 0.23663800000213087,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -4772,8 +5173,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0058",
       "exit_code": 0,
-      "elapsed_s": 0.210879499965813,
+      "elapsed_s": 0.23726449999958277,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -4784,8 +5186,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0059",
       "exit_code": 0,
-      "elapsed_s": 0.20883179997326806,
+      "elapsed_s": 0.23831490002339706,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -4796,8 +5199,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0060",
       "exit_code": 0,
-      "elapsed_s": 0.21114100003615022,
+      "elapsed_s": 0.23314460000256076,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -4808,8 +5212,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0061",
       "exit_code": 0,
-      "elapsed_s": 0.18602319998899475,
+      "elapsed_s": 0.20759179999004118,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -4820,8 +5225,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0062",
       "exit_code": 0,
-      "elapsed_s": 0.1874623000039719,
+      "elapsed_s": 0.2103122999833431,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -4832,8 +5238,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0063",
       "exit_code": 0,
-      "elapsed_s": 0.18712409998988733,
+      "elapsed_s": 0.20768449999741279,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -4844,8 +5251,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0064",
       "exit_code": 0,
-      "elapsed_s": 0.1860675999778323,
+      "elapsed_s": 0.2074177000031341,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -4856,8 +5264,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0065",
       "exit_code": 0,
-      "elapsed_s": 0.1947789000114426,
+      "elapsed_s": 0.2107831999892369,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -4868,8 +5277,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0066",
       "exit_code": 0,
-      "elapsed_s": 0.18889369996031746,
+      "elapsed_s": 0.20300439998391084,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -4880,8 +5290,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0067",
       "exit_code": 0,
-      "elapsed_s": 0.1899589000386186,
+      "elapsed_s": 0.20549610001035035,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -4892,8 +5303,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0068",
       "exit_code": 0,
-      "elapsed_s": 0.18765520001761615,
+      "elapsed_s": 0.20569990001968108,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -4904,8 +5316,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0069",
       "exit_code": 0,
-      "elapsed_s": 0.2181113999686204,
+      "elapsed_s": 0.20001800000318326,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -4916,8 +5329,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c04/frame_0070",
       "exit_code": 0,
-      "elapsed_s": 0.22210190002806485,
+      "elapsed_s": 0.19912120001390576,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -4928,8 +5342,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0001",
       "exit_code": 0,
-      "elapsed_s": 0.2321671000099741,
+      "elapsed_s": 0.2209500000171829,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -4940,8 +5355,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0002",
       "exit_code": 0,
-      "elapsed_s": 0.2268212999915704,
+      "elapsed_s": 0.21550500000012107,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -4952,8 +5368,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0003",
       "exit_code": 0,
-      "elapsed_s": 0.1968273000093177,
+      "elapsed_s": 0.21653810000861995,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -4964,8 +5381,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0004",
       "exit_code": 0,
-      "elapsed_s": 0.20498400001088157,
+      "elapsed_s": 0.224286899989238,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -4976,8 +5394,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0005",
       "exit_code": 0,
-      "elapsed_s": 0.20515459997113794,
+      "elapsed_s": 0.23049650000757538,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -4988,8 +5407,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0006",
       "exit_code": 0,
-      "elapsed_s": 0.20023229997605085,
+      "elapsed_s": 0.2273148999956902,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -5000,8 +5420,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0007",
       "exit_code": 0,
-      "elapsed_s": 0.20490790001349524,
+      "elapsed_s": 0.2242520000145305,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -5012,8 +5433,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0008",
       "exit_code": 0,
-      "elapsed_s": 0.19839390000561252,
+      "elapsed_s": 0.22039699999731965,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -5024,8 +5446,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0009",
       "exit_code": 0,
-      "elapsed_s": 0.2042316000442952,
+      "elapsed_s": 0.22596119999070652,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -5036,8 +5459,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0010",
       "exit_code": 0,
-      "elapsed_s": 0.1991725999978371,
+      "elapsed_s": 0.21900419998564757,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -5048,8 +5472,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0011",
       "exit_code": 0,
-      "elapsed_s": 0.20426470000529662,
+      "elapsed_s": 0.22661680000601336,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -5060,8 +5485,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0012",
       "exit_code": 0,
-      "elapsed_s": 0.20474129996728152,
+      "elapsed_s": 0.2254704000079073,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -5072,8 +5498,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0013",
       "exit_code": 0,
-      "elapsed_s": 0.19732209999347106,
+      "elapsed_s": 0.23242989997379482,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -5084,8 +5511,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0014",
       "exit_code": 0,
-      "elapsed_s": 0.21672289998969063,
+      "elapsed_s": 0.2280785999901127,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -5096,8 +5524,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0015",
       "exit_code": 0,
-      "elapsed_s": 0.20153920003212988,
+      "elapsed_s": 0.2308091000013519,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -5108,8 +5537,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0016",
       "exit_code": 0,
-      "elapsed_s": 0.2029762999736704,
+      "elapsed_s": 0.22735109998029657,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -5120,8 +5550,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0017",
       "exit_code": 0,
-      "elapsed_s": 0.199904500041157,
+      "elapsed_s": 0.2371700000076089,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -5132,8 +5563,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0018",
       "exit_code": 0,
-      "elapsed_s": 0.21045349998166785,
+      "elapsed_s": 0.23782480001682416,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -5144,8 +5576,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0019",
       "exit_code": 0,
-      "elapsed_s": 0.20824479998555034,
+      "elapsed_s": 0.2466474999964703,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -5156,8 +5589,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0020",
       "exit_code": 0,
-      "elapsed_s": 0.20106039999518543,
+      "elapsed_s": 0.2437289000081364,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -5168,8 +5602,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0021",
       "exit_code": 0,
-      "elapsed_s": 0.20244859997183084,
+      "elapsed_s": 0.24783949999255128,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -5180,8 +5615,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0022",
       "exit_code": 0,
-      "elapsed_s": 0.21647819998906925,
+      "elapsed_s": 0.2544645000016317,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -5192,8 +5628,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0023",
       "exit_code": 0,
-      "elapsed_s": 0.1990434000035748,
+      "elapsed_s": 0.2278707000077702,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -5204,8 +5641,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0024",
       "exit_code": 0,
-      "elapsed_s": 0.20611000002827495,
+      "elapsed_s": 0.23837239999556914,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -5216,8 +5654,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0025",
       "exit_code": 0,
-      "elapsed_s": 0.1989350999938324,
+      "elapsed_s": 0.24053119999007322,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -5228,8 +5667,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0026",
       "exit_code": 0,
-      "elapsed_s": 0.20263379998505116,
+      "elapsed_s": 0.22736050002276897,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -5240,8 +5680,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0027",
       "exit_code": 0,
-      "elapsed_s": 0.20176069997251034,
+      "elapsed_s": 0.22427320000133477,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -5252,8 +5693,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0028",
       "exit_code": 0,
-      "elapsed_s": 0.2129172999993898,
+      "elapsed_s": 0.23003679999965243,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -5264,8 +5706,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0029",
       "exit_code": 0,
-      "elapsed_s": 0.1989287000033073,
+      "elapsed_s": 0.23374699999112636,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -5276,8 +5719,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0030",
       "exit_code": 0,
-      "elapsed_s": 0.19795920001342893,
+      "elapsed_s": 0.2282734000182245,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -5288,8 +5732,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0031",
       "exit_code": 0,
-      "elapsed_s": 0.20213539997348562,
+      "elapsed_s": 0.22473659997922368,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -5300,8 +5745,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0032",
       "exit_code": 0,
-      "elapsed_s": 0.20076169999083504,
+      "elapsed_s": 0.22209320002002642,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -5312,8 +5758,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0033",
       "exit_code": 0,
-      "elapsed_s": 0.20250330003909767,
+      "elapsed_s": 0.22751170000992715,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -5324,8 +5771,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0034",
       "exit_code": 0,
-      "elapsed_s": 0.206151399994269,
+      "elapsed_s": 0.23600649999571033,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -5336,8 +5784,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0035",
       "exit_code": 0,
-      "elapsed_s": 0.20804260001750663,
+      "elapsed_s": 0.2254780000075698,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -5348,8 +5797,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0036",
       "exit_code": 0,
-      "elapsed_s": 0.20737900002859533,
+      "elapsed_s": 0.2291558000142686,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -5360,8 +5810,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0037",
       "exit_code": 0,
-      "elapsed_s": 0.20275669998954982,
+      "elapsed_s": 0.23269920001621358,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -5372,8 +5823,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0038",
       "exit_code": 0,
-      "elapsed_s": 0.20501259999582544,
+      "elapsed_s": 0.21503069999744184,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -5384,8 +5836,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0039",
       "exit_code": 0,
-      "elapsed_s": 0.23510330001590773,
+      "elapsed_s": 0.21803379998891614,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -5396,8 +5849,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0040",
       "exit_code": 0,
-      "elapsed_s": 0.23518540000077337,
+      "elapsed_s": 0.22370180001598783,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -5408,8 +5862,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0041",
       "exit_code": 0,
-      "elapsed_s": 0.2661120999837294,
+      "elapsed_s": 0.25852709999890067,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -5420,8 +5875,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0042",
       "exit_code": 0,
-      "elapsed_s": 0.25353539997013286,
+      "elapsed_s": 0.25582210000720806,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -5432,8 +5888,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0043",
       "exit_code": 0,
-      "elapsed_s": 0.25145909999264404,
+      "elapsed_s": 0.2545121999864932,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -5444,8 +5901,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0044",
       "exit_code": 0,
-      "elapsed_s": 0.24433780001709238,
+      "elapsed_s": 0.25170380002236925,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -5456,8 +5914,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0045",
       "exit_code": 0,
-      "elapsed_s": 0.25539710000157356,
+      "elapsed_s": 0.2561122000042815,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -5468,8 +5927,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0046",
       "exit_code": 0,
-      "elapsed_s": 0.2489587999880314,
+      "elapsed_s": 0.250085300009232,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -5480,8 +5940,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0047",
       "exit_code": 0,
-      "elapsed_s": 0.2517845000256784,
+      "elapsed_s": 0.2540224000113085,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -5492,8 +5953,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0048",
       "exit_code": 0,
-      "elapsed_s": 0.24985309998737648,
+      "elapsed_s": 0.2504655999946408,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -5504,8 +5966,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0049",
       "exit_code": 0,
-      "elapsed_s": 0.24506280000787228,
+      "elapsed_s": 0.25689310001325794,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -5516,8 +5979,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0050",
       "exit_code": 0,
-      "elapsed_s": 0.24773120001191273,
+      "elapsed_s": 0.25631550000980496,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -5528,8 +5992,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0051",
       "exit_code": 0,
-      "elapsed_s": 0.24852130003273487,
+      "elapsed_s": 0.2551201000169385,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -5540,8 +6005,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0052",
       "exit_code": 0,
-      "elapsed_s": 0.2563501000404358,
+      "elapsed_s": 0.253520899976138,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -5552,8 +6018,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0053",
       "exit_code": 0,
-      "elapsed_s": 0.24871409998741,
+      "elapsed_s": 0.26040139998076484,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -5564,8 +6031,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0054",
       "exit_code": 0,
-      "elapsed_s": 0.25229079998098314,
+      "elapsed_s": 0.2583005000196863,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -5576,8 +6044,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0055",
       "exit_code": 0,
-      "elapsed_s": 0.25404500000877306,
+      "elapsed_s": 0.2646227999939583,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -5588,8 +6057,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0056",
       "exit_code": 0,
-      "elapsed_s": 0.2492696000263095,
+      "elapsed_s": 0.26071459997911006,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -5600,8 +6070,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0057",
       "exit_code": 0,
-      "elapsed_s": 0.2379912000033073,
+      "elapsed_s": 0.2723008999892045,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -5612,8 +6083,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0058",
       "exit_code": 0,
-      "elapsed_s": 0.24684380000689998,
+      "elapsed_s": 0.3146019999985583,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -5624,8 +6096,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0059",
       "exit_code": 0,
-      "elapsed_s": 0.2575554000213742,
+      "elapsed_s": 0.2672003999759909,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -5636,8 +6109,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0060",
       "exit_code": 0,
-      "elapsed_s": 0.24601870001060888,
+      "elapsed_s": 0.2672438999870792,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "virtual",
@@ -5648,8 +6122,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0061",
       "exit_code": 0,
-      "elapsed_s": 0.20385380001971498,
+      "elapsed_s": 0.22188540000934154,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -5660,8 +6135,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0062",
       "exit_code": 0,
-      "elapsed_s": 0.2135996999568306,
+      "elapsed_s": 0.22279649999109097,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -5672,8 +6148,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0063",
       "exit_code": 0,
-      "elapsed_s": 0.20041589997708797,
+      "elapsed_s": 0.22463459998834878,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -5684,8 +6161,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0064",
       "exit_code": 0,
-      "elapsed_s": 0.2064941999851726,
+      "elapsed_s": 0.2211525999882724,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -5696,8 +6174,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0065",
       "exit_code": 0,
-      "elapsed_s": 0.20898989995475858,
+      "elapsed_s": 0.22453710000263527,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -5708,8 +6187,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0066",
       "exit_code": 0,
-      "elapsed_s": 0.2061301000067033,
+      "elapsed_s": 0.2252110000117682,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -5720,8 +6200,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0067",
       "exit_code": 0,
-      "elapsed_s": 0.20362579997163266,
+      "elapsed_s": 0.22718389998772182,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -5732,8 +6213,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0068",
       "exit_code": 0,
-      "elapsed_s": 0.22857070004101843,
+      "elapsed_s": 0.2256430000124965,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -5744,8 +6226,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0069",
       "exit_code": 0,
-      "elapsed_s": 0.20373629999812692,
+      "elapsed_s": 0.23046310001518577,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",
@@ -5756,8 +6239,9 @@
     {
       "case_id": "metadata_triclinic_oblique_holdout_c06/frame_0070",
       "exit_code": 0,
-      "elapsed_s": 0.21243869996396825,
+      "elapsed_s": 0.2286733000073582,
       "coordinate_hash_matches": true,
+      "coordinates_match": true,
       "field_mismatches": {},
       "route": {
         "expected": "component_graph",

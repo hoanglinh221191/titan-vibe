@@ -167,8 +167,13 @@ void PbctopoFrameSolver::compute_candidate_certification(CandidateCertificationW
     return;
   }
   work.assignment_valid = true;
+  // A worker reads the cache only if the frame's thread built it before.
+  const titan_pbctopo::PbctopoEdgeImageCache *edge_cache =
+      on_worker ? (edge_image_cache.has_value() ? &*edge_image_cache : nullptr)
+                : ensure_edge_image_cache();
   work.image_equations = evaluate_pbctopo_image_equations(
-      base_atoms, points, local_edges, (*certification_lattice));
+      base_atoms, points, local_edges, (*certification_lattice), 1.0e-6,
+      edge_cache);
   work.certification_lattice_delta =
       titan_pbctopo::pbctopo_lattice_query_audit_delta(
           lattice_before, titan_pbctopo::pbctopo_lattice_query_audit());

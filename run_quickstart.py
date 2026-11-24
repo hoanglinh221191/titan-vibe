@@ -11,11 +11,22 @@ digit, while a molecule written at another lattice image moves by a cell length.
 import argparse
 import csv
 import json
+import os
 import shutil
 import subprocess
 import sys
 import time
 from pathlib import Path
+
+
+def default_binary():
+    """titan-vibe.exe in this package on Windows; source/titan-vibe (the Linux build) elsewhere."""
+    root = Path(__file__).resolve().parent
+    names = ['titan-vibe.exe'] if os.name == 'nt' else ['titan-vibe']
+    candidates = [root / n for n in names] + [root / 'source' / n for n in names]
+    if os.name != 'nt':
+        candidates.reverse()
+    return next((c for c in candidates if c.is_file()), candidates[0])
 
 
 def read_models(pdb):
@@ -44,7 +55,8 @@ def centroids(model, ranges):
 def main():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--output", required=True, type=Path, help="New directory; an existing one is refused")
-    p.add_argument("--binary", type=Path, default=Path(__file__).resolve().parent / "titan.exe")
+    p.add_argument("--binary", type=Path, default=default_binary(),
+                   help="Default: titan-vibe.exe (Windows) or source/titan-vibe (Linux) in this package")
     p.add_argument("--tolerance", type=float, default=0.01, help="Centroid tolerance in Angstrom")
     a = p.parse_args()
     root = Path(__file__).resolve().parent

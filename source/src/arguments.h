@@ -1333,6 +1333,9 @@ public:
   // Short VIBE reference: the options a reconstruction needs and the labels
   // of the frame report (-vibe-help).
   static void vibe_help_print();
+  // Short HoloLift reference: one run from a trajectory to HoloLift
+  // coordinates, the output files and how to read them (-hololift-help).
+  static void hololift_help_print();
   void set_number_of_files(size_t num) { number_of_files = num; }
   void setPdbname(string name) { pdb_name = name; }
   string get_pdbOutput() const;

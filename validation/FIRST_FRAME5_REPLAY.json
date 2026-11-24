@@ -1,12 +1,12 @@
 {
-  "binary_sha256": "85101deb864d288911204c3ec6903e018a76d051e249546c17f1fa33186b8918",
+  "binary_sha256": "5d9540eef4442b7bad98fbb1f59fc3c123e45166b702bf6b7af057e2e0cf1ec6",
   "all_frames_requested": false,
   "all_pass": true,
   "systems_completed": 5,
   "results": {
     "S1_tetramer/A": {
       "exit_code": 0,
-      "elapsed_s": 0.711309699981939,
+      "elapsed_s": 0.8568554999947082,
       "atom_records": 25504,
       "coordinates_identical_at_PDB_precision": true,
       "frames": 1,
@@ -19,7 +19,7 @@
     },
     "S2_hexamer/A": {
       "exit_code": 0,
-      "elapsed_s": 1.2949310999829322,
+      "elapsed_s": 1.9297628000203986,
       "atom_records": 38252,
       "coordinates_identical_at_PDB_precision": true,
       "frames": 1,
@@ -32,7 +32,7 @@
     },
     "S3_protein_glycan/A": {
       "exit_code": 0,
-      "elapsed_s": 0.8711133999750018,
+      "elapsed_s": 0.8381737999734469,
       "atom_records": 14393,
       "coordinates_identical_at_PDB_precision": true,
       "frames": 1,
@@ -45,7 +45,7 @@
     },
     "S4_peptide_pair/A": {
       "exit_code": 0,
-      "elapsed_s": 0.18334450002294034,
+      "elapsed_s": 0.31069539999589324,
       "atom_records": 1254,
       "coordinates_identical_at_PDB_precision": true,
       "frames": 1,
@@ -61,7 +61,7 @@
     },
     "S5_phase_separated/A": {
       "exit_code": 0,
-      "elapsed_s": 2.195202100032475,
+      "elapsed_s": 3.6129705000203103,
       "atom_records": 10624,
       "coordinates_identical_at_PDB_precision": true,
       "frames": 1,

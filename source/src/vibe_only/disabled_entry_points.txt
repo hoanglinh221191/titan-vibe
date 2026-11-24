@@ -1,0 +1,65 @@
+# TITAN-VIBE (VIBE_ONLY=1): entry points of left-out modules that the engine
+# calls on every run, whatever the options. In absent_entry_points.cpp each of
+# them does nothing and returns a value-initialized result (false, 0, an empty
+# object), which is what the module does when its options are off. Every other
+# entry point there stops the program (see absent.h).
+#
+# One qualified name per line, as titan_vibe_only::absent() names it. After
+# changing this file, rerun tools/vibe_only/generate_absent_entry_points.py
+# with --append (no clang run is needed when the link reports nothing new).
+
+# Run setup (engine/run_setup.cpp): every analysis object is configured from
+# its options, which TITAN-VIBE refuses, so each stays disabled (enabled_{false}).
+TitanDSSPAnalyzer::configure
+TitanDSSPAnalyzer::configure_segments
+TitanHBondKineticsAnalyzer::configure
+TitanLJAnalyzer::configure
+TitanSqAnalyzer::configure
+TitanContactMapAnalyzer::configure
+TitanInterfaceAnalyzer::configure
+TitanDihedralAnalyzer::configure
+TitanQNativeAnalyzer::configure
+TitanMSDAnalyzer::configure
+TitanMembraneAnalyzer::configure
+TitanS2Analyzer::configure
+TitanRgAnalyzer::configure
+TitanRMSAnalyzer::configure
+
+# Trajectory setup and end (engine/trajectory_open.cpp, trajectory_prepare.cpp,
+# trajectory_finish.cpp). DSSP supports no molecule type here. The dense pair
+# cache holds pair energies, and the nucleic-acid profiler reports per-base
+# energies: TITAN-VIBE computes no energies, so neither is allocated.
+WaterAnalyzer::reset_trajectory_state
+cache_sigma_epsilon::set_size
+NucleicProfiler::initialize_if_needed
+TitanDSSPAnalyzer::supports_moltype
+TitanDSSPAnalyzer::compatible_backbone_residue_count
+TitanDSSPAnalyzer::finalize_trajectory
+end_cscd_trajectory
+
+# End of run (engine/run_finish.cpp): the energy tables and the post-processing
+# stages, each of which returns at once when its analysis is off.
+out
+folders::out_to_folders
+impl_entropy_duan_zhang
+print_cscd
+stat_hbonds
+run_gbsa_postproc
+run_dssp_postproc
+run_tica_msm_postproc
+run_dham_postproc
+run_mbar_postproc
+resolve_postproc_equilibrium_weights
+run_msm_equilibrium_postproc
+run_tpt_postproc
+run_validation_postproc
+run_tica_fes_postproc
+run_umap_postproc
+run_llps_postproc
+run_dccm_pca_postproc
+run_mbar_projection_exports_postproc
+run_awh_exploratory_postproc
+run_lspmd_postproc
+titan_sparse_graph_module::TitanUnifiedGraphRuntime::configure
+titan_sparse_graph_module::TitanUnifiedGraphRuntime::export_all
+titan_uncertainty::export_uncertainty_outputs

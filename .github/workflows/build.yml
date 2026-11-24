@@ -1,7 +1,7 @@
-name: build-host-and-replay
+name: build-and-replay
 
-# Builds the TITAN host under source/ with the toolchain of the release and runs the package checks
-# with the rebuilt executable. Started by hand (Actions > build-host-and-replay > Run workflow).
+# Builds titan-vibe from source/ on Windows (MSYS2 Clang) and on Linux (GCC 13) and runs the package
+# checks with the rebuilt executable. Started by hand (Actions > build-and-replay > Run workflow).
 on:
   workflow_dispatch:
 
@@ -21,11 +21,11 @@ jobs:
             mingw-w64-ucrt-x86_64-lld
             mingw-w64-ucrt-x86_64-openmp
             mingw-w64-ucrt-x86_64-python
-      - name: Build the host (portable profile)
+      - name: Build titan-vibe (portable profile)
         shell: msys2 {0}
         run: |
-          make -C source PROFILE=portable -j 4 all
-          ./source/titan.exe --version
+          make -C source -j 4 all
+          ./source/titan-vibe.exe --version
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -36,9 +36,26 @@ jobs:
         shell: pwsh
         run: |
           $env:Path = "C:\msys64\ucrt64\bin;$env:Path"
-          python ./run_quickstart.py --binary ./source/titan.exe --output ./ci_quickstart
+          python ./run_quickstart.py --binary ./source/titan-vibe.exe --output ./ci_quickstart
       - name: Held-out smoke replay with the rebuilt executable
         shell: pwsh
         run: |
           $env:Path = "C:\msys64\ucrt64\bin;$env:Path"
-          python ./replay.py --binary ./source/titan.exe --output ./ci_smoke
+          python ./replay.py --binary ./source/titan-vibe.exe --output ./ci_smoke
+
+  linux:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build titan-vibe (GCC 13, static)
+        run: |
+          sudo apt-get update && sudo apt-get install -y g++-13 make python3
+          make -C source CXX=g++-13 LDFLAGS="-static -fopenmp" -j 4 all
+          ./source/titan-vibe --version
+      - name: Package checksums
+        run: python3 ./verify_package.py
+      - name: Quick-start examples
+        run: python3 ./run_quickstart.py --output ./ci_quickstart
+      - name: Held-out smoke replay (coordinates within 0.001 A)
+        run: python3 ./replay.py --coordinate-tolerance 0.001 --output ./ci_smoke

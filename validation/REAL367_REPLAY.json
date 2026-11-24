@@ -1,12 +1,12 @@
 {
-  "binary_sha256": "85101deb864d288911204c3ec6903e018a76d051e249546c17f1fa33186b8918",
+  "binary_sha256": "5d9540eef4442b7bad98fbb1f59fc3c123e45166b702bf6b7af057e2e0cf1ec6",
   "all_frames_requested": true,
   "all_pass": true,
   "systems_completed": 7,
   "results": {
     "S1_tetramer/A": {
       "exit_code": 0,
-      "elapsed_s": 45.126569300016854,
+      "elapsed_s": 28.237577699997928,
       "atom_records": 2575904,
       "coordinates_identical_at_PDB_precision": true,
       "frames": 101,
@@ -23,7 +23,7 @@
     },
     "S1_tetramer/t116400": {
       "exit_code": 0,
-      "elapsed_s": 0.6733853000332601,
+      "elapsed_s": 0.9424866999906953,
       "atom_records": 25504,
       "coordinates_identical_at_PDB_precision": true,
       "frames": 1,
@@ -36,7 +36,7 @@
     },
     "S2_hexamer/A": {
       "exit_code": 0,
-      "elapsed_s": 81.242887099972,
+      "elapsed_s": 63.964073100010864,
       "atom_records": 3863452,
       "coordinates_identical_at_PDB_precision": true,
       "frames": 101,
@@ -49,7 +49,7 @@
     },
     "S3_protein_glycan/A": {
       "exit_code": 0,
-      "elapsed_s": 76.97580549999839,
+      "elapsed_s": 53.194942499976605,
       "atom_records": 1453693,
       "coordinates_identical_at_PDB_precision": true,
       "frames": 101,
@@ -62,7 +62,7 @@
     },
     "S3_protein_glycan/t112000": {
       "exit_code": 0,
-      "elapsed_s": 0.8421181999729015,
+      "elapsed_s": 1.3309812000079546,
       "atom_records": 14393,
       "coordinates_identical_at_PDB_precision": true,
       "frames": 1,
@@ -75,7 +75,7 @@
     },
     "S4_peptide_pair/A": {
       "exit_code": 0,
-      "elapsed_s": 1.95413779997034,
+      "elapsed_s": 3.6309377000143286,
       "atom_records": 38874,
       "coordinates_identical_at_PDB_precision": true,
       "frames": 31,
@@ -91,7 +91,7 @@
     },
     "S5_phase_separated/A": {
       "exit_code": 0,
-      "elapsed_s": 4.025487700011581,
+      "elapsed_s": 5.261405099998228,
       "atom_records": 329344,
       "coordinates_identical_at_PDB_precision": true,
       "frames": 31,

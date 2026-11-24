@@ -5,6 +5,7 @@
 #include "../titan_simd_dispatch.h"
 
 #include <algorithm>
+#include <array>
 #include <bit>
 #include <cmath>
 #include <cstdint>
@@ -126,13 +127,67 @@ void append_winding_basis(PbctopoImageEquationResiduals &result,
       residual;
 }
 
+bool edge_needs_nearest_image(const PbctopoLocalEdge &edge,
+                              std::size_t atom_count) noexcept {
+  const bool hard = edge.kind == PbctopoLocalEdgeKind::TopologyBond ||
+                    edge.kind == PbctopoLocalEdgeKind::MetadataSkeleton;
+  return hard && edge.a < atom_count && edge.b < atom_count && edge.a != edge.b;
+}
+
+// A cached nearest image, with the audit the query records
+// (record_lattice_query in lattice_math.cpp).
+PbctopoNearestImage replay_cached_nearest_image(
+    const PbctopoNearestImage &cached) noexcept {
+  PbctopoLatticeQueryAudit audit;
+  audit.queries = 1;
+  audit.failures = cached.valid ? 0 : 1;
+  audit.ambiguous = cached.ambiguous ? 1 : 0;
+  audit.enumeration_budget_failures = cached.node_budget_exhausted ? 1 : 0;
+  pbctopo_add_lattice_query_audit(audit);
+  return cached;
+}
+
 } // namespace
+
+PbctopoEdgeImageCache build_pbctopo_edge_image_cache(
+    std::span<const PbctopoAtom> wrapped_atoms,
+    std::span<const PbctopoLocalEdge> local_edges,
+    const PbctopoLatticeMetric &lattice) {
+  PbctopoEdgeImageCache cache;
+  cache.atoms = wrapped_atoms.data();
+  cache.atom_count = wrapped_atoms.size();
+  cache.edges = local_edges.data();
+  cache.edge_count = local_edges.size();
+  cache.lattice = &lattice;
+  cache.nearest.resize(local_edges.size());
+  cache.filled.assign(local_edges.size(), 0);
+  // The queries below are bookkeeping of the cache, not queries of the
+  // certification: restore the thread's audit afterwards.
+  const PbctopoLatticeQueryAudit audit_before = pbctopo_lattice_query_audit();
+  for (std::size_t index = 0; index < local_edges.size(); ++index) {
+    const auto &edge = local_edges[index];
+    if (!edge_needs_nearest_image(edge, wrapped_atoms.size()))
+      continue;
+    const auto &a = wrapped_atoms[edge.a];
+    const auto &b = wrapped_atoms[edge.b];
+    cache.nearest[index] =
+        lattice.nearest_image_scaled(b.sx - a.sx, b.sy - a.sy, b.sz - a.sz);
+    cache.filled[index] = 1;
+  }
+  pbctopo_reset_lattice_query_audit();
+  pbctopo_add_lattice_query_audit(audit_before);
+  return cache;
+}
 
 PbctopoImageEquationResiduals evaluate_pbctopo_image_equations(
     std::span<const PbctopoAtom> wrapped_atoms,
     std::span<const Vec3> placed_points,
     std::span<const PbctopoLocalEdge> local_edges,
-    const PbctopoLatticeMetric &lattice, double image_tolerance) {
+    const PbctopoLatticeMetric &lattice, double image_tolerance,
+    const PbctopoEdgeImageCache *edge_image_cache) {
+  const bool use_cache =
+      edge_image_cache != nullptr &&
+      edge_image_cache->matches(wrapped_atoms, local_edges, lattice);
   PbctopoImageEquationResiduals result;
   if (wrapped_atoms.empty() || placed_points.size() != wrapped_atoms.size() ||
       !std::isfinite(image_tolerance) || image_tolerance <= 0.0) {
@@ -184,7 +239,9 @@ PbctopoImageEquationResiduals evaluate_pbctopo_image_equations(
   };
   std::vector<ExpectedHardEdge> expected_hard_edges;
   expected_hard_edges.reserve(local_edges.size());
-  for (const auto &edge : local_edges) {
+  for (std::size_t edge_index = 0; edge_index < local_edges.size();
+       ++edge_index) {
+    const auto &edge = local_edges[edge_index];
     const bool topology = edge.kind == PbctopoLocalEdgeKind::TopologyBond;
     const bool metadata = edge.kind == PbctopoLocalEdgeKind::MetadataSkeleton;
     if (!topology && !metadata)
@@ -207,8 +264,11 @@ PbctopoImageEquationResiduals evaluate_pbctopo_image_equations(
     }
     const auto &a = wrapped_atoms[edge.a];
     const auto &b = wrapped_atoms[edge.b];
-    const auto nearest = lattice.nearest_image_scaled(
-        b.sx - a.sx, b.sy - a.sy, b.sz - a.sz);
+    const PbctopoNearestImage nearest =
+        use_cache && edge_image_cache->filled[edge_index] != 0
+            ? replay_cached_nearest_image(edge_image_cache->nearest[edge_index])
+            : lattice.nearest_image_scaled(b.sx - a.sx, b.sy - a.sy,
+                                           b.sz - a.sz);
     if (!nearest.valid) {
       add_image_residual();
       continue;
@@ -461,18 +521,31 @@ struct StericDenseGrid {
   }
 
   // False when the cells span too large a grid (or the indices do not fit
-  // the 32-bit lanes); the caller then sorts the cells instead.
+  // the 32-bit lanes); the caller then sorts the cells instead.  With a
+  // non-empty include mask only the atoms it marks enter the grid.
   bool build(const std::vector<PbctopoStericCellKey> &cells,
              std::span<const std::size_t> atom_component_index,
-             std::span<const PbctopoAtom> atoms) {
-    const std::size_t n = cells.size();
-    if (n == 0 || atoms.size() >= static_cast<std::size_t>(
-                                      std::numeric_limits<std::int32_t>::max()))
+             std::span<const PbctopoAtom> atoms,
+             std::span<const unsigned char> include = {}) {
+    const auto included = [&](std::size_t i) {
+      return include.empty() || include[i] != 0;
+    };
+    std::size_t first = 0;
+    while (first < cells.size() && !included(first))
+      ++first;
+    if (first == cells.size() ||
+        atoms.size() >= static_cast<std::size_t>(
+                            std::numeric_limits<std::int32_t>::max()))
       return false;
-    min_x = max_x = cells[0].x;
-    min_y = max_y = cells[0].y;
-    min_z = max_z = cells[0].z;
-    for (const auto &cell : cells) {
+    min_x = max_x = cells[first].x;
+    min_y = max_y = cells[first].y;
+    min_z = max_z = cells[first].z;
+    std::size_t n = 0;
+    for (std::size_t i = first; i < cells.size(); ++i) {
+      if (!included(i))
+        continue;
+      ++n;
+      const auto &cell = cells[i];
       min_x = std::min(min_x, cell.x);
       max_x = std::max(max_x, cell.x);
       min_y = std::min(min_y, cell.y);
@@ -497,15 +570,19 @@ struct StericDenseGrid {
     const std::uint64_t cells_total = nx * ny * nz;
 
     cell_begin.assign(cells_total + 1, 0);
-    for (const auto &cell : cells)
-      ++cell_begin[linear(cell.x, cell.y, cell.z) + 1];
+    for (std::size_t i = first; i < cells.size(); ++i) {
+      if (included(i))
+        ++cell_begin[linear(cells[i].x, cells[i].y, cells[i].z) + 1];
+    }
     for (std::uint64_t i = 0; i < cells_total; ++i)
       cell_begin[i + 1] += cell_begin[i];
     cursor.assign(cell_begin.begin(), cell_begin.end() - 1);
     atom.resize(n + kPad);
     component.resize(n + kPad);
     metadata.resize(n + kPad);
-    for (std::size_t i = 0; i < n; ++i) {
+    for (std::size_t i = first; i < cells.size(); ++i) {
+      if (!included(i))
+        continue;
       const std::uint32_t position =
           cursor[linear(cells[i].x, cells[i].y, cells[i].z)]++;
       atom[position] = static_cast<std::int32_t>(i);
@@ -595,7 +672,8 @@ bool scan_steric_dense_grid(const StericDenseGrid &grid,
                             std::span<const std::size_t> atom_component_index,
                             std::span<const PbctopoAtom> atoms,
                             const PbctopoLatticeMetric *wrapped_lattice,
-                            bool metadata_internal_only, Visit &visit_pair) {
+                            bool metadata_internal_only, Visit &visit_pair,
+                            std::span<const unsigned char> include) {
   const bool lattice_valid =
       wrapped_lattice != nullptr && wrapped_lattice->valid();
 #if TITAN_SIMD_X86
@@ -604,6 +682,8 @@ bool scan_steric_dense_grid(const StericDenseGrid &grid,
   thread_local std::vector<std::uint32_t> kept;
   kept.resize(cells.size());
   for (std::size_t atom_idx = 0; atom_idx < cells.size(); ++atom_idx) {
+    if (!include.empty() && include[atom_idx] == 0)
+      continue;
     const bool cross = !metadata_internal_only;
     const bool internal = lattice_valid &&
                           !atoms[atom_idx].has_topology_graph &&
@@ -658,7 +738,8 @@ bool scan_steric_dense_grid(const StericDenseGrid &grid,
 // contiguous run, found by one binary search, in z order and index order.
 template <class Visit>
 bool scan_steric_sorted_cells(const std::vector<PbctopoStericCellKey> &cells,
-                              Visit &visit_pair) {
+                              Visit &visit_pair,
+                              std::span<const unsigned char> include) {
   struct CellEntry {
     std::int64_t x;
     std::int64_t y;
@@ -678,12 +759,16 @@ bool scan_steric_sorted_cells(const std::vector<PbctopoStericCellKey> &cells,
   sorted_cells.clear();
   sorted_cells.reserve(cells.size());
   for (std::size_t atom_idx = 0; atom_idx < cells.size(); ++atom_idx) {
+    if (!include.empty() && include[atom_idx] == 0)
+      continue;
     const PbctopoStericCellKey &cell = cells[atom_idx];
     sorted_cells.push_back({cell.x, cell.y, cell.z, atom_idx});
   }
   std::sort(sorted_cells.begin(), sorted_cells.end(), entry_less);
 
   for (std::size_t atom_idx = 0; atom_idx < cells.size(); ++atom_idx) {
+    if (!include.empty() && include[atom_idx] == 0)
+      continue;
     const std::int64_t cx = cells[atom_idx].x;
     const std::int64_t cy = cells[atom_idx].y;
     const std::int64_t cz = cells[atom_idx].z;
@@ -705,6 +790,85 @@ bool scan_steric_sorted_cells(const std::vector<PbctopoStericCellKey> &cells,
     }
   }
   return true;
+}
+
+// The atoms the steric scan can meet at all.  For an atom the scan visits the
+// earlier atoms of the 27 cells around it, and a visited pair does anything
+// only between atoms of different components (unless only metadata-internal
+// pairs are scanned) or between two atoms that can form a metadata-internal
+// pair.  An atom is therefore kept when it can form a metadata-internal pair
+// (a topology key without a topology graph), or when the cell box of another
+// component reaches one of its 27 cells.  Both atoms of every pair that does
+// anything are kept, and the scan visits the kept atoms in the same order, so
+// leaving the others out changes neither the result nor the counters; a
+// placement whose components lie apart leaves no atom to scan.  Returns the
+// number of atoms kept, or SIZE_MAX (scan all) for more than 64 components.
+std::size_t steric_scan_inclusion(
+    const std::vector<PbctopoStericCellKey> &cells,
+    std::span<const std::size_t> atom_component_index,
+    std::span<const PbctopoAtom> atoms, bool metadata_internal_only,
+    std::vector<unsigned char> &include) {
+  constexpr std::size_t kMaxComponents = 64;
+  struct ComponentCells {
+    std::size_t component = 0;
+    std::int64_t min_x = 0, max_x = 0, min_y = 0, max_y = 0, min_z = 0,
+                 max_z = 0;
+  };
+  std::array<ComponentCells, kMaxComponents> boxes;
+  std::size_t box_count = 0;
+  std::size_t last = 0;
+  thread_local std::vector<std::uint8_t> slot_of_atom;
+  slot_of_atom.resize(cells.size());
+  for (std::size_t i = 0; i < cells.size(); ++i) {
+    const std::size_t component = atom_component_index[i];
+    std::size_t slot = box_count;
+    if (box_count > 0 && boxes[last].component == component) {
+      slot = last;
+    } else {
+      for (std::size_t s = 0; s < box_count; ++s) {
+        if (boxes[s].component == component) {
+          slot = s;
+          break;
+        }
+      }
+    }
+    const PbctopoStericCellKey &cell = cells[i];
+    if (slot == box_count) {
+      if (box_count == kMaxComponents)
+        return std::numeric_limits<std::size_t>::max();
+      boxes[box_count++] = {component, cell.x, cell.x, cell.y,
+                            cell.y,    cell.z, cell.z};
+    } else {
+      ComponentCells &box = boxes[slot];
+      box.min_x = std::min(box.min_x, cell.x);
+      box.max_x = std::max(box.max_x, cell.x);
+      box.min_y = std::min(box.min_y, cell.y);
+      box.max_y = std::max(box.max_y, cell.y);
+      box.min_z = std::min(box.min_z, cell.z);
+      box.max_z = std::max(box.max_z, cell.z);
+    }
+    slot_of_atom[i] = static_cast<std::uint8_t>(slot);
+    last = slot;
+  }
+  include.assign(cells.size(), 0);
+  std::size_t kept = 0;
+  for (std::size_t i = 0; i < cells.size(); ++i) {
+    bool keep = !atoms[i].has_topology_graph && atoms[i].has_topology_key;
+    if (!keep && !metadata_internal_only) {
+      const PbctopoStericCellKey &cell = cells[i];
+      for (std::size_t s = 0; s < box_count && !keep; ++s) {
+        if (s == slot_of_atom[i])
+          continue;
+        const ComponentCells &box = boxes[s];
+        keep = box.min_x <= cell.x + 1 && box.max_x >= cell.x - 1 &&
+               box.min_y <= cell.y + 1 && box.max_y >= cell.y - 1 &&
+               box.min_z <= cell.z + 1 && box.max_z >= cell.z - 1;
+      }
+    }
+    include[i] = keep ? 1 : 0;
+    kept += keep ? 1 : 0;
+  }
+  return kept;
 }
 
 PbctopoStericAudit evaluate_pbctopo_sterics_impl(
@@ -888,13 +1052,25 @@ PbctopoStericAudit evaluate_pbctopo_sterics_impl(
   }
   const std::size_t scanned_atoms = atom_cells.size();
 
-  StericDenseGrid &grid = steric_dense_grid();
-  const bool completed =
-      grid.build(atom_cells, atom_component_index, atoms)
-          ? scan_steric_dense_grid(grid, atom_cells, atom_component_index,
-                                   atoms, wrapped_lattice,
-                                   metadata_internal_only, visit_pair)
-          : scan_steric_sorted_cells(atom_cells, visit_pair);
+  thread_local std::vector<unsigned char> include;
+  const std::size_t kept_atoms =
+      steric_scan_inclusion(atom_cells, atom_component_index, atoms,
+                            metadata_internal_only, include);
+  const std::span<const unsigned char> include_span =
+      kept_atoms == std::numeric_limits<std::size_t>::max()
+          ? std::span<const unsigned char>{}
+          : std::span<const unsigned char>(include);
+  bool completed = true;
+  if (kept_atoms != 0) {
+    StericDenseGrid &grid = steric_dense_grid();
+    completed =
+        grid.build(atom_cells, atom_component_index, atoms, include_span)
+            ? scan_steric_dense_grid(grid, atom_cells, atom_component_index,
+                                     atoms, wrapped_lattice,
+                                     metadata_internal_only, visit_pair,
+                                     include_span)
+            : scan_steric_sorted_cells(atom_cells, visit_pair, include_span);
+  }
   if (!completed || scanned_atoms < atoms.size())
     return result;
   result.decision_complete = true;

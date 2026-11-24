@@ -1,0 +1,28 @@
+== make command (static, records below)
+make -C source CXX=g++-13 LDFLAGS="-static -fopenmp" -j 8 all
+== compiler
+g++-13 (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+== system
+Linux 6.6.87.2-microsoft-standard-WSL2 x86_64
+PRETTY_NAME="Ubuntu 24.04.1 LTS"
+== file
+static/titan-vibe: ELF 64-bit LSB executable, x86-64, version 1 (GNU/Linux), statically linked, BuildID[sha1]=5d8f5c51ef0d4540e2dbda040d8d37042eda0f71, for GNU/Linux 3.2.0, not stripped
+== size
+9606768
+== sha256
+c313c6d4d04392c4a2aae8279e6aa60964a091300346ee632ae75bf959bb7dfd
+== --version
+TITAN-VIBE (VIBE-only build of TITAN 0.2.0-dev.467+g994ffa0ad9cd.dirty)
+Version: 0.2.0
+Build number: 467
+Commit: 994ffa0ad9cd (dirty)
+Profile: portable
+Compiler: GCC 13.3.0
+Target: linux-x86_64
+Source date: 2026-11-24T02:56:04Z
+== default build (make -C source -j 8 all)
+default/titan-vibe: ELF 64-bit LSB pie executable, x86-64, version 1 (GNU/Linux), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, BuildID[sha1]=ca9c29e1d6590fa630c83aadf49babfc5d971ead, for GNU/Linux 3.2.0, not stripped
+	linux-vdso.so.1
+	libm.so.6 => /lib/x86_64-linux-gnu/libm.so.6
+	libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6
+	/lib64/ld-linux-x86-64.so.2

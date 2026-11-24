@@ -220,6 +220,9 @@ public:
   void require_complete_eobs(const PbctopoAnchorGraphContext &context,
                              const char *scope);
   void ensure_component_context();
+  // The frame's edge nearest images (certification.h), built once on the
+  // frame's thread; workers only read it, and use it only once it is built.
+  const titan_pbctopo::PbctopoEdgeImageCache *ensure_edge_image_cache();
   vector<Int3> extract_offsets_and_time(const vector<PbctopoAtom> &source_atoms,
                                         const vector<Vec3> &points);
   bool component_certificate_domain_complete();
@@ -438,6 +441,7 @@ public:
   int component_context_shell_radius{};
   bool component_context_ready{};
   optional<PbctopoLatticeMetric> certification_lattice;
+  optional<titan_pbctopo::PbctopoEdgeImageCache> edge_image_cache;
   int component_certificate_domain_complete_cache{};
   size_t report_soft_valid_candidates{};
   size_t report_nonclashing_candidates{};

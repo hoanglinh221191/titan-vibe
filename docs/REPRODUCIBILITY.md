@@ -1,26 +1,28 @@
-# Reproducibility record for 1.1.0
+# Reproducibility record for 1.2.0
 
-The executable and the host source under `source/` come from TITAN commit
-`dcb2bb5ffbcc9cf27d843a55f53d31f765b01794`. The excluded HoloLift paths are listed in
-`source/SOURCE_PROVENANCE.json`. The executable hash and the imported DLLs are
-recorded in `SOURCE_AUDIT.json`.
+The executable and the source under `source/` come from TITAN commit
+`994ffa0ad9cd69488643ec8a1313e816ff4ef862`. `source/SOURCE_PROVENANCE.json` records how the VIBE-only source
+tree was exported; every exported file equals the file of that commit, apart
+from line endings and the pinned build metadata in `source/Makefile`. The
+executable hash and the imported DLLs are recorded in `SOURCE_AUDIT.json`.
 
-The embedded host version is `0.2.0-dev.450+gdcb2bb5ffbcc.dirty`. Its suffix records the
-HoloLift-excluded export and the pinned metadata. The TITAN-VIBE distribution
-version 1.1.0 does not relabel that identity.
+The embedded TITAN version is `0.2.0-dev.467+g994ffa0ad9cd.dirty`. Its suffix records the
+source export and the pinned metadata. The TITAN-VIBE distribution version
+1.2.0 does not relabel that identity.
 
-This is the executable for the VIBE calculations of the revised methods
-article. `validation/` records the checks shipped with the package:
+`validation/` records the checks shipped with the package:
 - `QUICKSTART_RESULT.txt`: the quick-start examples against their
   `EXPECTED.json`.
-- `HELDOUT480_REPLAY.json`: the 480 held-out inputs against the references of
-  this release.
+- `HELDOUT480_REPLAY.json`: the 480 held-out inputs against the references
+  (byte-identical PDBs and equal report fields).
 - `REAL367_REPLAY.json` and `FIRST_FRAME5_REPLAY.json`: the five molecular frame
   sets, compared with the deposited coordinates and with the report fields of
-  this release.
+  `validation/REAL367_FIELDS_v1.1.0.csv`.
+- `LINUX_*`: the same checks for a static Linux build of `source/` with GCC
+  13.3.0 (`LINUX_BUILD.txt`); the held-out replay ran with
+  `--coordinate-tolerance 0.001`.
 
-The changes relative to 1.0.3 are counted in `SOURCE_AUDIT.json`. The original
-held-out endpoint table is kept in
+The original held-out endpoint table is kept in
 `examples/heldout480/ARCHIVED_CASE_ENDPOINTS.csv`.
 
 The designed-case oracle, the MDVWhole and GROMACS comparisons, and the timing

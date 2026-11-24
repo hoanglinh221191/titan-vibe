@@ -1,40 +1,59 @@
-# TITAN-VIBE 1.1.0 with executable and host source
+# TITAN-VIBE 1.2.0
 
-This archive provides:
-- `titan.exe`;
-- the complete buildable TITAN host source under `source/`;
+TITAN-VIBE reconstructs molecules and multi-chain assemblies across the
+periodic boundaries of molecular dynamics frames, in orthorhombic and
+triclinic cells, and reports for every frame whether the stored frame fixes
+the relative placement of the parts. The VIBE methods article uses this
+software.
+
+This package provides:
+- `titan-vibe.exe`, a Windows x86-64 executable;
+- the source of TITAN-VIBE under `source/`, which builds `titan-vibe` on
+  Windows and on Linux;
 - small examples with several snapshots each;
-- the 480 held-out inputs and replay drivers.
+- the 480 held-out inputs with their reference outputs, and replay drivers.
 
-VIBE is implemented in `source/src/pbctopo` of the host. The focused static
-library of the 1.0.x releases is no longer shipped. The VIBE methods article
-uses this software.
+## What TITAN-VIBE is
 
-The host is exported from TITAN commit
-`dcb2bb5ffbcc9cf27d843a55f53d31f765b01794`. HoloLift source, tests and runners are omitted
-(`HOLOLIFT ?= 0` in `source/Makefile`), and no HoloLift objects are linked.
-`titan.exe` accepts no `-pbctopo-temporal=hololift`. Other TITAN host functions
-remain.
+VIBE is implemented in the TITAN program (`source/src/pbctopo` and its host
+files). TITAN-VIBE is the VIBE-only build of TITAN: `source/` holds only the
+570 files that this build reads (154 C++ source files, about 8 MB):
+the structure, index, GROMACS topology and trajectory (xtc, trr) readers, the
+force-field library that types atoms when no topology is given, VIBE, the
+TITAN engine without its energy terms, and the PDB writer. None of TITAN's
+energy, solvation, kinetics or analysis modules is included.
+`source/src/vibe_only/README.md` explains how they are left out.
 
-The binary reports `0.2.0-dev.450+gdcb2bb5ffbcc.dirty`. Here `dirty` marks the documented source
-export (HoloLift excluded, build metadata pinned), not a change to the VIBE
-algorithm. This is the embedded TITAN host identity; the TITAN-VIBE
-distribution version is 1.1.0. Exact identities are in `SOURCE_AUDIT.json` and
-`titan_build_manifest.json`. `RELEASE_NOTES_v1.1.0.md` lists what changed
-since 1.0.3.
+- `titan-vibe` accepts the VIBE options and the input, output, frame and
+  thread options. Any other TITAN option is refused with a message, so no run
+  can reach a module that is not built.
+- `-h` and `-vibe-help` print the options and the meaning of every label.
+- Every run writes coordinates, so `-nocal=true` is required.
+
+The source is exported from TITAN commit `994ffa0ad9cd69488643ec8a1313e816ff4ef862`, and the executable
+reports `0.2.0-dev.467+g994ffa0ad9cd.dirty`. Here `dirty` marks the documented source export (only
+the VIBE-only files, build metadata pinned in `source/Makefile`), not a change
+to the VIBE algorithm. This is the embedded TITAN identity; the TITAN-VIBE
+distribution version is 1.2.0. Exact identities are in `SOURCE_AUDIT.json`
+and `titan_build_manifest.json`. `RELEASE_NOTES_v1.2.0.md` lists what
+changed since 1.1.0. On every check shipped here (the quick-start examples,
+the 480 held-out inputs and the 367 frames of five molecular systems) the
+outputs equal those of 1.1.0.
 
 ## Quick start
 
-VIBE runs inside the TITAN executable. Write one option per line in an
-argument file, then run it. Each example folder under `examples/quickstart`
-has its argument files; run them from that folder, and the outputs are written
-there:
+Write one option per line in an argument file, then run it. Each example
+folder under `examples/quickstart` has its argument files; run them from that
+folder, and the outputs are written there:
 
 ```powershell
 cd examples\quickstart\01_peptide_pair
-..\..\..\titan.exe -a arg.in
-..\..\..\titan.exe -vibe-help      # the options below and the meaning of every label
+..\..\..\titan-vibe.exe -a arg.in
+..\..\..\titan-vibe.exe -vibe-help      # the options below and the meaning of every label
 ```
+
+On Linux, after building (see Build), the executable is
+`../../../source/titan-vibe`.
 
 ### 1. A trajectory of a small assembly
 
@@ -130,16 +149,16 @@ lambda (r_i + r_j) in the input. Under periodic boundary conditions such a
 pair overlaps in the simulated system whatever placement is written, so it
 flags the input, not the placement.
 
-## Run without a compiler
+## Run without a compiler (Windows)
 
-Use Windows x86-64 on an AVX2/FMA-capable processor. The binary was built with
-Clang 22.1.4 and the portable profile, and it depends only on Windows/UCRT
-system DLLs. The Python drivers need Python 3.10 or newer and only the standard
-library. Run these commands from the extracted package directory in
-PowerShell:
+Use Windows x86-64 on an AVX2/FMA-capable processor. The executable
+(7.8 MB) was built with Clang 22.1.4 and the portable profile, and it
+depends only on Windows/UCRT system DLLs. The Python drivers need Python 3.10
+or newer and only the standard library. Run these commands from the extracted
+package directory in PowerShell:
 
 ```powershell
-.\titan.exe --version
+.\titan-vibe.exe --version
 python .\verify_package.py
 python .\run_quickstart.py --output .\my_quickstart
 python .\replay.py --output .\my_smoke
@@ -152,17 +171,70 @@ python .\replay.py --all --output .\my_480
   and component count. With `--all` it runs all 480 held-out inputs, each in
   its own directory, four one-thread processes at a time by default (`--jobs 1`
   runs them one after another). It compares each output PDB SHA-256 and the
-  scientific report fields with the reference outputs of this release, and
-  returns a nonzero exit code on any disagreement.
+  scientific report fields with the reference outputs, and returns a nonzero
+  exit code on any disagreement.
 - `REPLAY_RESULT.json` records the binary hash, the counts and the findings for
   every case.
-- Every driver refuses an existing output directory.
+- Every driver refuses an existing output directory, and every driver takes
+  `--binary` for another executable.
 
 This is an implementation replay of fixed inputs. It is not a new held-out
 experiment or an independent physical ground-truth assessment. The original
 endpoint table of the held-out confirmation is kept as
-`examples/heldout480/ARCHIVED_CASE_ENDPOINTS.csv`. The 1.0.3 references are
-kept in `examples/heldout480/manifest_v1.0.3.json`.
+`examples/heldout480/ARCHIVED_CASE_ENDPOINTS.csv`. The references are the
+outputs of release 1.1.0, which this release reproduces; the 1.0.3 references
+are kept in `examples/heldout480/manifest_v1.0.3.json`.
+
+## Build
+
+The source needs a C++23 compiler with OpenMP and GNU make; Eigen and the
+trajectory I/O source are included. `source/Makefile` builds `titan-vibe` by
+default (`VIBE_ONLY ?= 1`) and pins the source identity.
+
+### Windows
+
+The executable of this package was built with MSYS2 UCRT64 Clang 22.1.4, GNU
+make, LLVM LLD, GNU windres, Python, and the toolchain's OpenMP and static
+runtime libraries. In PowerShell, with that toolchain at
+`C:\msys64\ucrt64\bin`:
+
+```powershell
+$env:PATH = 'C:\msys64\ucrt64\bin;' + $env:PATH
+mingw32-make -C source -j 6 all
+.\source\titan-vibe.exe --version
+python .\run_quickstart.py --binary .\source\titan-vibe.exe --output .\rebuilt_quickstart
+python .\replay.py --binary .\source\titan-vibe.exe --all --output .\rebuilt_480
+```
+
+### Linux
+
+Tested with GCC 13.3.0 on Ubuntu 24.04.1 LTS under WSL2 (x86-64), statically linked:
+
+```bash
+make -C source CXX=g++-13 LDFLAGS="-static -fopenmp" -j 8 all
+./source/titan-vibe --version
+python3 run_quickstart.py --output rebuilt_quickstart
+python3 replay.py --all --coordinate-tolerance 0.001 --output rebuilt_480
+```
+
+`make -C source -j 8 all` builds with the system `g++` (GCC 13 or newer) an
+executable that loads only the C library at run time; it was also tested on
+the quick-start examples. On Linux the drivers use
+`source/titan-vibe` by default.
+
+GCC and Clang can round a coordinate differently in its last bit, and a PDB
+prints coordinates to 0.001 Å. The Linux build gives the quick-start results
+of `EXPECTED.json` and the 367 frames of the five molecular systems at PDB
+precision (`replay_real.py`, below). Of the 480 held-out outputs,
+459 are byte-identical to the references and 21
+differ in some coordinates by 0.001 Å, one unit of the last printed digit,
+with the same labels and report fields. `--coordinate-tolerance 0.001`
+accepts exactly this: the same records in the same order, coordinates within
+0.001 Å of `examples/heldout480/<case>/expected_oracle_v2_pbctopo.pdb`, and
+every report field equal except `wrapped_coordinate_hash`, a checksum of the
+wrapped input coordinates at full precision, which differs between the two
+compilers in every case. Do not assume byte-identical outputs across
+toolchains; use these checks.
 
 ## Reproduce the five molecular systems from the deposited data
 
@@ -196,32 +268,12 @@ analysis use the archived protocols in the data deposit and their own software.
 For other inputs, edit a copy of an argument file and run:
 
 ```powershell
-.\titan.exe -a 'D:\review\new_run\arg.in'
+.\titan-vibe.exe -a 'D:\review\new_run\arg.in'
 ```
 
 Output files are written to the working directory, so use a new working
-directory for each run. `.\titan.exe -vibe-help` lists the options and the
+directory for each run. `.\titan-vibe.exe -vibe-help` lists the options and the
 labels.
-
-## Build
-
-The host was built with MSYS2 UCRT64 Clang 22.1.4, GNU make, LLVM LLD, GNU
-windres, Python, and the toolchain's OpenMP and static runtime libraries. Eigen
-and the trajectory I/O source are included. In PowerShell, with that toolchain
-at `C:\msys64\ucrt64\bin`:
-
-```powershell
-$env:PATH = 'C:\msys64\ucrt64\bin;' + $env:PATH
-mingw32-make -C source PROFILE=portable -j 6 all
-.\source\titan.exe --version
-python .\run_quickstart.py --binary .\source\titan.exe --output .\rebuilt_quickstart
-python .\replay.py --binary .\source\titan.exe --all --output .\rebuilt_480
-```
-
-The Makefile pins the source identity and marks the HoloLift-excluded build as
-modified. Its Linux rules are included, but no Linux executable of this release
-has been built or validated. Do not assume byte-identical binaries across
-toolchains; use the reconstruction checks above.
 
 ## Retained contacts
 
@@ -238,8 +290,10 @@ set.
 ## Provenance and licenses
 
 - `SHA256SUMS.txt` covers the packaged files.
-- `validation/` holds the validation records of this release.
+- `validation/` holds the validation records of this release, for the Windows
+  executable and for the Linux build.
 - `source/LICENSE` is the TITAN license. Third-party notices in the included
   source and force-field files are retained.
+- `source/SOURCE_PROVENANCE.json` records how the source tree was exported.
 - The example topologies are reduced to the sections VIBE reads (see each
   example's README), so they are not simulation topologies.

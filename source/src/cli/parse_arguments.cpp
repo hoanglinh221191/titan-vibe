@@ -5,6 +5,9 @@
 #include "titan_build_info.h"
 #include "titan_ui.h"
 #include "titan_version_info.h"
+#ifdef TITAN_VIBE_ONLY
+#include "vibe_only/option_allowlist.h"
+#endif
 #include <algorithm>
 #include <cctype>
 #include <cmath>
@@ -62,6 +65,12 @@ int arguments::parse_arguments(int argc, char **argv) {
     // Remember what is being parsed so a std::sto* failure can name the option
     // instead of surfacing a bare "stoi"/"stod".
     titan_cli::active_option_token() = argv[i];
+#ifdef TITAN_VIBE_ONLY
+    if (!titan_vibe_only::option_allowed(argv[i])) {
+      titan_vibe_only::report_refused_option(argv[i]);
+      return titan_cli::kInvalidArguments;
+    }
+#endif
     const std::string arg = normalize_pbe_cli_alias(string(argv[i]));
     std::string common_value;
 

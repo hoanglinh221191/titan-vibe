@@ -1,0 +1,106 @@
+{
+  "binary_sha256": "c313c6d4d04392c4a2aae8279e6aa60964a091300346ee632ae75bf959bb7dfd",
+  "all_frames_requested": true,
+  "all_pass": true,
+  "systems_completed": 7,
+  "results": {
+    "S1_tetramer/A": {
+      "exit_code": 0,
+      "elapsed_s": 21.13056190200001,
+      "atom_records": 2575904,
+      "coordinates_identical_at_PDB_precision": true,
+      "frames": 101,
+      "fields_changed_from_1_0_3": {
+        "status": 1,
+        "evidence_state": 1,
+        "fallback_reason": 1
+      },
+      "field_mismatches": [],
+      "scientific_fields_identical": true,
+      "route_changes": 97,
+      "input_checksum_changes": 0,
+      "pass": true
+    },
+    "S1_tetramer/t116400": {
+      "exit_code": 0,
+      "elapsed_s": 1.3766146890000073,
+      "atom_records": 25504,
+      "coordinates_identical_at_PDB_precision": true,
+      "frames": 1,
+      "fields_changed_from_1_0_3": {},
+      "field_mismatches": [],
+      "scientific_fields_identical": true,
+      "route_changes": 0,
+      "input_checksum_changes": 0,
+      "pass": true
+    },
+    "S2_hexamer/A": {
+      "exit_code": 0,
+      "elapsed_s": 34.001802282,
+      "atom_records": 3863452,
+      "coordinates_identical_at_PDB_precision": true,
+      "frames": 101,
+      "fields_changed_from_1_0_3": {},
+      "field_mismatches": [],
+      "scientific_fields_identical": true,
+      "route_changes": 0,
+      "input_checksum_changes": 0,
+      "pass": true
+    },
+    "S3_protein_glycan/A": {
+      "exit_code": 0,
+      "elapsed_s": 27.04306808299998,
+      "atom_records": 1453693,
+      "coordinates_identical_at_PDB_precision": true,
+      "frames": 101,
+      "fields_changed_from_1_0_3": {},
+      "field_mismatches": [],
+      "scientific_fields_identical": true,
+      "route_changes": 100,
+      "input_checksum_changes": 0,
+      "pass": true
+    },
+    "S3_protein_glycan/t112000": {
+      "exit_code": 0,
+      "elapsed_s": 1.4167787089999706,
+      "atom_records": 14393,
+      "coordinates_identical_at_PDB_precision": true,
+      "frames": 1,
+      "fields_changed_from_1_0_3": {},
+      "field_mismatches": [],
+      "scientific_fields_identical": true,
+      "route_changes": 0,
+      "input_checksum_changes": 0,
+      "pass": true
+    },
+    "S4_peptide_pair/A": {
+      "exit_code": 0,
+      "elapsed_s": 1.5184927459999926,
+      "atom_records": 38874,
+      "coordinates_identical_at_PDB_precision": true,
+      "frames": 31,
+      "fields_changed_from_1_0_3": {
+        "evidence_state": 3,
+        "fallback_reason": 3
+      },
+      "field_mismatches": [],
+      "scientific_fields_identical": true,
+      "route_changes": 30,
+      "input_checksum_changes": 8,
+      "pass": true
+    },
+    "S5_phase_separated/A": {
+      "exit_code": 0,
+      "elapsed_s": 3.0727784279999923,
+      "atom_records": 329344,
+      "coordinates_identical_at_PDB_precision": true,
+      "frames": 31,
+      "fields_changed_from_1_0_3": {},
+      "field_mismatches": [],
+      "scientific_fields_identical": true,
+      "route_changes": 0,
+      "input_checksum_changes": 0,
+      "pass": true
+    }
+  }
+}

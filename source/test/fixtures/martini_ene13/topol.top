@@ -1,9 +1,0 @@
-; written by test/fixtures/martini_ene13/make_fixture.py
-#include "martini_subset.itp"
-#include "cgpep.itp"
-
-[ system ]
-CGPEP dimer for the ENE-13 oracle
-
-[ molecules ]
-CGPEP 2

@@ -2831,7 +2831,8 @@ IMPORTANT NOTES
         R"MANUAL(                        hololift is not available in this build (HOLOLIFT=0).
 )MANUAL"
 #else
-        R"MANUAL(                        hololift runs HoloLift-MD after VIBE: the relative
+        R"MANUAL(                        hololift runs HoloLift after VIBE (short reference:
+                        -hololift-help): the relative
                         periodic images of the components are selected for the
                         whole trajectory by exact dynamic programming, with a
                         charge on selections that lack contact evidence, and
@@ -3604,6 +3605,7 @@ IMPORTANT NOTES
 
   -h, --help            Print help message
   -vibe-help            Short reference for VIBE (-pbctopo) and its frame report
+  -hololift-help        Short reference for HoloLift (-pbctopo-temporal=hololift)
   -v, --version         Print build number
 
 ================================================================================
@@ -3615,13 +3617,19 @@ IMPORTANT NOTES
 }
 
 void arguments::vibe_help_print() {
-  cout << R"VIBE(
-TITAN-VIBE quick reference                  (all TITAN options: titan.exe -h)
-
+#ifdef TITAN_VIBE_ONLY
+  // The VIBE-only build has no other options, and its executable is titan-vibe.
+  const char *head = "\nTITAN-VIBE quick reference\n";
+  const char *run = "titan-vibe -a arg.in";
+#else
+  const char *head = "\nTITAN-VIBE quick reference                  (all TITAN options: titan.exe -h)\n";
+  const char *run = "titan.exe -a arg.in";
+#endif
+  cout << head << R"VIBE(
 VIBE places every part of a periodic frame (a molecule, or a chain of a
 complex) at the lattice image that keeps the contacts it makes in the
 simulation, and labels how far the contacts determine that placement.
-Run it with an argument file, one option per line:  titan.exe -a arg.in
+Run it with an argument file, one option per line:  )VIBE" << run << R"VIBE(
 
 Input
   -f=frames.pdb             multi-model PDB, a CRYST1 record in every model
@@ -3682,4 +3690,92 @@ Frame report: other columns
   bonded_winding_rank  > 0 when a bonded cycle itself runs through the boundary
                        (fallback_reason bonded_winding)
 )VIBE";
+}
+
+void arguments::hololift_help_print() {
+#ifdef TITAN_WITHOUT_HOLOLIFT
+  cout << "HoloLift is not part of this build (HOLOLIFT=0).\n";
+#else
+  cout << R"HOLOLIFT(
+HoloLift quick reference                    (all TITAN options: titan.exe -h)
+
+What it does
+  In a periodic simulation every molecule has many copies, one per cell.  For
+  each frame VIBE lists the placements of the molecules that the frame allows,
+  ranked, and keeps its first choice; that choice is made for one frame at a
+  time.  HoloLift chooses one placement per frame for the whole trajectory at
+  once, so that the molecules move continuously: it moves a molecule to
+  another copy of its partner only where the contacts in the frames call for
+  it.  The answer is exact on VIBE's candidate lists.
+
+Run it
+  Write the options into a file, one per line, and run
+      titan.exe -a arg.in
+  in the folder that should receive the output.
+
+    -s=reference.pdb        a structure in the atom order of the trajectory;
+                            its atom records name the atoms of the output PDB
+    -traj=run.xtc           the trajectory (XTC)
+    -n=index.ndx  -g=0-0    index file; group 0 holds the molecules to follow
+    -common_topo=topol.top  GROMACS topology of the system; its bonds define
+                            the molecules
+    -ff=charmm36            force field of the topology, with
+    -path-a=<folder>        -path-a and -path-n pointing at the forcefields
+    -path-n=<folder>        folder of the release
+    -pbctopo=true           VIBE, the reconstruction of each frame
+    -pbctopo-temporal=hololift
+                            HoloLift after VIBE
+    -nocal=true             coordinates only, no energy terms
+    -no-dssp=true  -noprint-side_chain_contact=true
+                            skip TITAN's structure analyses
+    -nt=8                   threads (no thread count changes a result)
+    -b=<ps> -e=<ps> -dt=<ps>
+                            optional: first and last time, and stride
+
+  A worked example with known answer: examples/01_separation, explained step
+  by step in docs/TUTORIAL.md.
+
+The line to look at
+  A run ends with one line on the screen; for examples/01_separation
+    PASS system=hololift frames=250 ... evidence_unsupported=0 ...
+         changed=60 gaps=0 ...
+  frames                frames read
+  changed               frames where HoloLift chose differently from VIBE's
+                        first choice for that frame
+  evidence_unsupported  frames where HoloLift kept a placement without contact
+                        evidence although another placement had it; 0 means
+                        every frame keeps the contacts it shows
+  gaps                  frames VIBE could not reconstruct; the path is solved
+                        separately on each side of a gap
+  Any line other than PASS, and any exit code other than 0, is an error; its
+  class (TRAJECTORY_ERROR, SOLVE_ERROR, ...) is printed on standard error.
+
+Output files, in the working directory
+  hololift_coordinates.xtc  the reconstructed trajectory of the -g group (nm)
+  hololift_coordinates.pdb  its first frame: load it, then the XTC, in VMD,
+                            PyMOL or ChimeraX
+  hololift_frame_results.csv
+                            one row per frame:
+                              framewise_* = VIBE's first choice
+                              temporal_*  = HoloLift's choice
+                              *_component_images = the cell shift (a:b:c) of
+                                each molecule, separated by |
+                              changed_from_framewise = 1 where they differ
+  hololift_system_summary.csv
+                            the totals of the run and the settings used
+  hololift_segment_results.csv, hololift_coordinates.csv,
+  hololift_policy_admissions.csv
+                            details: see docs/TUTORIAL.md
+  pbctopo_*.csv             the VIBE results HoloLift read (see -vibe-help)
+
+Settings
+  titan.exe runs HoloLift with its default settings: only placements that VIBE
+  certified are used, rank weight 1, transition weight 1, and a charge of 1000
+  on a placement without contact evidence when another one has it.  The
+  written coordinates keep HoloLift's relative placements and follow the
+  motion of the whole assembly across cells, also when the box changes size.
+  The standalone runner (tools/hololift_temporal_value_runner.cpp) takes other
+  settings as environment variables; see README.md.
+)HOLOLIFT";
+#endif
 }

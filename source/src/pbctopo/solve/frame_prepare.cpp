@@ -1,5 +1,7 @@
 #include "pbctopo/solve/solver.h"
 
+#include "pbctopo/anchor_mst_rigid.h"
+
 #include "Multi_MOL.h"
 #include "titan_executor.h"
 
@@ -36,11 +38,30 @@ void PbctopoFrameSolver::ensure_component_context() {
             static_cast<size_t>(component_context_shell_radius));
     timing.component_image_shell_max_shift_count =
         max(timing.component_image_shell_max_shift_count, shifts.size());
+    // Component placements translate component_atoms component by component.
+    base_anchor_context.rigid_anchor_mst =
+        titan_pbctopo::make_pbctopo_rigid_anchor_mst(component_atoms,
+                                                     components);
+  } else {
+    base_anchor_context.rigid_anchor_mst.reset();
   }
   component_context_ready = true;
   ++timing.component_context_builds;
   timing.component_context_s +=
       chrono::duration<double>(clock::now() - component_context_started).count();
+}
+
+const titan_pbctopo::PbctopoEdgeImageCache *
+PbctopoFrameSolver::ensure_edge_image_cache() {
+  if (!certification_lattice.has_value())
+    return nullptr;
+  if (!edge_image_cache.has_value() ||
+      !edge_image_cache->matches(base_atoms, local_edges,
+                                 *certification_lattice)) {
+    edge_image_cache = titan_pbctopo::build_pbctopo_edge_image_cache(
+        base_atoms, local_edges, *certification_lattice);
+  }
+  return &*edge_image_cache;
 }
 
 vector<Int3> PbctopoFrameSolver::extract_offsets_and_time(const vector<PbctopoAtom> &source_atoms,
@@ -140,6 +161,7 @@ PbctopoComponentSearchCallbacks PbctopoFrameSolver::make_frame_component_search_
       component_atoms.size() == base_atoms.size();
   callbacks.hard_certificate_domain_complete =
       component_certificate_domain_complete();
+  callbacks.executor = executor;
   return callbacks;
 }
 

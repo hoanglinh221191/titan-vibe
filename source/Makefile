@@ -4,12 +4,13 @@
 # Tích hợp Auto Dependency Tracking (.d)
 # ==========================================
 
-# Pinned source-export provenance; HoloLift exclusion is a local build change.
-export TITAN_GIT_COMMIT = dcb2bb5ffbcc9cf27d843a55f53d31f765b01794
-export TITAN_BUILD_NUMBER = 450
+# TITAN-VIBE source tree: it holds only the files of the VIBE-only build, which is the
+# default here (VIBE_ONLY ?= 1). Pinned source-export provenance (the export is marked modified).
+export TITAN_GIT_COMMIT = 994ffa0ad9cd69488643ec8a1313e816ff4ef862
+export TITAN_BUILD_NUMBER = 467
 export TITAN_GIT_DIRTY = true
 export TITAN_RELEASE_BUILD = false
-export SOURCE_DATE_EPOCH = 1794904592
+export SOURCE_DATE_EPOCH = 1795488964
 PROFILE ?= portable
 TOOLCHAIN ?= auto
 TITAN_CXX23_FLOOR ?= clang20-gxx13
@@ -185,9 +186,24 @@ BIE_SRCS = $(wildcard $(SRC_ROOT)/bie/*.cpp) \
 PBE_SRCS  = $(wildcard $(SRC_ROOT)/tabi/*.cpp) $(BIE_SRCS) $(PBE_GRID_SRCS)
 PBCTOPO_SRCS = $(wildcard $(SRC_ROOT)/pbctopo/*.cpp) \
                $(wildcard $(SRC_ROOT)/pbctopo/solve/*.cpp)
+# VIBE_ONLY=1 builds TITAN-VIBE (executable titan-vibe): VIBE (-pbctopo) with
+# the structure, index, topology and trajectory readers and the PDB writer, and
+# none of the energy, solvation, kinetics or analysis modules. It implies
+# HOLOLIFT=0. The options it accepts and the entry points of the modules it
+# leaves out are in src/vibe_only/ (see src/vibe_only/README.md). Objects go to
+# $(BUILD_ROOT)/vibe-$(PROFILE).
+VIBE_ONLY ?= 1
+ifeq ($(VIBE_ONLY),1)
+ifeq ($(HOLOLIFT),1)
+    $(error VIBE_ONLY=1 builds without HoloLift; drop HOLOLIFT=1)
+endif
+HOLOLIFT = 0
+COMMON_CXX_DEFINES += -DTITAN_VIBE_ONLY=1
+BUILD_DIR = $(BUILD_ROOT)/vibe-$(PROFILE)
+endif
 # HOLOLIFT=0 builds without HoloLift-MD (src/hololift is neither compiled nor
 # needed); -pbctopo-temporal=hololift is then refused.
-HOLOLIFT ?= 0
+HOLOLIFT ?= 1
 ifeq ($(HOLOLIFT),0)
 HOLOLIFT_SRCS =
 COMMON_CXX_DEFINES += -DTITAN_WITHOUT_HOLOLIFT=1
@@ -206,6 +222,20 @@ GBSA_SRCS = $(wildcard $(SRC_ROOT)/gbsa/*.cpp)
 ENERGY_SRCS = $(wildcard $(SRC_ROOT)/energy/*.cpp)
 SRCS  = $(ROOT_SRCS) $(CLI_SRCS) $(PBE_SRCS) $(PBCTOPO_SRCS) $(HOLOLIFT_SRCS) $(TITAN_PATH_SRCS) $(GMXTRAJ_SRCS) $(PTOPO_SRCS) \
         $(POSTPROC_SRCS) $(ENGINE_SRCS) $(NOCAL_SRCS) $(TOPOLOGY_SRCS) $(FREE_ENERGY_SRCS) $(GBSA_SRCS) $(ENERGY_SRCS)
+ifeq ($(VIBE_ONLY),1)
+VIBE_ROOT_SRCS = $(addprefix $(SRC_ROOT)/,$(addsuffix .cpp, \
+    Main arguments help initialization misc folder gen_inputlist memory_utils \
+    MOL Multi_MOL groups parse_pdb pre_proc_pdb parse_coordinate_1_file take_coordinates \
+    post_process_nucleotides take_com sup_funccpp write_coor chunk_streamer \
+    solve_pbc solv_pbc_pbctopo solv_pbc_new_al solv_pbc_cluster solv_pbc_reffile sup_solv_pbc clust \
+    pbctopo_hull titan_gyration titan_alignment titan_executor titan_config_schema \
+    titan_output_manifest titan_performance_observer titan_segment_config))
+SRCS = $(VIBE_ROOT_SRCS) $(CLI_SRCS) $(filter-out $(SRC_ROOT)/engine/frame.cpp,$(ENGINE_SRCS)) \
+       $(addprefix $(SRC_ROOT)/gmxtraj/,xdrfile.cpp xdrfile_trr.cpp xdrfile_xtc.cpp) $(NOCAL_SRCS) \
+       $(PBCTOPO_SRCS) $(filter-out $(SRC_ROOT)/topology/nonbonded_row_kernel.cpp,$(TOPOLOGY_SRCS)) \
+       $(wildcard $(SRC_ROOT)/vibe_only/*.cpp)
+TARGET := $(patsubst titan%,titan-vibe%,$(TARGET))
+endif
 OBJS  = $(patsubst %.cpp,$(BUILD_DIR)/%.o,$(SRCS))
 DEPS  = $(OBJS:.o=.d)
 

@@ -86,6 +86,13 @@ using namespace std;
 // coordinates keep HoloLift's relative images and unwrap the common translation with the displacement-preserving
 // (toroidal) scheme, so they serve transport under constant pressure directly.
 static int run_engine(arguments &Arguments) {
+#ifdef TITAN_VIBE_ONLY
+  // TITAN-VIBE has no energy terms: every run is a coordinate run.
+  if (!Arguments.flag_nocal) {
+    TitanUI::print_error("TITAN-VIBE writes coordinates only; set -nocal=true (see -vibe-help).");
+    return titan_cli::kInvalidArguments;
+  }
+#endif
   const int status = engine(Arguments);
   if (status != 0 || !Arguments.pbc.solv_pbctopo || Arguments.pbc.pbctopo_temporal != "hololift")
     return status;
@@ -128,6 +135,11 @@ int main(int argc, char **argv) {
         return 0;
       if (parse_status != titan_cli::kNoArgumentFile)
         return parse_status;
+#ifdef TITAN_VIBE_ONLY
+      TitanUI::print_error("TITAN-VIBE reads its options from the command line or from an argument file "
+                           "(-a arg.in); see -vibe-help.");
+      return titan_cli::kInvalidArguments;
+#endif
       Arguments.parse_arguments_interactive(argc);
       return run_engine(Arguments);
     }

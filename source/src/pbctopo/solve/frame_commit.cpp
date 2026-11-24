@@ -54,6 +54,8 @@ bool PbctopoFrameSolver::certify_and_commit() {
       band_candidates.resize(band_size);
       band_points.resize(band_size);
       band_work.resize(band_size);
+      // Built here, on the frame's thread, so that the workers find it.
+      ensure_edge_image_cache();
       executor->parallel_for(
           band_size, band_workers, 1,
           [&](size_t, size_t begin, size_t end) {

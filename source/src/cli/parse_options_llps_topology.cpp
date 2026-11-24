@@ -497,13 +497,27 @@ arguments::OptionStep arguments::parse_options_llps_topology(int argc,
     vibe_help_print();
     return option_exit(2);
   }
+  if (string(argv[i]) == "-hololift-help" || string(argv[i]) == "--hololift-help") {
+    hololift_help_print();
+    return option_exit(2);
+  }
   if (string(argv[i]) == "-h" || string(argv[i]) == "--help") {
     help = true;
+#ifdef TITAN_VIBE_ONLY
+    // TITAN-VIBE has only the VIBE options; the full TITAN reference does not apply.
+    vibe_help_print();
+    return option_exit(2);
+#else
     if (help_print() == 0)
       return option_exit(2);
+#endif
   }
   if (string(argv[i]) == "-v" || string(argv[i]) == "--version") {
+#ifdef TITAN_VIBE_ONLY
+    cout << "TITAN-VIBE (VIBE-only build of TITAN " << titan_build::full_version() << ")\n"
+#else
     cout << "TITAN " << titan_build::full_version() << '\n'
+#endif
          << "Version: " << titan_build::product_version() << '\n'
          << "Build number: " << titan_build::build_number_string() << '\n'
          << "Commit: " << titan_build::git_commit_short() << " ("

@@ -1,15 +1,16 @@
 """Run the five systems directly from the 11 September deposited data archive.
 
 The reconstructed atom records are compared with the deposited outputs at PDB precision. The
-scientific report fields are compared with validation/REAL367_FIELDS_v1.1.0.csv, the outputs of this
-release; the fields that differ from the deposited 1.0.3 reports are counted separately (release
-1.1.0 labels contact networks that close through the boundary as extended_periodic).
+scientific report fields are compared with validation/REAL367_FIELDS_v1.1.0.csv, the outputs of release
+1.1.0, which later releases must reproduce; the fields that differ from the deposited 1.0.3 reports are
+counted separately (release 1.1.0 labels contact networks that close through the boundary as
+extended_periodic).
 
   python replay_real.py --data-root <vibe_data_update_20260911> --output <new dir> [--all-frames]
   python replay_real.py ... --write-fields <csv>   # record the fields of this run (release builder)
 """
 from pathlib import Path
-import argparse, csv, json, subprocess, time, hashlib
+import argparse, csv, json, os, subprocess, time, hashlib
 
 FIELDS = ('status', 'mode', 'component_count', 'evidence_state', 'fallback_reason', 'hard_feasible',
           'hard_certified', 'evidence_graph_connected', 'soft_observed_contacts_checked',
@@ -21,6 +22,16 @@ FIELDS = ('status', 'mode', 'component_count', 'evidence_state', 'fallback_reaso
 # Recorded, not compared: the search route name (equal outputs can be reached by different routes) and
 # the input checksum, which follows the last bits of the cell matrix; the coordinates are compared.
 RECORDED = ('mode', 'wrapped_coordinate_hash')
+
+
+def default_binary():
+    """titan-vibe.exe in this package on Windows; source/titan-vibe (the Linux build) elsewhere."""
+    root = Path(__file__).resolve().parent
+    names = ['titan-vibe.exe'] if os.name == 'nt' else ['titan-vibe']
+    candidates = [root / n for n in names] + [root / 'source' / n for n in names]
+    if os.name != 'nt':
+        candidates.reverse()
+    return next((c for c in candidates if c.is_file()), candidates[0])
 
 
 def coordinates(path, first_only):
@@ -40,7 +51,8 @@ def main():
     p.add_argument('--output', required=True, type=Path, help='New directory; existing directories are refused')
     p.add_argument('--all-frames', action='store_true', help='All 367 comparison frames; default first frame of each system')
     p.add_argument('--only-extras', action='store_true', help='Only the two additional Figure 1 frames')
-    p.add_argument('--binary', type=Path, default=Path(__file__).resolve().parent / 'titan.exe')
+    p.add_argument('--binary', type=Path, default=default_binary(),
+                   help='Default: titan-vibe.exe (Windows) or source/titan-vibe (Linux) in this package')
     p.add_argument('--write-fields', type=Path, help='Write the report fields of this run to this CSV')
     a = p.parse_args()
     here = Path(__file__).resolve().parent

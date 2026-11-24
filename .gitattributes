@@ -16,3 +16,4 @@
 *.tpr binary
 *.exe binary
 *.zip binary
+*.pdb text eol=lf
